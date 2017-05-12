@@ -1,4 +1,16 @@
 WillowSword::Engine.routes.draw do
-  get '/service_document', to: 'service_document#index', defaults: {format: 'xml'}
+  # Nb. "resource" does not include the :index method; whereas "resources" does. It is intended for singular resources.
+  # Cf. http://guides.rubyonrails.org/routing.html
+
+  defaults format: :xml do
+    root to: 'service_documents#show' # points / to /service_document
+
+    resource :service_document, only: [:show]
+    resources :collections, only: [:show] do
+      resources :works, only: [:show]
+    end
+
+  end
+
 
 end

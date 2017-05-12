@@ -1,9 +1,9 @@
 require_dependency "willow_sword/application_controller"
 
 module WillowSword
-  class ServiceDocumentController < ApplicationController
+  class ServiceDocumentsController < ApplicationController
 
-    def index
+    def show
       @collections = Collection.ordered
     end
 

@@ -2,8 +2,9 @@ xml.service('xmlns:atom':"http://www.w3.org/2005/Atom", 'xmlns:dcterms':"http://
   xml.sword :version, "2.0"
   xml.sword :maxUploadSize, @maxUploadSize if @maxUploadSize
   xml.workspace({collections: @collections.count}) do
+    xml.atom :title, "Willow Sword"
     @collections.each do |collection|
-      xml.collection(href:"TODO.url") do
+      xml.collection(href: collection_url(collection)) do
         xml.atom :title, collection.title.join(", ")
         xml.accept "*/*"
         xml.accept(alternate:"multipart-related") do xml.text! "*/*" end
@@ -14,7 +15,6 @@ xml.service('xmlns:atom':"http://www.w3.org/2005/Atom", 'xmlns:dcterms':"http://
         xml.sword :acceptPackaging, "http://purl.org/net/sword/package/SimpleZip"
         xml.sword :acceptPackaging, "http://purl.org/net/sword/package/Binary"
         xml.sword :acceptPackaging, "http://purl.org/net/sword/package/METSDSpaceSIP"
-        xml.sword :service, "TODO.url"
       end
     end
   end
