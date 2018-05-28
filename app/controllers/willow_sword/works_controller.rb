@@ -2,49 +2,40 @@ require_dependency "willow_sword/application_controller"
 
 module WillowSword
   class WorksController < ApplicationController
+    include WillowSword::FetchHeaders
+    include WillowSword::MultipartDeposit
+    include WillowSword::AtomEntryDeposit
+    include WillowSword::BinaryDeposit
+    include WillowSword::ProcessDeposit
+
     def show
       @work = nil
     end
 
     def create
-      # support multiple content-types
-      #   application/zip = Resource with a Binary File Deposit
-      #   multipart/related = Resource with a Multipart Deposit
-      #   application/atom+xml;type=entry = Resource with an Atom Entry
-      puts params
-      validate_headers
-      render json: nil, status: :created, location: collection_work_url(params[:collection_id], 'new_id')
-    end
-
-    private
-    def validate_headers
-      puts request.headers
-      puts '-'*50
-      # request.headers["Content-disposition"]
-      # Choose based on content type
-      case request.content_type
-      when 'multipart/related'
-        validate_multipart
-      when 'application/atom+xml;type=entry'
-        validate_atom_entry
+      if validate_request
+        render json: nil, status: :created, location: collection_work_url(params[:collection_id], 'new_id')
       else
-        validate_default
+        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code 
       end
     end
 
-    def validate_multipart
-      puts 'multi-part'
-      true
-    end
+    private
 
-    def validate_atom_entry
-      puts 'atom-entry'
-      true
-    end
-
-    def validate_default
-      puts 'default'
-      true
+    def validate_request
+      fetch_headers
+      # Choose based on content type
+      case request.content_type
+      when 'multipart/related'
+        multipart_not_supported
+      when 'application/atom+xml;type=entry'
+        atom_entry_not_supported
+      else
+        validate_binary
+        save_binary_data
+        fetch_data_content_type
+        validate_data
+      end
     end
 
   end
