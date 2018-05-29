@@ -20,12 +20,9 @@ module WillowSword
       when 'application/zip'
         # process zip
         puts 'process zip'
+        process_zip
         # TODO: match with content_type and packaging
         # TODO: verify md5 sum
-        # TODO: Unzip file
-        # TODO: validate if it is a bag
-        # TODO: crosswalk metadata
-        # TODO: Add to Hyrax
         true
       when 'application/xml'
         # process xml
@@ -36,11 +33,35 @@ module WillowSword
         # TODO: Add to Hyrax
         true
       else
-        puts 'Unknow format of data'
-        message = 'Server does not support this content type'
+        puts 'Unknown format of data'
+        message = "Server does not support the content type #{@data_content_type}"
         @error = WillowSword::Error.new(message, type = :method_not_allowed)
         false
       end
+    end
+
+    def process_zip
+      # unzip file
+      contents = File.join(@dir, 'contents')
+      zp = WillowSword::ZipPackage.new(@file.path, contents)
+      zp.unzip_file
+      # validate or create bag
+      bag = WillowSword::BagPackage.new(contents, File.join(@dir, 'bag'))
+      data_files = bag.package.bag_files - [File.join(bag.package.data_dir, 'envFormat.md')]
+      # Extract metadata
+      xw = WillowSword::DcCrosswalk.new(File.join(bag.data_dir, 'metadata.xml'))
+      metadata = xw.metadata
+      puts metadata
+      puts '-'*50
+      puts data_files
+      puts '-'*50
+      # create work
+      create_work(metadata, data_files)
+    end
+
+    def create_work(metadata, data_files)
+      puts 'In create work'
+      true
     end
 
   end
