@@ -12,16 +12,17 @@ module WillowSword
       puts 'saving body'
       puts request.body.length
       @file = nil
+      @dir = nil
       if request.body.length > 0
-        filepath = File.join('tmp/data', SecureRandom.uuid)
-        unless File.directory?(filepath)
-          FileUtils.mkdir_p(filepath)
+        @dir = File.join('tmp/data', SecureRandom.uuid)
+        unless File.directory?(@dir)
+          FileUtils.mkdir_p(@dir)
         end
-        @file = File.open(File.join(filepath, @filename), 'wb')
+        @file = File.open(File.join(@dir, @filename), 'wb')
         @file.write(request.body.read)
         @file.close
         puts "File path: #{@file.path}"
-        # @file.unlink 
+        # @file.unlink
       end
     end
 
