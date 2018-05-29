@@ -47,9 +47,9 @@ module WillowSword
       zp.unzip_file
       # validate or create bag
       bag = WillowSword::BagPackage.new(contents, File.join(@dir, 'bag'))
-      data_files = bag.package.bag_files - [File.join(bag.package.data_dir, 'envFormat.md')]
+      data_files = bag.package.bag_files - [File.join(bag.package.data_dir, 'metadata.xml')]
       # Extract metadata
-      xw = WillowSword::DcCrosswalk.new(File.join(bag.data_dir, 'metadata.xml'))
+      xw = WillowSword::DcCrosswalk.new(File.join(bag.package.data_dir, 'metadata.xml'))
       metadata = xw.metadata
       puts metadata
       puts '-'*50

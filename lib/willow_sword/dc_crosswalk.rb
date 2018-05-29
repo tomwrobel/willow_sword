@@ -3,17 +3,15 @@ module WillowSword
     attr_reader :metadata
     def initialize(src_file)
       @src_file = src_file
-      @metadata = xml_to_json
+      @metadata = {}
+      map_xml
     end
     def map_xml
-      @metadata = nil
       return metadata unless File.exist? @src_file
-      doc = File.open(@src_file) { |f| Nokogiri::XML(f) }
+      f = File.open(@src_file)
+      doc = Nokogiri::XML(f)
       # doc = Nokogiri::XML(@xml_metadata)
       doc.remove_namespaces!
-      @metadata = []
-      # abstract
-      # creator
       terms = %w(abstract accessRights accrualMethod accrualPeriodicity
         accrualPolicy alternative audience available bibliographicCitation
         conformsTo contributor coverage created creator date dateAccepted
@@ -30,6 +28,7 @@ module WillowSword
         end
         @metadata[term.to_sym] = values unless values.blank?
       end
+      f.close
     end
   end
 end
