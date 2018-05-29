@@ -9,10 +9,9 @@ module WillowSword
     def initialize(src, dst)
       @src = src
       @dst = dst
-      @package = ::BagIt::Bag.new(@dst)
       @src = File.join(src, '/') if File.directory?(src)
       @dst = File.join(dst, '/') if File.directory?(dst)
-
+      assign_package
     end
 
     def create_bag
@@ -23,6 +22,17 @@ module WillowSword
         @package.add_file(relative_path, src_path=file_path.to_path)
       end
       @package.manifest!
+    end
+
+    def assign_package
+      src_package = ::BagIt::Bag.new(@src)
+      dst_package = ::BagIt::Bag.new(@dst)
+      if src_package.valid?
+        @package = src_package
+      else
+        @package = dst_package
+        create_bag unless @package.valid?
+      end
     end
   end
 end
