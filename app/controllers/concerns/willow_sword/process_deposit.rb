@@ -12,23 +12,22 @@ module WillowSword
       @data_content_type = `file --b --mime-type "#{@file.path}"`.strip
       puts "Mime type: #{@data_content_type}"
       # @extension = Rack::Mime::MIME_TYPES.invert[mime_type]
+      # TODO: match with content_type and packaging
+      puts "Content type from header: #{@content_type}"
+      puts "Content type from data: #{@data_content_type}"
     end
 
-    def validate_data
-      # Validate against hash
+    def process_data
+      # process the saved data
       case @data_content_type
       when 'application/zip'
         # process zip
         puts 'process zip'
         process_zip
-        # TODO: match with content_type and packaging
-        # TODO: verify md5 sum
         true
       when 'application/xml'
         # process xml
         puts 'process xml'
-        # TODO: match with content_type and packaging
-        # TODO: verify md5 sum
         # TODO: crosswalk metadata
         # TODO: Add to Hyrax
         true
@@ -60,6 +59,9 @@ module WillowSword
     end
 
     def create_work(metadata, data_files)
+      # This method can be in
+      #   controllers/concerns/willow_sword/hyrax/works_behavior and
+      #   controllers/concerns/willow_sword/hyrax_api/works_behavior
       puts 'In create work'
       true
     end
