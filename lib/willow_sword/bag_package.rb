@@ -11,6 +11,7 @@ module WillowSword
       @dst = dst
       @src = File.join(src, '/') if File.directory?(src)
       @dst = File.join(dst, '/') if File.directory?(dst)
+      @package = nil
       assign_package
     end
 
@@ -25,14 +26,21 @@ module WillowSword
     end
 
     def assign_package
-      src_package = ::BagIt::Bag.new(@src)
-      dst_package = ::BagIt::Bag.new(@dst)
-      if src_package.valid?
-        @package = src_package
+      if File.exist?(File.join(@src, 'bagit.txt')) &&
+        File.exist?(File.join(@src, 'bag-info.txt'))
+        @package = ::BagIt::Bag.new(@src)
       else
-        @package = dst_package
+        @package = ::BagIt::Bag.new(@dst)
         create_bag unless @package.valid?
       end
+      # src_package = ::BagIt::Bag.new(@src)
+      # dst_package = ::BagIt::Bag.new(@dst)
+      # if src_package.valid?
+      #   @package = src_package
+      # else
+      #   @package = dst_package
+      #   create_bag unless @package.valid?
+      # end
     end
   end
 end
