@@ -42,13 +42,13 @@ module WillowSword
       # require 'digest/md5'
       # md5 = Digest::MD5.new
       # request.body.each { |line| md5.update(line) }
-      md5 = `md5sum "#{@file.path}" | awk '{ print $1 }'`
-      if md5 != @md5hash
+      md5 = `md5sum "#{@file.path}" | awk '{ print $1 }'`.strip
+      if md5 == @md5hash
+        true
+      else
         message = "The checksum does not match the header md5 checksum"
         @error = WillowSword::Error.new(message, type = :checksum_mismatch)
         false
-      else
-        true
       end
     end
 

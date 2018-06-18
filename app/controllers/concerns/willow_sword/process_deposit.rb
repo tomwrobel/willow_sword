@@ -11,9 +11,7 @@ module WillowSword
       @data_content_type = `file --b --mime-type "#{@file.path}"`.strip
       puts "Mime type: #{@data_content_type}"
       # @extension = Rack::Mime::MIME_TYPES.invert[mime_type]
-      # TODO: match with content_type and packaging
-      puts "Content type from header: #{@content_type}"
-      puts "Content type from data: #{@data_content_type}"
+      # Not matching content_type and packaging from headers with that computed.
     end
 
     def process_data
@@ -39,12 +37,13 @@ module WillowSword
     end
 
     def process_zip
+      contents_path = File.join(@dir, 'contents')
+      bag_path = File.join(@dir, 'bag')
       # unzip file
-      contents = File.join(@dir, 'contents')
-      zp = WillowSword::ZipPackage.new(@file.path, contents)
+      zp = WillowSword::ZipPackage.new(@file.path, contents_path)
       zp.unzip_file
       # validate or create bag
-      bag = WillowSword::BagPackage.new(contents, File.join(@dir, 'bag'))
+      bag = WillowSword::BagPackage.new(contents_path, bag_path)
       data_files = bag.package.bag_files - [File.join(bag.package.data_dir, 'metadata.xml')]
       # Extract metadata
       xw = WillowSword::DcCrosswalk.new(File.join(bag.package.data_dir, 'metadata.xml'))
