@@ -24,14 +24,13 @@ module WillowSword
       }
     end
 
-    # Recursively generate a zip file from the contents of a specified directory. 
+    # Recursively generate a zip file from the contents of a specified directory.
     # The directory itself is not included in the archive, rather just its contents.
     def create_zip
       entries = Dir.entries(@src); entries.delete("."); entries.delete("..")
-      io = Zip::File.open(@dst, Zip::File::CREATE);
-
+      io = Zip::File.open(@dst, Zip::File::CREATE)
       writeEntries(entries, "", io)
-      io.close();
+      io.close()
     end
 
     private
@@ -46,7 +45,9 @@ module WillowSword
           subdir =Dir.entries(diskFilePath); subdir.delete("."); subdir.delete("..")
           writeEntries(subdir, zipFilePath, io)
         else
-          io.get_output_stream(zipFilePath) { |f| f.puts(File.open(diskFilePath, "rb").read())}
+          disk_file = File.open(diskFilePath, "rb")
+          io.get_output_stream(zipFilePath) { |f| f.puts(disk_file.read()) }
+          disk_file.close
         end
       }
     end
