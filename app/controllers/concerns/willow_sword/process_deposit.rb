@@ -6,8 +6,7 @@ module WillowSword
 
     def fetch_data_content_type
       @data_content_type = nil
-      puts "File exists: #{@file.present? and File.exist? @file.path}"
-      return unless (@file.present? and File.exist? @file.path)
+      # return unless (@file.present? and File.exist? @file.path)
       # @data_content_type = `file --b --mime-type "#{File.join(Dir.pwd, @file.path)}"`.strip
       @data_content_type = `file --b --mime-type "#{@file.path}"`.strip
       puts "Mime type: #{@data_content_type}"

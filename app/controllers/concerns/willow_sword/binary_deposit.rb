@@ -24,6 +24,9 @@ module WillowSword
         @file.close
         puts "File path: #{@file.path}"
         # @file.unlink
+      end
+      if @file.present? and File.exist? @file.path
+        puts "File exists: #{@file.present? and File.exist? @file.path}"
         true
       else
         message = "Content not received"
@@ -34,13 +37,13 @@ module WillowSword
 
     def validate_data
       return true if @md5hash.nil?
-      require 'digest/md5'
-      # md5 = Digest::MD5.hexdigest(request.body.read)
-      md5 = Digest::MD5.new
-      request.body.each { |line| md5.update(line) }
-      puts "md5 from data   #{md5.hexdigest}"
-      puts "md5 from header #{@md5hash}"
-      if md5.hexdigest != @md5hash
+      # return true unless (@file.present? and File.exist? @file.path)
+      # Digest md5 sum isn't same as md5sum
+      # require 'digest/md5'
+      # md5 = Digest::MD5.new
+      # request.body.each { |line| md5.update(line) }
+      md5 = `md5sum "#{@file.path}" | awk '{ print $1 }'`
+      if md5 != @md5hash
         message = "The checksum does not match the header md5 checksum"
         @error = WillowSword::Error.new(message, type = :checksum_mismatch)
         false
