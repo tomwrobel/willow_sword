@@ -16,7 +16,7 @@ module WillowSword
       if validate_request
         render json: nil, status: :created, location: collection_work_url(params[:collection_id], 'new_id')
       else
-        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code 
+        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
     end
 
@@ -31,10 +31,11 @@ module WillowSword
       when 'application/atom+xml;type=entry'
         atom_entry_not_supported
       else
-        validate_binary
-        save_binary_data
+        return false unless validate_deposit
+        return false unless save_binary_data
+        return false unless validate_data
         fetch_data_content_type
-        validate_data
+        process_data
       end
     end
 
