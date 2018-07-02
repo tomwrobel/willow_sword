@@ -3,7 +3,7 @@ module WillowSword
     module ServiceDocumentsBehavior
       extend ActiveSupport::Concern
       def show
-        @collections = Collection.ordered
+        @collections = Collection.all
       end
     end
   end
