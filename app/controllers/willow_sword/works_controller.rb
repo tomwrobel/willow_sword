@@ -8,7 +8,7 @@ module WillowSword
     include WillowSword::AtomEntryDeposit
     include WillowSword::BinaryDeposit
     include WillowSword::ProcessDeposit
-    include WillowSword::HyraxApi::WorksBehavior
+    include WillowSword::Hyrax::WorksBehavior
 
     def show
       @work = nil
