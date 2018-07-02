@@ -18,7 +18,7 @@ module WillowSword
         unless File.directory?(@dir)
           FileUtils.mkdir_p(@dir)
         end
-        @file = File.open(File.join(@dir, @filename), 'wb')
+        @file = File.open(File.join(@dir, @headers[:filename]), 'wb')
         # @file.write(request.body.read)
         request.body.each { |line| @file.write(line) }
         @file.close
