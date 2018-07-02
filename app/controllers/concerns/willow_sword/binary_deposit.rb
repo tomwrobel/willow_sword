@@ -3,7 +3,7 @@ module WillowSword
 
     private
 
-    def validate_deposit
+    def validate_binary_deposit
       # Requires no active validation
       true
     end
@@ -35,15 +35,15 @@ module WillowSword
       end
     end
 
-    def validate_data
-      return true if @md5hash.nil?
+    def validate_binary_data
+      return true if @headers[:md5hash].nil?
       # return true unless (@file.present? and File.exist? @file.path)
       # Digest md5 sum isn't same as md5sum
       # require 'digest/md5'
       # md5 = Digest::MD5.new
       # request.body.each { |line| md5.update(line) }
       md5 = `md5sum "#{@file.path}" | awk '{ print $1 }'`.strip
-      if md5 == @md5hash
+      if md5 == @headers[:md5hash]
         true
       else
         message = "The checksum does not match the header md5 checksum"

@@ -6,6 +6,7 @@ module WillowSword
     private
 
     def fetch_headers
+      @headers = {}
       fetch_content_type
       fetch_filename
       fetch_md5hash
@@ -16,46 +17,46 @@ module WillowSword
     end
 
     def fetch_content_type
-      @content_type = request.headers.fetch('Content-Type', nil)
-      puts "Content type: #{@content_type}"
+      @headers[:content_type] = request.headers.fetch('Content-Type', nil)
+      puts "Content type: #{@headers[:content_type]}"
     end
 
     def fetch_filename
-      @filename = nil
+      @headers[:filename] = nil
       cd = request.headers.fetch('Content-Disposition', '')
       if cd.include? '='
-        @filename = cd.split('=')[-1].strip()
+        @headers[:filename] = cd.split('=')[-1].strip()
       end
-      if @filename.blank?
-        @filename = SecureRandom.uuid
+      if @headers[:filename].blank?
+        @headers[:filename] = SecureRandom.uuid
       end
-      puts "Filename: #{@filename}"
+      puts "Filename: #{@headers[:filename]}"
     end
 
     def fetch_md5hash
-      @md5hash = request.headers.fetch('Content-MD5', nil)
-      puts "MD5 hash: #{@md5hash}"
+      @headers[:md5hash] = request.headers.fetch('Content-MD5', nil)
+      puts "MD5 hash: #{@headers[:md5hash]}"
     end
 
     def fetch_packaging
-      @packaging = request.headers.fetch('Packaging', nil)
-      puts "Packaging #{@packaging}"
+      @headers[:packaging] = request.headers.fetch('Packaging', nil)
+      puts "Packaging #{@headers[:packaging]}"
     end
 
     def fetch_in_progress
-      @in_progress = request.headers.fetch('In-Progress', nil)
-      puts "In progress: #{@in_progress}"
+      @headers[:in_progress] = request.headers.fetch('In-Progress', nil)
+      puts "In progress: #{@headers[:in_progress]}"
     end
 
     def fetch_on_behalf_of
-      @on_behalf_of = request.headers.fetch('On-Behalf-Of', nil)
-      puts "On behalf of: #{@on_behalf_of}"
+      @headers[:on_behalf_of] = request.headers.fetch('On-Behalf-Of', nil)
+      puts "On behalf of: #{@headers[:on_behalf_of]}"
     end
 
     def fetch_slug
-      @slug = request.headers.fetch('Slug', nil)
-      puts "Slug: #{@slug}"
+      @headers[:slug] = request.headers.fetch('Slug', nil)
+      puts "Slug: #{@headers[:slug]}"
     end
-   
+
   end
 end

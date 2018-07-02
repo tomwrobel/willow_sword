@@ -33,14 +33,6 @@ module WillowSword
         @package = ::BagIt::Bag.new(@dst)
         create_bag unless @package.valid?
       end
-      # src_package = ::BagIt::Bag.new(@src)
-      # dst_package = ::BagIt::Bag.new(@dst)
-      # if src_package.valid?
-      #   @package = src_package
-      # else
-      #   @package = dst_package
-      #   create_bag unless @package.valid?
-      # end
     end
   end
 end
