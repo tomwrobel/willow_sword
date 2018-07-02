@@ -4,7 +4,8 @@ module WillowSword
       extend ActiveSupport::Concern
       def show
         @collection = Collection.find(params[:id])
-        @works = @collection.works
+        @works = []
+        @works = @collection.works if @collection.present?
       end
     end
   end
