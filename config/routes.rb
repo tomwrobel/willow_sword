@@ -7,7 +7,9 @@ WillowSword::Engine.routes.draw do
 
     resource :service_document, only: [:show]
     resources :collections, only: [:show] do
-      resources :works, only: [:show, :create] #:update, :destroy
+      resources :works, only: [:show, :create] do
+        resources :file_sets, only: [:show, :create, :update]  #:destroy
+      end
     end
 
   end
