@@ -107,5 +107,26 @@ module WillowSword
       puts '-'*50
     end
 
+    def process_file
+      @files = [@file.path]
+      @attributes = {}
+    end
+
+    def process_metadata
+      case @data_content_type
+      when 'application/xml'
+        # process xml
+        puts 'process xml'
+        process_xml
+        true
+      else
+        puts 'Unknown format of data'
+        message = "Server does not support the content type #{@data_content_type}"
+        @error = WillowSword::Error.new(message, type = :method_not_allowed)
+        false
+      end
+
+    end
+
   end
 end
