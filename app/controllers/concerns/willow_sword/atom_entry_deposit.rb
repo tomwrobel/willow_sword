@@ -9,7 +9,7 @@ module WillowSword
     end
 
     def validate_atom_entry
-      puts 'atom-entry'
+      # Requires no active validation
       true
     end
 

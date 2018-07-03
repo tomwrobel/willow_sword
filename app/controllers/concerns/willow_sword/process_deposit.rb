@@ -69,8 +69,7 @@ module WillowSword
       when 'application/xml'
         # process xml
         puts 'process xml'
-        # TODO: crosswalk metadata
-        # TODO: Add to Hyrax
+        process_xml
         true
       else
         puts 'Unknown format of data'
@@ -78,6 +77,16 @@ module WillowSword
         @error = WillowSword::Error.new(message, type = :method_not_allowed)
         false
       end
+    end
+
+    def process_xml
+      xw = WillowSword::DcCrosswalk.new(@file.path)
+      @attributes = xw.metadata
+      @files = []
+      puts @attributes
+      puts '-'*50
+      puts @files
+      puts '-'*50
     end
 
     def process_zip

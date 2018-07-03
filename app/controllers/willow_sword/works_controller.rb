@@ -31,11 +31,19 @@ module WillowSword
       case request.content_type
       when 'multipart/related'
         multipart_not_supported
+        return false
       when 'application/atom+xml;type=entry'
-        atom_entry_not_supported
+        # atom deposit
+        return false unless validate_atom_entry
       else
         # binary deposit
         return false unless validate_binary_deposit
+      end
+      fetch_data_and_deposit
+    end
+
+    private
+      def fetch_data_and_deposit
         return false unless save_binary_data
         return false unless validate_binary_data
         fetch_data_content_type
@@ -45,7 +53,6 @@ module WillowSword
         add_work
         true
       end
-    end
 
   end
 end
