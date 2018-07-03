@@ -7,7 +7,7 @@ module WillowSword
       map_xml
     end
     def map_xml
-      return metadata unless File.exist? @src_file
+      return @metadata unless File.exist? @src_file
       f = File.open(@src_file)
       doc = Nokogiri::XML(f)
       # doc = Nokogiri::XML(@xml_metadata)
@@ -21,12 +21,21 @@ module WillowSword
         isVersionOf language license mediator medium modified provenance
         publisher references relation replaces requires rights rightsHolder
         source spatial subject tableOfContents temporal title type valid)
+      translated_terms = {
+          'created' =>'date_created',
+          'rights' => 'rights_statement',
+          'relation' => 'related_url',
+          'type' => 'resource_type'
+      }
+      singular = %w(rights)
       terms.each do |term|
         values = []
         doc.xpath("//#{term}").each do |t|
           values << t.text if t.text.present?
         end
-        @metadata[term.to_sym] = values unless values.blank?
+        key = translated_terms.include?(term) ? translated_terms[term] : term
+        values = values.first if values.present? && singular.include?(term)
+        @metadata[key.to_sym] = values unless values.blank?
       end
       f.close
     end
