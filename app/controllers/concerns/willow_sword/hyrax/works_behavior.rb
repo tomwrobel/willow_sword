@@ -35,14 +35,14 @@ module WillowSword
 
       def find
         puts 'In find'
-        attributes[:id] = SecureRandom.uuid unless attributes[:id].present?
-        return find_by_id if attributes[:id]
+        params[:id] = SecureRandom.uuid unless params[:id].present?
+        return find_by_id if params[:id]
         raise "Missing identifier: Unable to search for existing object without the ID"
       end
 
       def find_by_id
         puts 'In find_by_id'
-        klass.find(attributes[:id]) if klass.exists?(attributes[:id])
+        klass.find(params[:id]) if klass.exists?(params[:id])
       end
 
       def update_work
