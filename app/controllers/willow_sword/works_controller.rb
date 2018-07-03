@@ -13,7 +13,7 @@ module WillowSword
     def show
       @collection_id = params[:collection_id]
       @klass = Work
-      @object = find
+      @object = find_work
       unless @object
         message = "Server cannot find work with id #{params[:id]}"
         @error = WillowSword::Error.new(message, type = :bad_request)
