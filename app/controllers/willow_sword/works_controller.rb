@@ -2,7 +2,7 @@ require_dependency "willow_sword/application_controller"
 
 module WillowSword
   class WorksController < ApplicationController
-    attr_reader :headers, :file, :dir, :data_content_type, :attributes, :files, :object, :file_ids, :klass
+    attr_reader :collection_id, :headers, :file, :dir, :data_content_type, :attributes, :files, :object, :file_ids, :klass
     include WillowSword::FetchHeaders
     include WillowSword::MultipartDeposit
     include WillowSword::AtomEntryDeposit
@@ -11,13 +11,15 @@ module WillowSword
     include WillowSword::Hyrax::WorksBehavior
 
     def show
+      @collection_id = params[:collection_id]
       @work = nil
     end
 
     def create
       if validate_request
+        @collection_id = params[:collection_id]
         puts "URL #{collection_work_url(params[:collection_id], @object)}"
-        render json: nil, status: :created, location: collection_work_url(params[:collection_id], @object)
+        render 'show.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
       else
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
