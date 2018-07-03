@@ -12,14 +12,20 @@ module WillowSword
 
     def show
       @collection_id = params[:collection_id]
-      @work = nil
+      @klass = Work
+      @object = find
+      unless @object
+        message = "Server cannot find work with id #{params[:id]}"
+        @error = WillowSword::Error.new(message, type = :bad_request)
+        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
+      end
     end
 
     def create
       if validate_request
         @collection_id = params[:collection_id]
         puts "URL #{collection_work_url(params[:collection_id], @object)}"
-        render 'show.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
+        render 'create.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
       else
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end

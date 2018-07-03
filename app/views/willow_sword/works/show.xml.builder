@@ -1,4 +1,4 @@
-xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
+xml.feed(xmlns:"http://www.w3.org/2005/Atom", 'xmlns:dcterms':"http://purl.org/dc/terms/") do
   xml.title @object.title.join(", ")
   # Get work
   xml.content(rel:"src", href:collection_work_url(@collection_id, @object))
@@ -12,6 +12,16 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
       xml.content(rel:"src", href:collection_work_file_set_url(@collection_id, @object, file_set_id))
       # Edit file metadata
       xml.link(rel:"edit", href:collection_work_file_set_url(@collection_id, @object, file_set_id))
+    end
+  end
+  # Add dc metadata
+  xw = WillowSword::DcCrosswalk.new(nil)
+  @object.attributes.each do |attr, values|
+    if xw.terms.include?(attr.to_s)
+      term = xw.translated_terms.key(attr.to_s).present? ? xw.translated_terms.key(attr.to_s) : attr.to_s
+      Array(values).each do |val|
+        xml.dcterms term.to_sym, val
+      end
     end
   end
 end
