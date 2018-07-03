@@ -1,18 +1,14 @@
 module WillowSword
   class DcCrosswalk
-    attr_reader :metadata
+    attr_reader :metadata, :terms, :translated_terms, :singular
     def initialize(src_file)
       @src_file = src_file
       @metadata = {}
       map_xml
     end
-    def map_xml
-      return @metadata unless File.exist? @src_file
-      f = File.open(@src_file)
-      doc = Nokogiri::XML(f)
-      # doc = Nokogiri::XML(@xml_metadata)
-      doc.remove_namespaces!
-      terms = %w(abstract accessRights accrualMethod accrualPeriodicity
+
+    def terms
+      %w(abstract accessRights accrualMethod accrualPeriodicity
         accrualPolicy alternative audience available bibliographicCitation
         conformsTo contributor coverage created creator date dateAccepted
         dateCopyrighted dateSubmitted description educationLevel extent
@@ -21,13 +17,28 @@ module WillowSword
         isVersionOf language license mediator medium modified provenance
         publisher references relation replaces requires rights rightsHolder
         source spatial subject tableOfContents temporal title type valid)
-      translated_terms = {
-          'created' =>'date_created',
-          'rights' => 'rights_statement',
-          'relation' => 'related_url',
-          'type' => 'resource_type'
+    end
+
+    def translated_terms
+      {
+        'created' =>'date_created',
+        'rights' => 'rights_statement',
+        'relation' => 'related_url',
+        'type' => 'resource_type'
       }
-      singular = %w(rights)
+    end
+
+    def singular
+      %w(rights)
+    end
+
+    def map_xml
+      return @metadata unless @src_file.present?
+      return @metadata unless File.exist? @src_file
+      f = File.open(@src_file)
+      doc = Nokogiri::XML(f)
+      # doc = Nokogiri::XML(@xml_metadata)
+      doc.remove_namespaces!
       terms.each do |term|
         values = []
         doc.xpath("//#{term}").each do |t|
@@ -41,3 +52,4 @@ module WillowSword
     end
   end
 end
+
