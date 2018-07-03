@@ -25,7 +25,7 @@ module WillowSword
 
       def add_work
         puts 'In add_work'
-        @object = find
+        @object = find_work
         if @object
           update_work
         else
@@ -33,25 +33,21 @@ module WillowSword
         end
       end
 
-      def find
-        puts 'In find'
-        params[:id] = SecureRandom.uuid unless params[:id].present?
-        return find_by_id if params[:id]
-        raise "Missing identifier: Unable to search for existing object without the ID"
+      def find_work
+        puts 'In find_work'
+        # params[:id] = SecureRandom.uuid unless params[:id].present?
+        return find_work_by_id if params[:id]
       end
 
-      def find_by_id
-        puts 'In find_by_id'
+      def find_work_by_id
+        puts 'In find_work_by_id'
         klass.find(params[:id]) if klass.exists?(params[:id])
       end
 
       def update_work
         puts 'In update_work'
         raise "Object doesn't exist" unless @object
-        # run_callbacks(:save) do
         work_actor.update(environment(update_attributes))
-        # end
-        # log_updated(object)
       end
 
       def create_work
@@ -87,20 +83,11 @@ module WillowSword
         # a way that is compatible with how the factory needs them.
         def transform_attributes
           attributes.slice(*permitted_attributes).merge(file_attributes)
-          # StringLiteralProcessor.process(attributes.slice(*permitted_attributes))
-          #                      .merge(file_attributes)
         end
 
         def file_attributes
           @file_ids.present? ? { uploaded_files: @file_ids } : {}
         end
-
-        # def file_attributes
-        #   hash = {}
-        #   hash[:remote_files] = attributes[:remote_files] if attributes[:remote_files].present?
-        #   hash[:uploaded_files] = attributes[:uploaded_files] if attributes[:uploaded_files].present?
-        #   hash
-        # end
 
         def permitted_attributes
           klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
