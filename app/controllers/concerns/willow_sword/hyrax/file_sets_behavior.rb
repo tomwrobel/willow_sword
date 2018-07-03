@@ -1,6 +1,6 @@
 module WillowSword
   module Hyrax
-    module FilesBehavior
+    module FileSetsBehavior
       extend ActiveSupport::Concern
 
       def find_file_set
