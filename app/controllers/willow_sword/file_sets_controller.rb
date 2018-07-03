@@ -2,12 +2,16 @@ require_dependency "willow_sword/application_controller"
 
 module WillowSword
   class FileSetsController < ApplicationController
-    attr_reader :collection_id, :work_id, :file_set, :object
+    attr_reader :collection_id, :work_id, :file_set, :object, :headers, :file, :dir, :data_content_type, :attributes, :files, :klass
+    include WillowSword::FetchHeaders
+    include WillowSword::ProcessDeposit
+    include WillowSword::Hyrax::WorksBehavior
+    include WillowSword::Hyrax::FileSetsBehavior
 
     def show
       @collection_id = params[:collection_id]
       @work_id = params[:work_id]
-      @file_set = FileSet.find(params[:id])
+      @file_set = FileSet.find(params[:id]) if FileSet.exists?(params[:id])
       unless @file_set
         message = "Server cannot find file set with id #{params[:id]}"
         @error = WillowSword::Error.new(message, type = :bad_request)
@@ -20,7 +24,7 @@ module WillowSword
       @work_id = params[:work_id]
       if fetch_and_add_file
         puts "URL #{collection_work_url(params[:collection_id], @object)}"
-        render 'create.xml.builder', formats: [:xml], status: :updated
+        render 'create.xml.builder', formats: [:xml], status: 200
       else
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
@@ -30,7 +34,7 @@ module WillowSword
       @collection_id = params[:collection_id]
       @work_id = params[:work_id]
       if fetch_and_add_metadata
-        render status: :updated
+        render status: 200
       else
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
@@ -52,6 +56,7 @@ module WillowSword
       end
 
       def fetch_and_add_metadata
+        fetch_headers
         return false unless save_binary_data
         return false unless validate_binary_data
         fetch_data_content_type
