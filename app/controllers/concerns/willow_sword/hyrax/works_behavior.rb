@@ -11,17 +11,20 @@ module WillowSword
       extend ActiveSupport::Concern
 
       def upload_files
+        puts 'In upload_files'
         @file_ids = []
         @files.each do |file|
-          u = Hyrax::UploadedFile.new
+          u = ::Hyrax::UploadedFile.new
           u.user_id = User.find_by_user_key(User.batch_user_key).id unless User.find_by_user_key(User.batch_user_key).nil?
-          u.file = CarrierWave::SanitizedFile.new(file)
+          u.file = ::CarrierWave::SanitizedFile.new(file)
           u.save
           @file_ids << u.id
         end
+        puts "Files uploaded: #{@file_ids}"
       end
 
       def add_work
+        puts 'In add_work'
         @object = find
         if @object
           update_work
@@ -31,15 +34,19 @@ module WillowSword
       end
 
       def find
+        puts 'In find'
+        attributes[:id] = SecureRandom.uuid unless attributes[:id].present?
         return find_by_id if attributes[:id]
         raise "Missing identifier: Unable to search for existing object without the ID"
       end
 
       def find_by_id
+        puts 'In find_by_id'
         klass.find(attributes[:id]) if klass.exists?(attributes[:id])
       end
 
       def update_work
+        puts 'In update_work'
         raise "Object doesn't exist" unless @object
         # run_callbacks(:save) do
         work_actor.update(environment(update_attributes))
@@ -48,16 +55,19 @@ module WillowSword
       end
 
       def create_work
+        puts 'In create_work'
         attrs = create_attributes
         @object = klass.new
         work_actor.create(environment(attrs))
       end
 
       def create_attributes
+        puts 'In create_attributes'
         transform_attributes
       end
 
       def update_attributes
+        puts 'In update_attributes'
         transform_attributes.except(:id)
       end
 
@@ -66,11 +76,11 @@ module WillowSword
         # @return [Hyrax::Actors::Environment]
         def environment(attrs)
           # Set Hyrax.config.batch_user_key
-          Hyrax::Actors::Environment.new(@object, Ability.new(User.batch_user), attrs)
+          ::Hyrax::Actors::Environment.new(@object, Ability.new(User.batch_user), attrs)
         end
 
         def work_actor
-          Hyrax::CurationConcern.actor
+          ::Hyrax::CurationConcern.actor
         end
 
         # Override if we need to map the attributes from the parser in

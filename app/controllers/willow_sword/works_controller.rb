@@ -2,7 +2,7 @@ require_dependency "willow_sword/application_controller"
 
 module WillowSword
   class WorksController < ApplicationController
-    attr_reader :headers, :file, :dir, :data_content_type, :attributes, :files, :object, :file_ids
+    attr_reader :headers, :file, :dir, :data_content_type, :attributes, :files, :object, :file_ids, :klass
     include WillowSword::FetchHeaders
     include WillowSword::MultipartDeposit
     include WillowSword::AtomEntryDeposit
@@ -16,6 +16,7 @@ module WillowSword
 
     def create
       if validate_request
+        puts "URL #{collection_work_url(params[:collection_id], @object)}"
         render json: nil, status: :created, location: collection_work_url(params[:collection_id], @object)
       else
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
@@ -39,8 +40,10 @@ module WillowSword
         return false unless validate_binary_data
         fetch_data_content_type
         process_data
-        # upload_files unless @files.blank?
-        # add_work
+        @klass = Work
+        upload_files unless @files.blank?
+        add_work
+        true
       end
     end
 
