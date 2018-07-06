@@ -18,7 +18,7 @@ module WillowSword
 
     def fetch_content_type
       @headers[:content_type] = request.headers.fetch('Content-Type', nil)
-      puts "Content type: #{@headers[:content_type]}"
+      # puts "Content type: #{@headers[:content_type]}"
     end
 
     def fetch_filename
@@ -30,32 +30,32 @@ module WillowSword
       if @headers[:filename].blank?
         @headers[:filename] = SecureRandom.uuid
       end
-      puts "Filename: #{@headers[:filename]}"
+      # puts "Filename: #{@headers[:filename]}"
     end
 
     def fetch_md5hash
       @headers[:md5hash] = request.headers.fetch('Content-MD5', nil)
-      puts "MD5 hash: #{@headers[:md5hash]}"
+      # puts "MD5 hash: #{@headers[:md5hash]}"
     end
 
     def fetch_packaging
       @headers[:packaging] = request.headers.fetch('Packaging', nil)
-      puts "Packaging #{@headers[:packaging]}"
+      # puts "Packaging #{@headers[:packaging]}"
     end
 
     def fetch_in_progress
       @headers[:in_progress] = request.headers.fetch('In-Progress', nil)
-      puts "In progress: #{@headers[:in_progress]}"
+      # puts "In progress: #{@headers[:in_progress]}"
     end
 
     def fetch_on_behalf_of
       @headers[:on_behalf_of] = request.headers.fetch('On-Behalf-Of', nil)
-      puts "On behalf of: #{@headers[:on_behalf_of]}"
+      # puts "On behalf of: #{@headers[:on_behalf_of]}"
     end
 
     def fetch_slug
       @headers[:slug] = request.headers.fetch('Slug', nil)
-      puts "Slug: #{@headers[:slug]}"
+      # puts "Slug: #{@headers[:slug]}"
     end
 
   end

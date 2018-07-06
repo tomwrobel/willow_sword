@@ -5,8 +5,8 @@ module WillowSword
     private
 
     def save_binary_data
-      puts 'saving body'
-      puts request.body.length
+      # puts 'saving body'
+      # puts request.body.length
       @file = nil
       @dir = nil
       if request.body.length > 0
@@ -18,11 +18,11 @@ module WillowSword
         # @file.write(request.body.read)
         request.body.each { |line| @file.write(line) }
         @file.close
-        puts "File path: #{@file.path}"
+        # puts "File path: #{@file.path}"
         # @file.unlink
       end
       if @file.present? and File.exist? @file.path
-        puts "File exists: #{@file.present? and File.exist? @file.path}"
+        # puts "File exists: #{@file.present? and File.exist? @file.path}"
         true
       else
         message = "Content not received"
@@ -53,7 +53,7 @@ module WillowSword
       # return unless (@file.present? and File.exist? @file.path)
       # @data_content_type = `file --b --mime-type "#{File.join(Dir.pwd, @file.path)}"`.strip
       @data_content_type = `file --b --mime-type "#{@file.path}"`.strip
-      puts "Mime type: #{@data_content_type}"
+      # puts "Mime type: #{@data_content_type}"
       # @extension = Rack::Mime::MIME_TYPES.invert[mime_type]
       # Not matching content_type and packaging from headers with that computed.
     end
@@ -63,16 +63,16 @@ module WillowSword
       case @data_content_type
       when 'application/zip'
         # process zip
-        puts 'process zip'
+        # puts 'process zip'
         process_zip
         true
       when 'application/xml'
         # process xml
-        puts 'process xml'
+        # puts 'process xml'
         process_xml
         true
       else
-        puts 'Unknown format of data'
+        # puts 'Unknown format of data'
         message = "Server does not support the content type #{@data_content_type}"
         @error = WillowSword::Error.new(message, type = :method_not_allowed)
         false
@@ -83,10 +83,10 @@ module WillowSword
       xw = WillowSword::DcCrosswalk.new(@file.path)
       @attributes = xw.metadata
       @files = []
-      puts @attributes
-      puts '-'*50
-      puts @files
-      puts '-'*50
+      # puts @attributes
+      # puts '-'*50
+      # puts @files
+      # puts '-'*50
     end
 
     def process_zip
@@ -101,10 +101,10 @@ module WillowSword
       # Extract metadata
       xw = WillowSword::DcCrosswalk.new(File.join(bag.package.data_dir, 'metadata.xml'))
       @attributes = xw.metadata
-      puts @attributes
-      puts '-'*50
-      puts @files
-      puts '-'*50
+      # puts @attributes
+      # puts '-'*50
+      # puts @files
+      # puts '-'*50
     end
 
     def process_file
@@ -116,11 +116,11 @@ module WillowSword
       case @data_content_type
       when 'application/xml'
         # process xml
-        puts 'process xml'
+        # puts 'process xml'
         process_xml
         true
       else
-        puts 'Unknown format of data'
+        # puts 'Unknown format of data'
         message = "Server does not support the content type #{@data_content_type}"
         @error = WillowSword::Error.new(message, type = :method_not_allowed)
         false

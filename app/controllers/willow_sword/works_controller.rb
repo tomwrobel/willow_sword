@@ -24,7 +24,7 @@ module WillowSword
     def create
       if validate_request
         @collection_id = params[:collection_id]
-        puts "URL #{collection_work_url(params[:collection_id], @object)}"
+        # puts "URL #{collection_work_url(params[:collection_id], @object)}"
         render 'create.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
       else
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
