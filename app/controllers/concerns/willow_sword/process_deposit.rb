@@ -6,10 +6,10 @@ module WillowSword
 
     def save_binary_data
       # puts 'saving body'
-      # puts request.body.length
+      # puts request.body.size
       @file = nil
       @dir = nil
-      if request.body.length > 0
+      if request.body.size > 0
         @dir = File.join('tmp/data', SecureRandom.uuid)
         unless File.directory?(@dir)
           FileUtils.mkdir_p(@dir)
