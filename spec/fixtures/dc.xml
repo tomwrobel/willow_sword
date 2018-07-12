@@ -9,7 +9,7 @@
   <dc:description>This is a test dc record to test the dc crosswalk</dc:description>
   <dc:publisher>Digital Nest</dc:publisher>
   <dc:contributor>The dublin core generator</dc:contributor>
-  <dc:date>29/05/2018</dc:date>
+  <dc:created>29/05/2018</dc:created>
   <dc:source>http://sword.digitalnest.com</dc:source>
   <dc:language>English</dc:language>
   <dc:relation>http://example.com</dc:relation>

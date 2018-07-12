@@ -81,6 +81,7 @@ module WillowSword
 
     def process_xml
       xw = WillowSword::DcCrosswalk.new(@file.path)
+      xw.map_xml
       @attributes = xw.metadata
       @files = []
       # puts @attributes

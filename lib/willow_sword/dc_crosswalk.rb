@@ -4,7 +4,6 @@ module WillowSword
     def initialize(src_file)
       @src_file = src_file
       @metadata = {}
-      map_xml
     end
 
     def terms
