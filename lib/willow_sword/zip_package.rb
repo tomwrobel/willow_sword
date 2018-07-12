@@ -2,13 +2,11 @@ require 'zip'
 
 module WillowSword
   class ZipPackage
-
-    attr_reader :package
+    # Class to unzip a file and create a zip file
 
     def initialize(src, dst)
       @src = src
       @dst = dst
-      @package = nil
       @src = File.join(src, '/') if File.directory?(src)
       @dst = File.join(dst, '/') if File.directory?(dst)
     end
