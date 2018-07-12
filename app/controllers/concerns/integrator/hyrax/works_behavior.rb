@@ -5,7 +5,7 @@
 # https://github.com/leaf-research-technologies/leaf_addons/blob/master/lib/generators/leaf_addons/templates/lib/importer/files_parser.rb
 # https://github.com/leaf-research-technologies/leaf_addons/blob/9643b649df513e404c96ba5b9285d83abc4b2c9a/lib/generators/leaf_addons/templates/lib/importer/factory/base_factory.rb
 
-module WillowSword
+module Integrator
   module Hyrax
     module WorksBehavior
       extend ActiveSupport::Concern

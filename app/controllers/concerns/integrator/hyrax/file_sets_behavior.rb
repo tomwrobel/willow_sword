@@ -1,4 +1,4 @@
-module WillowSword
+module Integrator
   module Hyrax
     module FileSetsBehavior
       extend ActiveSupport::Concern

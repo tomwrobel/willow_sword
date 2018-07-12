@@ -5,8 +5,8 @@ module WillowSword
     attr_reader :collection_id, :work_id, :file_set, :object, :headers, :file, :dir, :data_content_type, :attributes, :files, :klass
     include WillowSword::FetchHeaders
     include WillowSword::ProcessDeposit
-    include WillowSword::Hyrax::WorksBehavior
-    include WillowSword::Hyrax::FileSetsBehavior
+    include Integrator::Hyrax::WorksBehavior
+    include Integrator::Hyrax::FileSetsBehavior
 
     def show
       @collection_id = params[:collection_id]

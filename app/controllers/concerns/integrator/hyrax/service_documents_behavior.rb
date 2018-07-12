@@ -1,9 +1,9 @@
-module WillowSword
-  module HyraxApi
+module Integrator
+  module Hyrax
     module ServiceDocumentsBehavior
       extend ActiveSupport::Concern
       def show
-        @collections = []
+        @collections = Collection.all
       end
     end
   end

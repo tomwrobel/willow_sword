@@ -8,7 +8,7 @@ module WillowSword
     include WillowSword::AtomEntryDeposit
     include WillowSword::BinaryDeposit
     include WillowSword::ProcessDeposit
-    include WillowSword::Hyrax::WorksBehavior
+    include Integrator::Hyrax::WorksBehavior
 
     def show
       @collection_id = params[:collection_id]
