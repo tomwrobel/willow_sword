@@ -1,0 +1,3 @@
+5a7ed63f4865fcaf885fc831db8d1598beddb55a007def2472b3721a49f43cbd  data/Swordv2Spec.pdf
+de88e13fc78dc506a2b8dbe23a10b94c3f30b1cee5334fc4ded420bb28b2f4c5  data/bagitSpec.pdf
+525a86b77498466ed1bf47cb23876e754f6dca0467ebbaa5d29bd4f992383ae5  data/metadata.xml

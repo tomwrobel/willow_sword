@@ -3,6 +3,8 @@ require 'pathname'
 
 module WillowSword
   class BagPackage
+    # Class to create a bag for a given source and at the given destination,
+    # if the source isn't already a bag.
 
     attr_reader :package
 
