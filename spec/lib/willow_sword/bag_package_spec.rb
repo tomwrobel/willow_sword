@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'sandbox'
 require 'willow_sword/bag_package'
 RSpec.describe WillowSword::BagPackage do

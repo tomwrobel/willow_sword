@@ -41,3 +41,10 @@ bower.json
 # Ignore Byebug command history file.
 .byebug_history
 .idea/
+
+pkg/
+# Ignore dummy application database, log and tmp files
+spec/dummy/db/*.sqlite3
+spec/dummy/db/*.sqlite3-journal
+spec/dummy/log/*.log
+spec/dummy/tmp/

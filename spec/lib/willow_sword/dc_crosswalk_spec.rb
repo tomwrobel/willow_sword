@@ -1,12 +1,12 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'willow_sword/dc_crosswalk'
 
 RSpec.describe WillowSword::DcCrosswalk do
   describe 'DcCrosswalk with no source' do
     before(:each) do
       @src = nil
-      @src = File.join(ENGINE_RAILS_ROOT, 'spec', 'fixtures', 'dc.xml')
-      @no_src = File.join(ENGINE_RAILS_ROOT, 'spec', 'fixtures', 'dc2.xml')
+      # @src = File.join(ENGINE_RAILS_ROOT, 'spec', 'fixtures', 'dc.xml')
+      # @no_src = File.join(ENGINE_RAILS_ROOT, 'spec', 'fixtures', 'dc2.xml')
       @dc = WillowSword::DcCrosswalk.new(@src)
     end
 

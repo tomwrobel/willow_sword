@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'sandbox'
 require 'willow_sword/zip_package'
 RSpec.describe WillowSword::ZipPackage do
