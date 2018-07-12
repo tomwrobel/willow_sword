@@ -13,17 +13,8 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
-group :development, :test do
-  gem 'rspec-rails' #, '~> 3.5'
-end
-
 group :test do
+  gem 'rspec-rails' #, '~> 3.5'
   gem 'factory_girl_rails' # , '~> 4.0'
   gem 'shoulda-matchers' #, '~> 3.1'
-  gem 'faker'
-  gem 'database_cleaner'
 end
-
-gem 'bagit'
-gem 'validatable'
-gem 'rubyzip', '>= 1.0.0'
