@@ -4,6 +4,9 @@ module Integrator
       extend ActiveSupport::Concern
       def show
         @collections = Collection.all
+        unless @collections
+          @collections = [Collection.new(WillowSword.config.default_collection)]
+        end
       end
     end
   end
