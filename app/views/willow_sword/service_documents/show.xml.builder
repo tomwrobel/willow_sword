@@ -4,7 +4,7 @@ xml.service('xmlns:atom':"http://www.w3.org/2005/Atom", 'xmlns:dcterms':"http://
   xml.workspace({collections: @collections.count}) do
     xml.atom :title, WillowSword.config.title
     @collections.each do |collection|
-      xml.collection(href: collection_url(collection)) do
+      xml.collection(href: collection_url(collection.id)) do
         xml.atom :title, collection.title.join(", ")
         xml.accept "*/*"
         xml.accept(alternate:"multipart-related") do xml.text! "*/*" end

@@ -11,14 +11,15 @@ module Integrator
         #       last = (total_records/100).to_i
         #       previous = (current == 0) ? nil : current - 1
         #       next = (current == last) ? nil : current + 1
+        @collection = nil
+        @works = []
         if params[:id] == WillowSword.config.default_collection[:id]
           @collection = Collection.new(WillowSword.config.default_collection)
           WillowSword.config.work_models.each do |work_model|
-            @works << work_model.singularize.classify.constantize.all
+            @works += work_model.singularize.classify.constantize.all
           end
         else
           @collection = Collection.find(params[:id]) if Collection.exists?(params[:id])
-          @works = []
           @works = @collection.works if @collection.present?
         end
         unless @collection
