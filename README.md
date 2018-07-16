@@ -21,8 +21,8 @@ $ gem install willow_sword
 Mount the engine. Add this line to config/routes.rb
 
 ```ruby
-mount WillowSword::Engine => '/sword
-'```
+mount WillowSword::Engine => '/sword'
+```
 
 ## Usage
 To use the plugin see [usage](https://github.com/CottageLabs/willow_sword/wiki/Usage)
