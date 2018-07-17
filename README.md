@@ -5,7 +5,7 @@ A Ruby on Rails engine for the Sword V2 server. The Sword server is currently in
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'willow_sword'
+gem 'willow_sword', git: 'https://github.com/CottageLabs/willow_sword.git'
 ```
 
 And then execute:
