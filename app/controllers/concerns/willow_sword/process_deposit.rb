@@ -26,7 +26,7 @@ module WillowSword
         true
       else
         message = "Content not received"
-        @error = WillowSword::Error.new(message, type = :content)
+        @error = WillowSword::Error.new(message, type = :bad_request)
         false
       end
     end
@@ -65,16 +65,14 @@ module WillowSword
         # process zip
         # puts 'process zip'
         process_zip
-        true
       when 'application/xml'
         # process xml
         # puts 'process xml'
         process_xml
-        true
       else
         # puts 'Unknown format of data'
         message = "Server does not support the content type #{@data_content_type}"
-        @error = WillowSword::Error.new(message, type = :method_not_allowed)
+        @error = WillowSword::Error.new(message, type = :content)
         false
       end
     end
@@ -88,6 +86,13 @@ module WillowSword
       # puts '-'*50
       # puts @files
       # puts '-'*50
+      unless @attributes.any?
+        message = "Could not extract any metadata"
+        @error = WillowSword::Error.new(message, type = :bad_request)
+        false
+      else
+        true
+      end
     end
 
     def process_zip
@@ -101,11 +106,19 @@ module WillowSword
       @files = bag.package.bag_files - [File.join(bag.package.data_dir, 'metadata.xml')]
       # Extract metadata
       xw = WillowSword::DcCrosswalk.new(File.join(bag.package.data_dir, 'metadata.xml'))
+      xw.map_xml
       @attributes = xw.metadata
       # puts @attributes
       # puts '-'*50
       # puts @files
       # puts '-'*50
+      unless @attributes.any?
+        message = "Could not extract any metadata from file metadata.xml"
+        @error = WillowSword::Error.new(message, type = :bad_request)
+        false
+      else
+        true
+      end
     end
 
     def process_file
@@ -119,11 +132,10 @@ module WillowSword
         # process xml
         # puts 'process xml'
         process_xml
-        true
       else
         # puts 'Unknown format of data'
         message = "Server does not support the content type #{@data_content_type}"
-        @error = WillowSword::Error.new(message, type = :method_not_allowed)
+        @error = WillowSword::Error.new(message, type = :content)
         false
       end
 
