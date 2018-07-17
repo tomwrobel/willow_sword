@@ -55,7 +55,7 @@ module WillowSword
         return false unless save_binary_data
         return false unless validate_binary_data
         fetch_data_content_type
-        process_data
+        return false unless process_data
         @klass = Work
         upload_files unless @files.blank?
         add_work
