@@ -2,6 +2,9 @@ module Integrator
   module Hyrax
     module CollectionsBehavior
       extend ActiveSupport::Concern
+      before_action :set_klass
+      attr_reader :klass, :collection, :works
+
       def show
         # TODO: Use search query to get 100 most recent list of works
         #       Process current = params[:start]
@@ -14,12 +17,12 @@ module Integrator
         @collection = nil
         @works = []
         if params[:id] == WillowSword.config.default_collection[:id]
-          @collection = Collection.new(WillowSword.config.default_collection)
+          @collection = klass.new(WillowSword.config.default_collection)
           WillowSword.config.work_models.each do |work_model|
             @works += work_model.singularize.classify.constantize.all
           end
         else
-          @collection = Collection.find(params[:id]) if Collection.exists?(params[:id])
+          @collection = klass.find(params[:id]) if Collection.exists?(params[:id])
           @works = @collection.works if @collection.present?
         end
         unless @collection
@@ -28,6 +31,13 @@ module Integrator
           render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
         end
       end
+
+      private
+
+      def set_klass
+        klass = WillowSword.config.collection_models.first.singularize.classify.constantize
+      end
+
     end
   end
 end
