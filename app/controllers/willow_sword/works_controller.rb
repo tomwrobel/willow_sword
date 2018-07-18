@@ -12,7 +12,6 @@ module WillowSword
 
     def show
       @collection_id = params[:collection_id]
-      @klass = Work
       @object = find_work
       unless @object
         message = "Server cannot find work with id #{params[:id]}"
@@ -56,7 +55,6 @@ module WillowSword
         return false unless validate_binary_data
         fetch_data_content_type
         return false unless process_data
-        @klass = Work
         upload_files unless @files.blank?
         add_work
         true

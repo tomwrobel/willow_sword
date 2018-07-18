@@ -68,6 +68,10 @@ module Integrator
       end
 
       private
+        def klass
+          WillowSword.config.work_models.first.singularize.classify.constantize
+        end
+
         # @param [Hash] attrs the attributes to put in the environment
         # @return [Hyrax::Actors::Environment]
         def environment(attrs)
