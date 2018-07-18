@@ -16,7 +16,7 @@ module Integrator
         @collection = nil
         @works = []
         if params[:id] == WillowSword.config.default_collection[:id]
-          @collection = @klass.new(WillowSword.config.default_collection)
+          @collection = klass.new(WillowSword.config.default_collection)
           WillowSword.config.work_models.each do |work_model|
             @works += work_model.singularize.classify.constantize.all
           end
@@ -33,8 +33,8 @@ module Integrator
 
       private
 
-      def set_klass
-        @klass = WillowSword.config.collection_models.first.singularize.classify.constantize
+      def klass
+        WillowSword.config.collection_models.first.singularize.classify.constantize
       end
 
     end
