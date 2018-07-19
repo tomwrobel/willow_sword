@@ -2,7 +2,9 @@ require_dependency "willow_sword/application_controller"
 
 module WillowSword
   class FileSetsController < ApplicationController
-    attr_reader :collection_id, :work_id, :file_set, :object, :headers, :file, :dir, :data_content_type, :attributes, :files, :klass
+    before_action :set_file_set_klass, :set_work_klass
+    attr_reader :collection_id, :work_id, :file_set, :object, :headers, :file, :dir,
+                :data_content_type, :attributes, :files, :work_klass, :file_set_klass
     include WillowSword::FetchHeaders
     include WillowSword::ProcessDeposit
     include Integrator::Hyrax::WorksBehavior
@@ -11,7 +13,7 @@ module WillowSword
     def show
       @collection_id = params[:collection_id]
       @work_id = params[:work_id]
-      @file_set = FileSet.find(params[:id]) if FileSet.exists?(params[:id])
+      @file_set = file_set_klass.find(params[:id]) if file_set_klass.exists?(params[:id])
       unless @file_set
         message = "Server cannot find file set with id #{params[:id]}"
         @error = WillowSword::Error.new(message, type = :bad_request)
@@ -47,8 +49,7 @@ module WillowSword
         return false unless validate_binary_data
         process_file
         upload_files
-        @klass = Work
-        @object = klass.find(params[:work_id]) if klass.exists?(params[:work_id])
+        @object = work_klass.find(params[:work_id]) if work_klass.exists?(params[:work_id])
         if @object
           update_work
         end

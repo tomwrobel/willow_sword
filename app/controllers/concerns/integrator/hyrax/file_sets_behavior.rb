@@ -10,7 +10,7 @@ module Integrator
 
       def find_file_set_by_id
         # puts 'In find_file_set_by_id'
-        FileSet.find(params[:id]) if FileSet.exists?(params[:id])
+        file_set_klass.find(params[:id]) if file_set_klass.exists?(params[:id])
       end
 
       def update_file_set
@@ -25,12 +25,16 @@ module Integrator
       end
 
       private
+        def set_file_set_klass
+          @file_set_klass = WillowSword.config.file_set_models.first.singularize.classify.constantize
+        end
+
         def transform_file_set_attributes
           attributes.slice(*file_set_permitted_attributes)
         end
 
         def file_set_permitted_attributes
-          FileSet.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
+          file_set_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
         end
     end
   end

@@ -41,7 +41,7 @@ module Integrator
 
       def find_work_by_id
         # puts 'In find_work_by_id'
-        klass.find(params[:id]) if klass.exists?(params[:id])
+        work_klass.find(params[:id]) if work_klass.exists?(params[:id])
       end
 
       def update_work
@@ -53,7 +53,7 @@ module Integrator
       def create_work
         # puts 'In create_work'
         attrs = create_attributes
-        @object = klass.new
+        @object = work_klass.new
         work_actor.create(environment(attrs))
       end
 
@@ -68,8 +68,8 @@ module Integrator
       end
 
       private
-        def klass
-          WillowSword.config.work_models.first.singularize.classify.constantize
+        def set_work_klass
+          @work_klass = WillowSword.config.work_models.first.singularize.classify.constantize
         end
 
         # @param [Hash] attrs the attributes to put in the environment
@@ -94,7 +94,7 @@ module Integrator
         end
 
         def permitted_attributes
-          klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
+          work_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
         end
     end
   end
