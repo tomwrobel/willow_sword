@@ -69,7 +69,11 @@ module Integrator
 
       private
         def set_work_klass
-          @work_klass = WillowSword.config.work_models.first.singularize.classify.constantize
+          if headers[:hyrax_work_model] && WillowSword.config.work_models.include?(headers[:hyrax_work_model])
+            @work_klass = headers[:hyrax_work_model].constantize
+          else
+            @work_klass = WillowSword.config.work_models.first.constantize
+          end
         end
 
         # @param [Hash] attrs the attributes to put in the environment
