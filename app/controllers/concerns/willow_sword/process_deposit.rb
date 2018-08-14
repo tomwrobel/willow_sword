@@ -65,7 +65,7 @@ module WillowSword
         # process zip
         # puts 'process zip'
         process_zip
-      when 'application/xml'
+      when 'application/xml', 'text/xml'
         # process xml
         # puts 'process xml'
         process_xml
