@@ -78,14 +78,14 @@ module WillowSword
     end
 
     def process_xml
-      xw = WillowSword::DcCrosswalk.new(@file.path)
+      xw = WillowSword::ModsCrosswalk.new(@file.path)
       xw.map_xml
-      @attributes = xw.metadata
+      @attributes = xw.mapped_metadata
       @files = []
-      # puts @attributes
-      # puts '-'*50
-      # puts @files
-      # puts '-'*50
+      puts @attributes
+      puts '-'*50
+      puts @files
+      puts '-'*50
       unless @attributes.any?
         message = "Could not extract any metadata"
         @error = WillowSword::Error.new(message, type = :bad_request)
@@ -105,13 +105,13 @@ module WillowSword
       bag = WillowSword::BagPackage.new(contents_path, bag_path)
       @files = bag.package.bag_files - [File.join(bag.package.data_dir, 'metadata.xml')]
       # Extract metadata
-      xw = WillowSword::DcCrosswalk.new(File.join(bag.package.data_dir, 'metadata.xml'))
+      xw = WillowSword::ModsCrosswalk.new(File.join(bag.package.data_dir, 'metadata.xml'))
       xw.map_xml
-      @attributes = xw.metadata
-      # puts @attributes
-      # puts '-'*50
-      # puts @files
-      # puts '-'*50
+      @attributes = xw.mapped_metadata
+      puts @attributes
+      puts '-'*50
+      puts @files
+      puts '-'*50
       unless @attributes.any?
         message = "Could not extract any metadata from file metadata.xml"
         @error = WillowSword::Error.new(message, type = :bad_request)
