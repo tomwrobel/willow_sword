@@ -51,13 +51,17 @@ module Integrator
       end
 
       def create_work
-        puts 'In create_work'
+        # puts 'In create_work'
         attrs = create_attributes
         @object = work_klass.new
         work_actor.create(environment(attrs))
-        puts headers
-        puts '-'*50
-        puts @work_klass
+        # puts 'Headers'
+        # puts headers
+        # puts '-'*50
+        # puts "Work class: #{@work_klass}"
+        # puts 'attributes'
+        # puts attrs
+        # puts '-'*50
       end
 
       def create_attributes

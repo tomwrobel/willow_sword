@@ -82,10 +82,10 @@ module WillowSword
       xw.map_xml
       @attributes = xw.mapped_metadata
       @files = []
-      puts @attributes
-      puts '-'*50
-      puts @files
-      puts '-'*50
+      # puts @attributes
+      # puts '-'*50
+      # puts @files
+      # puts '-'*50
       unless @attributes.any?
         message = "Could not extract any metadata"
         @error = WillowSword::Error.new(message, type = :bad_request)
@@ -108,10 +108,10 @@ module WillowSword
       xw = WillowSword::ModsCrosswalk.new(File.join(bag.package.data_dir, 'metadata.xml'))
       xw.map_xml
       @attributes = xw.mapped_metadata
-      puts @attributes
-      puts '-'*50
-      puts @files
-      puts '-'*50
+      # puts @attributes
+      # puts '-'*50
+      # puts @files
+      # puts '-'*50
       unless @attributes.any?
         message = "Could not extract any metadata from file metadata.xml"
         @error = WillowSword::Error.new(message, type = :bad_request)

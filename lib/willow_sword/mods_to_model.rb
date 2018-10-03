@@ -73,7 +73,7 @@ module WillowSword
       end
       # related item
       @metadata.fetch('related_items', []).each do |ri|
-        if ri.any? and ri.fetch('title', []).any?
+        if ri.any? and ri.fetch('related_item_title', []).any?
           assign_nested_hash('related_items', ri, merge=false)
         end
       end
@@ -104,38 +104,33 @@ module WillowSword
     private
 
     def assign_nested_term(parent, term, value)
-      if @mapped_metadata.fetch("#{parent}_attributes", []).any?
-        vals = Hash(@mapped_metadata["#{parent}_attributes"].first)
-        # only creator role is multivalued
-        if term == 'role'
-          vals[term] = vals.fetch(term, [])
-          vals[term] += Array(value)
-        else
-          vals[term] = Array(value).first
-        end
-        @mapped_metadata["#{parent}_attributes"] = [vals]
+      @mapped_metadata["#{parent}_attributes"] ||= []
+      vals = @mapped_metadata["#{parent}_attributes"].first
+      vals ||= {}
+      vals[term] = Array(vals[term]) + Array(value)
+      unless term == 'role'
+        # All vals except role are singular
+        vals[term] = Array(value).first
       end
+      @mapped_metadata["#{parent}_attributes"] = [vals]
     end
 
     def assign_nested_hash(parent, values, merge=true)
-      # only creator role is multivalued
+      @mapped_metadata["#{parent}_attributes"] ||= []
+      # All vals except role are singular
       values.each do |k, v|
-        if k == 'role'
-          values[k] = Array(v)
-        else
+        values[k] = Array(v)
+        unless k == 'role'
           values[k] = Array(v).first
         end
       end
       values.delete_if {|k, v| v.blank?}
       if merge
-        vals = {}
-        if @mapped_metadata["#{parent}_attributes"].any?
-          vals = Hash(@mapped_metadata["#{parent}_attributes"].first)
-        end
+        vals = @mapped_metadata["#{parent}_attributes"].first
+        vals ||= {}
         vals.merge!(values)
         @mapped_metadata["#{parent}_attributes"] = [vals]
       else
-        @mapped_metadata["#{parent}_attributes"] ||= []
         @mapped_metadata["#{parent}_attributes"] << values
       end
     end
