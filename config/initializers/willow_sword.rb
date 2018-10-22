@@ -4,4 +4,6 @@ WillowSword.setup do |config|
   config.collection_models = ['Collection']
   config.work_models = ['Work']
   config.file_set_models = ['FileSet']
+  config.xml_mapping_create = 'MODS'
+  config.xml_mapping_read = 'DC'
 end

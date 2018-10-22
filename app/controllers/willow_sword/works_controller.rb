@@ -19,9 +19,11 @@ module WillowSword
         message = "Server cannot find work with id #{params[:id]}"
         @error = WillowSword::Error.new(message, type = :bad_request)
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
-      else
+      elsif WillowSword.config.xml_mapping_read == 'MODS'
         @mods = assign_model_to_mods
-        # render '/willow_sword/works/show.mods.xml.builder', formats: [:xml], status: 200
+        render '/willow_sword/works/show.mods.xml.builder', formats: [:xml], status: 200
+      else
+        render '/willow_sword/works/show.dc.xml.builder', formats: [:xml], status: 200
       end
     end
 

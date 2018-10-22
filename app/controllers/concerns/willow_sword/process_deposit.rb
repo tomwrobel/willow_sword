@@ -78,9 +78,15 @@ module WillowSword
     end
 
     def process_xml
-      xw = WillowSword::ModsCrosswalk.new(@file.path)
-      xw.map_xml
-      @attributes = xw.mapped_metadata
+      if WillowSword.config.xml_mapping_create == 'MODS'
+        xw = WillowSword::ModsCrosswalk.new(@file.path)
+        xw.map_xml
+        @attributes = xw.mapped_metadata
+      else
+        xw = WillowSword::DcCrosswalk.new(@file.path)
+        xw.map_xml
+        @attributes = xw.metadata
+      end
       @files = []
       # puts @attributes
       # puts '-'*50
