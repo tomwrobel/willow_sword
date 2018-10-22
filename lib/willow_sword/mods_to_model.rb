@@ -234,7 +234,7 @@ module WillowSword
             mapped_name['institution'] += Array(val)
           end
         end
-        name_hash.fetch('identifiers', []).each do |key, val|
+        name_hash.fetch('identifier', []).each do |key, val|
           if id_keys.include?(key.downcase)
             mapped_name[key.downcase] = mapped_name.fetch(key.downcase, [])
             mapped_name[key.downcase] += Array(val)
