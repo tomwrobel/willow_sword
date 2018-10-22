@@ -23,7 +23,7 @@ module WillowSword
       end
       # Language
       if @metadata.fetch('language', []).any?
-        @mapped_metadata['language'] = Array(@metadata['language']).first
+        @mapped_metadata['language'] = Array(@metadata['language'])
       end
       # names
       if @metadata.fetch('names', []).any?
@@ -68,9 +68,9 @@ module WillowSword
         assign_nested_term('files_information', 'extent', @metadata['extent'])
       end
       # record_info - recordContentSource
-      if @metadata.fetch('record_info', []).any?
-        assign_record_content_source
-      end
+      # if @metadata.fetch('record_info', []).any?
+      #  assign_record_content_source
+      # end
       # related item
       @metadata.fetch('related_items', []).each do |ri|
         if ri.any? and ri.fetch('related_item_title', []).any?
@@ -104,7 +104,8 @@ module WillowSword
       if publishers.any?
         @mapped_metadata.delete('publishers_attributes')
         @mapped_metadata['bibliographic_information_attributes'] ||= []
-        @mapped_metadata['bibliographic_information_attributes']['publishers_attributes'] = publishers
+        @mapped_metadata['bibliographic_information_attributes'][0] ||= {}
+        @mapped_metadata['bibliographic_information_attributes'][0]['publishers_attributes'] = publishers
       end
     end
 
@@ -218,7 +219,6 @@ module WillowSword
       #   if orcid map it to creator_identifier. creator_identifier_scheme - Orcid
       #   all other id, map it to institutional_id
       aff_keys = %w(institution division department sub_department research_group college)
-      id_keys = %w(orcid institutional_id)
       @metadata['names'].each do |name_hash|
         mapped_name = {}
         if name_hash.fetch('display_form', []).any?
@@ -242,13 +242,10 @@ module WillowSword
           end
         end
         name_hash.fetch('identifier', []).each do |key, val|
-          if id_keys.include?(key.downcase)
-            mapped_name[key.downcase] = mapped_name.fetch(key.downcase, [])
-            mapped_name[key.downcase] += Array(val)
-          else
-            mapped_name['institutional_id'] = mapped_name.fetch('institutional_id', [])
-            mapped_name['institutional_id'] += Array(val)
-          end
+          mapped_name['creator_identifier'] = mapped_name.fetch('creator_identifier', [])
+          mapped_name['creator_identifier'] += Array(val)
+          mapped_name['creator_identifier_scheme'] = mapped_name.fetch('creator_identifier_scheme', [])
+          mapped_name['creator_identifier_scheme'] += Array(key)
         end
         if name_hash.fetch('role', []).any?
           mapped_name['role'] = Array(name_hash.fetch('role'))
