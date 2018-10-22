@@ -5,6 +5,7 @@ require "willow_sword/error"
 require "willow_sword/dc_crosswalk"
 require "willow_sword/mods_crosswalk"
 require "willow_sword/mods_to_model"
+require "willow_sword/model_to_mods"
 
 module WillowSword
   # Your code goes here...

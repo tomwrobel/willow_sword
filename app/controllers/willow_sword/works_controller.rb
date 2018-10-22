@@ -10,6 +10,7 @@ module WillowSword
     include WillowSword::BinaryDeposit
     include WillowSword::ProcessDeposit
     include Integrator::Hyrax::WorksBehavior
+    include WillowSword::ModelToMods
 
     def show
       @collection_id = params[:collection_id]
@@ -18,6 +19,9 @@ module WillowSword
         message = "Server cannot find work with id #{params[:id]}"
         @error = WillowSword::Error.new(message, type = :bad_request)
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
+      else
+        @mods = assign_model_to_mods
+        # render '/willow_sword/works/show.mods.xml.builder', formats: [:xml], status: 200
       end
     end
 
