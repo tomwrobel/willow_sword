@@ -100,7 +100,7 @@ module WillowSword
         assign_model(@metadata['type_of_resource'])
       end
       # Deal with double nested attributes
-      publishers = @mapped_metadata.get('publishers_attributes', [])
+      publishers = @mapped_metadata.fetch('publishers_attributes', [])
       if publishers.any?
         @mapped_metadata.delete('publishers_attributes')
         @mapped_metadata['bibliographic_information_attributes'] ||= []
