@@ -10,21 +10,7 @@ module WillowSword
       end
       # identifiers
       @mapped_metadata['identifiers'] = {}
-      # -- identfier from publishers
-      if Array(@object[:publishers]).any?
-        id_keys = {
-          doi:  'doi',
-          publisher_name: 'publisher',
-          article_number: 'article_number',
-          issn: 'issn',
-          isbn_10: 'isbn',
-          isbn_13: 'isbn'
-        }
-        id_keys.each do |model_key, mods_key|
-          @mapped_metadata['identifiers'][mods_key] ||= []
-          @mapped_metadata['identifiers'][mods_key] += Array(@object[:publishers][0][model_key])
-        end
-      end
+      # publisher ids - with publishers below
       # -- identifier from admin
       if Array(@object[:admin_information]).any?
         @mapped_metadata['identifiers']['source_identifiers'] = Array(@object[:admin_information][0][:identifier_at_source])
@@ -48,7 +34,7 @@ module WillowSword
         ids = {}
         id = Array(creator[:creator_identifier]).first
         id_key = Array(creator[:creator_identifier_scheme]).first
-        if id and key
+        if id and id_key
           ids[id_key] = Array(id)
         end
         agent['identifier'] = ids if ids.any?
@@ -64,26 +50,43 @@ module WillowSword
       if Array(@object[:license_and_rights_information]).any?
         @mapped_metadata['copyrightDate'] = Array(@object[:license_and_rights_information][0][:copyright_date])
       end
-      # origin info - date captured
       if Array(@object[:bibliographic_information]).any?
+        # origin info - date captured
         @mapped_metadata['dateCaptured'] = Array(@object[:bibliographic_information][0][:date_of_data_collection])
-      end
-      if Array(@object[:publishers]).any?
-        # origin info - date issued
-        @mapped_metadata['dateIssued'] = Array(@object[:publishers][0][:publication_date])
-        # origin info - edition
-        @mapped_metadata['edition'] = Array(@object[:publishers][0][:edition])
-        # origin info - place
-        @mapped_metadata['place'] = Array(@object[:publishers][0][:place_of_publication])
-        # origin info - publisher
-        @mapped_metadata['publisher'] = Array(@object[:publishers][0][:publisher_name])
+        # Origin Info and identifiers
+        publishers = Array(@object.bibliographic_information[0][:publishers])
+        if publishers.any?
+          # origin info - date issued
+          @mapped_metadata['dateIssued'] = Array(publishers[0][:publication_date])
+          # origin info - edition
+          @mapped_metadata['edition'] = Array(publishers[0][:edition])
+          # origin info - place
+          @mapped_metadata['place'] = Array(publishers[0][:place_of_publication])
+          # origin info - publisher
+          @mapped_metadata['publisher'] = Array(publishers[0][:publisher_name])
+          # -- identfier from publishers
+          id_keys = {
+            doi:  'doi',
+            publisher_name: 'publisher',
+            article_number: 'article_number',
+            issn: 'issn',
+            isbn_10: 'isbn',
+            isbn_13: 'isbn'
+          }
+          id_keys.each do |model_key, mods_key|
+            if Array(publishers[0][model_key]).any?
+              @mapped_metadata['identifiers'][mods_key] ||= []
+              @mapped_metadata['identifiers'][mods_key] += Array(publishers[0][model_key])
+            end
+          end
+        end
       end
       # physical description - form
       form = {}
       form['peerReviewed'] = Array(@object[:peer_review_status]) if Array(@object[:peer_review_status]).any?
       form['status'] = Array(@object[:publication_status]) if Array(@object[:publication_status]).any?
       if Array(@object[:files_information]).any?
-        form['version'] = Array(@object[:files_information][0][:version]) if Array(@object[:files_information][0][:version]).any?
+        form['version'] = Array(@object[:files_information][0][:file_version]) if Array(@object[:files_information][0][:file_version]).any?
         @mapped_metadata['extent'] = Array(@object[:files_information][0][:extent])
       end
       @mapped_metadata['form'] = form if form.any?
@@ -100,7 +103,7 @@ module WillowSword
         related_item['title'] = Array(ri[:related_item_title]) if Array(ri[:related_item_title]).any?
         related_item['abstract'] = Array(ri[:related_item_abstract]) if Array(ri[:related_item_abstract]).any?
         related_item['identifier'] = Array(ri[:related_item_ID]) if Array(ri[:related_item_ID]).any?
-        @mapped_metadata['related_items'] << ri if ri.any?
+         @mapped_metadata['related_items'] << related_item if related_item.any?
       end
       # subject - genre
       @mapped_metadata['genre'] = Array(@object[:keyword])

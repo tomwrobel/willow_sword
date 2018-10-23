@@ -264,7 +264,7 @@ module WillowSword
       end
       if vals.fetch('version', []).any?
         parent = 'files_information'
-        assign_nested_term(parent, 'version', vals['version'])
+        assign_nested_term(parent, 'file_version', vals['version'])
       end
     end
 
