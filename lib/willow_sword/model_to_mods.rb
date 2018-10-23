@@ -6,7 +6,7 @@ module WillowSword
       @mapped_metadata['abstract'] = Array(@object[:abstract])
       # accessCondition
       if Array(@object[:license_and_rights_information]).any?
-        @mapped_metadata['accessCondition'] = Array(@object[:license_and_rights_information][0][:licence])
+        @mapped_metadata['access_condition'] = Array(@object[:license_and_rights_information][0][:licence])
       end
       # identifiers
       @mapped_metadata['identifiers'] = {}
@@ -46,9 +46,10 @@ module WillowSword
         agent['affiliation'] = affiliation if affiliation.any?
         # identifiers
         ids = {}
-        id_keys = [:orcid, :institutional_id]
-        id_keys.each do |id_key|
-          ids[id_key.to_s] = Array(creator[id_key]) if Array(creator[id_key]).any?
+        id = Array(creator[:creator_identifier]).first
+        id_key = Array(creator[:creator_identifier_scheme]).first
+        if id and key
+          ids[id_key] = Array(id)
         end
         agent['identifier'] = ids if ids.any?
         # role
@@ -78,13 +79,14 @@ module WillowSword
         @mapped_metadata['publisher'] = Array(@object[:publishers][0][:publisher_name])
       end
       # physical description - form
-      @mapped_metadata['form'] = {}
-      @mapped_metadata['form']['peerReviewed'] = Array(@object[:peer_review_status])
-      @mapped_metadata['form']['status'] = Array(@object[:publication_status])
+      form = {}
+      form['peerReviewed'] = Array(@object[:peer_review_status]) if Array(@object[:peer_review_status]).any?
+      form['status'] = Array(@object[:publication_status]) if Array(@object[:publication_status]).any?
       if Array(@object[:files_information]).any?
-        @mapped_metadata['form']['version'] = Array(@object[:files_information][0][:version])
+        form['version'] = Array(@object[:files_information][0][:version]) if Array(@object[:files_information][0][:version]).any?
         @mapped_metadata['extent'] = Array(@object[:files_information][0][:extent])
       end
+      @mapped_metadata['form'] = form if form.any?
       # record_info
       if Array(@object[:admin_information]).any?
         @mapped_metadata['record_info'] = {}
