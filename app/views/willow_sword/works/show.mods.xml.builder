@@ -17,10 +17,10 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
   # Add MODS metadata
   # x.Hello("World!", "type" => "global")
   xml.mods({'xmlns:xlink':'http://www.w3.org/1999/xlink',
-    'version':'3.4',
+    'version':'3.7',
     'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance',
     'xmlns':'http://www.loc.gov/mods/v3',
-    'xsi:schemaLocation':'http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd'
+    'xsi:schemaLocation':'http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd'
   }) do
     # Abstract
     Array(@mods.fetch('abstract', [])).each do |val|
