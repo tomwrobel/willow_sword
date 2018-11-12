@@ -23,6 +23,8 @@ Mount the engine. Add this line to config/routes.rb
 ```ruby
 mount WillowSword::Engine => '/sword'
 ```
+## Configuration
+The plugin has a few configuration options. To view the current default options and override these, see [configuration options](https://github.com/CottageLabs/willow_sword/wiki/Configuring-willow-sword)
 
 ## Usage
 To use the plugin see [usage](https://github.com/CottageLabs/willow_sword/wiki/Usage)
