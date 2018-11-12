@@ -11,26 +11,29 @@ module WillowSword
       @dir = nil
       @dir = File.join('tmp/data', SecureRandom.uuid)
       contents_path = File.join(@dir, 'contents')
-      if params[:atom][:file].size > 0 || params[:payload][:file].size > 0
-        unless File.directory?(@dir)
-          FileUtils.mkdir_p(@dir)
+      if params[:metadata] || params[:payload]
+        unless File.directory?(contents_path)
+          FileUtils.mkdir_p(contents_path)
         end
       end
-      if params[:atom][:file].size > 0
-        # save metadata - params[:atom]
-        # name = params[:atom][:file].original_filename
+      if params[:metadata]
+        # save metadata - params[:metadata]
         path = File.join(contents_path, 'metadata.xml')
-        @metadata_file = File.open(path, "wb") {
-         |f| f.write(params[:atom][:file].read)
-        }
+        if params[:metadata].kind_of? ActionDispatch::Http::UploadedFile
+          tmp = params[:metadata].tempfile
+          FileUtils.move tmp.path, path
+        else
+          File.open(path, 'wb') do |f|
+            f.write(params[:metadata])
+          end
+        end
       end
-      if params[:payload][:file].size > 0
-        # save file - params[:atom]
-        # name = params[:payload][:file].original_filename
-        path = File.join(@dir, @headers[:filename])
-        @file = File.open(path, "wb")
-        @file.write(params[:payload][:file].read)
-        @file.close
+      if params[:payload]
+        # Save payload - params[:payload]
+        path = File.join(@dir, params[:payload].original_filename)
+        tmp = params[:payload].tempfile
+        FileUtils.move tmp.path, path
+        @file = File.new(path)
         fetch_data_content_type
         if @data_content_type == 'application/zip'
           # unzip file
@@ -42,13 +45,12 @@ module WillowSword
           FileUtils.cp(@file.path, new_file_path)
         end
       end
-      if (@metadata_file.present and File.exist? @metadata_file.path) or
-         (@file.present? and File.exist? @file.path)
-        true
-      else
+      if Dir.empty?(contents_path)
         message = "Content not received"
         @error = WillowSword::Error.new(message, type = :bad_request)
         false
+      else
+        true
       end
     end
 

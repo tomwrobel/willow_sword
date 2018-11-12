@@ -29,10 +29,12 @@ module WillowSword
     end
 
     def create
+      @error = nil
       if validate_request
         @collection_id = params[:collection_id]
         render 'create.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
       else
+        @error = WillowSword::Error.new("Error creating work", type = :bad_request) unless @error.present?
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
     end
@@ -47,7 +49,7 @@ module WillowSword
         return false unless validate_multi_part
         fetch_multipart_data_and_deposit
       when 'application/atom+xml;type=entry', 'application/xml', 'text/xml'
-        # atom deposit
+        # xml deposit
         return false unless validate_atom_entry
         fetch_raw_data_and_deposit
       else
@@ -57,25 +59,26 @@ module WillowSword
       end
     end
 
-    private
-      def fetch_raw_data_and_deposit
-        return false unless save_binary_data
-        return false unless validate_binary_data
-        fetch_data_content_type
-        return false unless process_data
-        upload_files unless @files.blank?
-        add_work
-        true
-      end
+    def fetch_raw_data_and_deposit
+      return false unless save_binary_data
+      return false unless validate_binary_data
+      fetch_data_content_type
+      return false unless process_data
+      upload_files unless @files.blank?
+      add_work
+      true
+    end
 
-      def fetch_multipart_data_and_deposit
-        return false unless save_multipart_data
+    def fetch_multipart_data_and_deposit
+      return false unless save_multipart_data
+      if @file.present?
         return false unless File.file?(@file) and validate_binary_data
-        return false unless process_bag
-        upload_files unless @files.blank?
-        add_work
-        true
       end
+      return false unless process_bag
+      upload_files unless @files.blank?
+      add_work
+      true
+    end
 
   end
 end
