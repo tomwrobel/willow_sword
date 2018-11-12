@@ -47,6 +47,7 @@ module WillowSword
       get_subtitle
       get_type_of_resource
       get_title
+      get_headers
     end
 
     def get_abstract
@@ -193,6 +194,12 @@ module WillowSword
     def get_title
       vals = get_text(@mods, 'titleInfo/title')
       @metadata['title'] = vals if vals.any?
+    end
+
+    def get_headers
+      if @headers.any?
+        @metadata['headers'] = stringify_keys(@headers)
+      end
     end
 
     def get_type_of_resource

@@ -107,6 +107,10 @@ module WillowSword
         @mapped_metadata['bibliographic_information_attributes'][0] ||= {}
         @mapped_metadata['bibliographic_information_attributes'][0]['publishers_attributes'] = publishers
       end
+      # Add in-progress header
+      unless @metadata.dig('headers', 'in_progress').nil?
+        assign_nested_term('admin_information', 'deposit_in_progress', @metadata.dig('headers', 'in_progress'))
+      end
     end
 
     private
