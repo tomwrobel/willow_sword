@@ -147,9 +147,10 @@ module WillowSword
       zp.unzip_file
       # validate or create bag
       bag = WillowSword::BagPackage.new(contents_path, bag_path)
-      @files = bag.package.bag_files - [File.join(bag.package.data_dir, 'metadata.xml')]
+      metadata_file = File.join(bag.package.data_dir, 'metadata.xml')
+      @files = bag.package.bag_files - [metadata_file]
       # Extract metadata
-      process_xml(File.join(bag.package.data_dir, 'metadata.xml'))
+      process_xml(metadata_file)
     end
 
     def process_file
@@ -175,9 +176,10 @@ module WillowSword
       bag_path = File.join(@dir, 'bag')
       # validate or create bag
       bag = WillowSword::BagPackage.new(contents_path, bag_path)
-      @files = bag.package.bag_files - [File.join(bag.package.data_dir, 'metadata.xml')]
+      metadata_file = File.join(bag.package.data_dir, 'metadata.xml')
+      @files = bag.package.bag_files - [metadata_file]
       # Extract metadata
-      process_xml(File.join(bag.package.data_dir, 'metadata.xml'))
+      process_xml(metadata_file)
     end
 
   end
