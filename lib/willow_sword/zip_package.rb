@@ -37,7 +37,6 @@ module WillowSword
       entries.each { |e|
         zipFilePath = path == "" ? e : File.join(path, e)
         diskFilePath = File.join(@src, zipFilePath)
-        # puts "Deflating " + diskFilePath
         if  File.directory?(diskFilePath)
           io.mkdir(zipFilePath)
           subdir =Dir.entries(diskFilePath); subdir.delete("."); subdir.delete("..")

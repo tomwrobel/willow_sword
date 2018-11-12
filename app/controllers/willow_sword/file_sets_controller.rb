@@ -25,7 +25,6 @@ module WillowSword
       @collection_id = params[:collection_id]
       @work_id = params[:work_id]
       if fetch_and_add_file
-        puts "URL #{collection_work_url(params[:collection_id], @object)}"
         render 'create.xml.builder', formats: [:xml], status: 200
       else
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code

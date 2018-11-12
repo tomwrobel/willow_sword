@@ -11,7 +11,6 @@ module Integrator
       extend ActiveSupport::Concern
 
       def upload_files
-        # puts 'In upload_files'
         @file_ids = []
         @files.each do |file|
           u = ::Hyrax::UploadedFile.new
@@ -20,11 +19,9 @@ module Integrator
           u.save
           @file_ids << u.id
         end
-        # puts "Files uploaded: #{@file_ids}"
       end
 
       def add_work
-        # puts 'In add_work'
         @object = find_work
         if @object
           update_work
@@ -34,43 +31,30 @@ module Integrator
       end
 
       def find_work
-        # puts 'In find_work'
         # params[:id] = SecureRandom.uuid unless params[:id].present?
         return find_work_by_id if params[:id]
       end
 
       def find_work_by_id
-        # puts 'In find_work_by_id'
         work_klass.find(params[:id]) if work_klass.exists?(params[:id])
       end
 
       def update_work
-        # puts 'In update_work'
         raise "Object doesn't exist" unless @object
         work_actor.update(environment(update_attributes))
       end
 
       def create_work
-        # puts 'In create_work'
         attrs = create_attributes
         @object = work_klass.new
         work_actor.create(environment(attrs))
-        # puts 'Headers'
-        # puts headers
-        # puts '-'*50
-        # puts "Work class: #{@work_klass}"
-        # puts 'attributes'
-        # puts attrs
-        # puts '-'*50
       end
 
       def create_attributes
-        # puts 'In create_attributes'
         transform_attributes
       end
 
       def update_attributes
-        # puts 'In update_attributes'
         transform_attributes.except(:id)
       end
 
