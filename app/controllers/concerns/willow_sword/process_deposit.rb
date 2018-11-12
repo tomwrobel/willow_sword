@@ -1,12 +1,58 @@
 # require 'rack/mime'
+require 'fileutils'
+
 module WillowSword
   module ProcessDeposit
 
     private
 
+    def save_multipart_data
+      @file = nil
+      @dir = nil
+      @dir = File.join('tmp/data', SecureRandom.uuid)
+      contents_path = File.join(@dir, 'contents')
+      if params[:atom][:file].size > 0 || params[:payload][:file].size > 0
+        unless File.directory?(@dir)
+          FileUtils.mkdir_p(@dir)
+        end
+      end
+      if params[:atom][:file].size > 0
+        # save metadata - params[:atom]
+        # name = params[:atom][:file].original_filename
+        path = File.join(contents_path, 'metadata.xml')
+        @metadata_file = File.open(path, "wb") {
+         |f| f.write(params[:atom][:file].read)
+        }
+      end
+      if params[:payload][:file].size > 0
+        # save file - params[:atom]
+        # name = params[:payload][:file].original_filename
+        path = File.join(@dir, @headers[:filename])
+        @file = File.open(path, "wb")
+        @file.write(params[:payload][:file].read)
+        @file.close
+        fetch_data_content_type
+        if @data_content_type == 'application/zip'
+          # unzip file
+          zp = WillowSword::ZipPackage.new(@file.path, contents_path)
+          zp.unzip_file
+        else
+          # Copy file to contents dir
+          new_file_path = File.join(contents_path, @headers[:filename])
+          FileUtils.cp(@file.path, new_file_path)
+        end
+      end
+      if (@metadata_file.present and File.exist? @metadata_file.path) or
+         (@file.present? and File.exist? @file.path)
+        true
+      else
+        message = "Content not received"
+        @error = WillowSword::Error.new(message, type = :bad_request)
+        false
+      end
+    end
+
     def save_binary_data
-      # puts 'saving body'
-      # puts request.body.size
       @file = nil
       @dir = nil
       if request.body.size > 0
@@ -18,11 +64,9 @@ module WillowSword
         # @file.write(request.body.read)
         request.body.each { |line| @file.write(line) }
         @file.close
-        # puts "File path: #{@file.path}"
         # @file.unlink
       end
       if @file.present? and File.exist? @file.path
-        # puts "File exists: #{@file.present? and File.exist? @file.path}"
         true
       else
         message = "Content not received"
@@ -53,7 +97,6 @@ module WillowSword
       # return unless (@file.present? and File.exist? @file.path)
       # @data_content_type = `file --b --mime-type "#{File.join(Dir.pwd, @file.path)}"`.strip
       @data_content_type = `file --b --mime-type "#{@file.path}"`.strip
-      # puts "Mime type: #{@data_content_type}"
       # @extension = Rack::Mime::MIME_TYPES.invert[mime_type]
       # Not matching content_type and packaging from headers with that computed.
     end
@@ -63,35 +106,28 @@ module WillowSword
       case @data_content_type
       when 'application/zip'
         # process zip
-        # puts 'process zip'
         process_zip
       when 'application/xml', 'text/xml'
         # process xml
-        # puts 'process xml'
-        process_xml
+        @files = []
+        process_xml(@file.path)
       else
-        # puts 'Unknown format of data'
         message = "Server does not support the content type #{@data_content_type}"
         @error = WillowSword::Error.new(message, type = :content)
         false
       end
     end
 
-    def process_xml
+    def process_xml(file_path)
       if WillowSword.config.xml_mapping_create == 'MODS'
-        xw = WillowSword::ModsCrosswalk.new(@file.path)
+        xw = WillowSword::ModsCrosswalk.new(file_path)
         xw.map_xml
         @attributes = xw.mapped_metadata
       else
-        xw = WillowSword::DcCrosswalk.new(@file.path)
+        xw = WillowSword::DcCrosswalk.new(file_path)
         xw.map_xml
         @attributes = xw.metadata
       end
-      @files = []
-      # puts @attributes
-      # puts '-'*50
-      # puts @files
-      # puts '-'*50
       unless @attributes.any?
         message = "Could not extract any metadata"
         @error = WillowSword::Error.new(message, type = :bad_request)
@@ -111,20 +147,7 @@ module WillowSword
       bag = WillowSword::BagPackage.new(contents_path, bag_path)
       @files = bag.package.bag_files - [File.join(bag.package.data_dir, 'metadata.xml')]
       # Extract metadata
-      xw = WillowSword::ModsCrosswalk.new(File.join(bag.package.data_dir, 'metadata.xml'))
-      xw.map_xml
-      @attributes = xw.mapped_metadata
-      # puts @attributes
-      # puts '-'*50
-      # puts @files
-      # puts '-'*50
-      unless @attributes.any?
-        message = "Could not extract any metadata from file metadata.xml"
-        @error = WillowSword::Error.new(message, type = :bad_request)
-        false
-      else
-        true
-      end
+      process_xml(File.join(bag.package.data_dir, 'metadata.xml'))
     end
 
     def process_file
@@ -136,15 +159,23 @@ module WillowSword
       case @data_content_type
       when 'application/xml'
         # process xml
-        # puts 'process xml'
-        process_xml
+        @files = []
+        process_xml(@file.path)
       else
-        # puts 'Unknown format of data'
         message = "Server does not support the content type #{@data_content_type}"
         @error = WillowSword::Error.new(message, type = :content)
         false
       end
+    end
 
+    def process_bag
+      contents_path = File.join(@dir, 'contents')
+      bag_path = File.join(@dir, 'bag')
+      # validate or create bag
+      bag = WillowSword::BagPackage.new(contents_path, bag_path)
+      @files = bag.package.bag_files - [File.join(bag.package.data_dir, 'metadata.xml')]
+      # Extract metadata
+      process_xml(File.join(bag.package.data_dir, 'metadata.xml'))
     end
 
   end

@@ -31,7 +31,6 @@ module WillowSword
     def create
       if validate_request
         @collection_id = params[:collection_id]
-        # puts "URL #{collection_work_url(params[:collection_id], @object)}"
         render 'create.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
       else
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
@@ -43,25 +42,36 @@ module WillowSword
     def validate_request
       # Choose based on content type
       case request.content_type
-      when 'multipart/related'
-        multipart_not_supported
-        return false
-      when 'application/atom+xml;type=entry'
+      when 'multipart/form-data'
+        # multipart deposit
+        return false unless validate_multi_part
+        fetch_multipart_data_and_deposit
+      when 'application/atom+xml;type=entry', 'application/xml', 'text/xml'
         # atom deposit
         return false unless validate_atom_entry
+        fetch_raw_data_and_deposit
       else
         # binary deposit
         return false unless validate_binary_deposit
+        fetch_raw_data_and_deposit
       end
-      fetch_data_and_deposit
     end
 
     private
-      def fetch_data_and_deposit
+      def fetch_raw_data_and_deposit
         return false unless save_binary_data
         return false unless validate_binary_data
         fetch_data_content_type
         return false unless process_data
+        upload_files unless @files.blank?
+        add_work
+        true
+      end
+
+      def fetch_multipart_data_and_deposit
+        return false unless save_multipart_data
+        return false unless File.file?(@file) and validate_binary_data
+        return false unless process_bag
         upload_files unless @files.blank?
         add_work
         true
