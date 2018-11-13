@@ -14,7 +14,8 @@ module Integrator
         @file_ids = []
         @files.each do |file|
           u = ::Hyrax::UploadedFile.new
-          u.user_id = User.find_by_user_key(User.batch_user_key).id unless User.find_by_user_key(User.batch_user_key).nil?
+          @current_user = User.batch_user unless @current_user.present?
+          u.user_id = @current_user.id unless @current_user.nil?
           u.file = ::CarrierWave::SanitizedFile.new(file)
           u.save
           @file_ids << u.id
@@ -71,7 +72,8 @@ module Integrator
         # @return [Hyrax::Actors::Environment]
         def environment(attrs)
           # Set Hyrax.config.batch_user_key
-          ::Hyrax::Actors::Environment.new(@object, Ability.new(User.batch_user), attrs)
+          @current_user = User.batch_user unless @current_user.present?
+          ::Hyrax::Actors::Environment.new(@object, Ability.new(@current_user), attrs)
         end
 
         def work_actor

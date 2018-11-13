@@ -20,5 +20,19 @@ module WillowSword
       end
     end
 
+    def validate_target_user
+      if @headers.fetch(:on_behalf_of, nil)
+        target_user = User.find(@headers[:on_behalf_of])
+        if target_user.present?
+          @current_user = target_user
+          true
+        else
+          message = "On-behalf-of user not found"
+          @error = WillowSword::Error.new(message, type = :target_owner_unknown)
+          false
+        end
+      end
+    end
+
   end
 end

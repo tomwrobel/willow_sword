@@ -3,7 +3,7 @@ require_dependency "willow_sword/application_controller"
 module WillowSword
   class WorksController < ApplicationController
     before_action :set_work_klass
-    attr_reader :collection_id, :headers, :file, :dir, :data_content_type, :attributes, :files, :object, :file_ids, :work_klass
+    attr_reader :collection_id, :headers, :file, :dir, :data_content_type, :attributes, :files, :object, :file_ids, :work_klass, :current_user
     include WillowSword::MultipartDeposit
     include WillowSword::AtomEntryDeposit
     include WillowSword::BinaryDeposit
@@ -43,6 +43,7 @@ module WillowSword
 
     def validate_request
       # Choose based on content type
+      return false unless validate_target_user
       case request.content_type
       when 'multipart/form-data'
         # multipart deposit
