@@ -56,7 +56,7 @@ module Integrator
       end
 
       def update_attributes
-        transform_attributes.except(:id)
+        transform_attributes.except(:id, 'id')
       end
 
       private

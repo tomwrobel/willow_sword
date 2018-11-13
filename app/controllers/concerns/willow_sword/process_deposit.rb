@@ -41,7 +41,7 @@ module WillowSword
           zp.unzip_file
         else
           # Copy file to contents dir
-          new_file_path = File.join(contents_path, @headers[:filename])
+          new_file_path = File.join(contents_path, params[:payload].original_filename)
           FileUtils.cp(@file.path, new_file_path)
         end
       end
@@ -137,6 +137,7 @@ module WillowSword
       else
         @resource_type = xw.model
         set_work_klass
+        set_id_from_header
         true
       end
     end
@@ -182,6 +183,12 @@ module WillowSword
       @files = bag.package.bag_files - [metadata_file]
       # Extract metadata
       process_xml(metadata_file)
+    end
+
+    def set_id_from_header
+      unless @headers[:slug].blank?
+        @attributes['id'] = @headers[:slug]
+      end
     end
 
   end
