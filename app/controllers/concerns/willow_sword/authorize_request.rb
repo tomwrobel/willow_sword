@@ -11,7 +11,7 @@ module WillowSword
         unless api_key.blank?
           message = "Not authorized. API key not found."
         else
-          message = "Not authorized. API key is missing."
+          message = "Not authorized. API key not available."
         end
         @error = WillowSword::Error.new(message, type = :target_owner_unknown)
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
