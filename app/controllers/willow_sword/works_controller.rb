@@ -14,6 +14,8 @@ module WillowSword
 
     def show
       @collection_id = params[:collection_id]
+      model = find_work_klass(params[:id])
+      @work_klass = model.constantize unless model.blank?
       @object = find_work
       unless @object
         message = "Server cannot find work with id #{params[:id]}"

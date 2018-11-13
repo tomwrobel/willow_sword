@@ -107,6 +107,22 @@ module Integrator
         def permitted_attributes
           work_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
         end
+
+        def find_work_klass(work_id)
+          model = nil
+          blacklight_config = Blacklight::Configuration.new
+          search_builder = Blacklight::SearchBuilder.new([:find_one], blacklight_config)
+          repository = Blacklight::Solr::Repository.new(blacklight_config)
+          response = repository.search(search_builder.merge(fl: 'id, has_model_ssim').with(id: work_id).query)
+          if response.dig('response', 'numFound') == 1
+            model = response.dig('response', 'docs')[0]['has_model_ssim'][0]
+          end
+          model
+        end
+
+        def find_one(solr_parameters)
+          solr_parameters[:fq] << "{!raw f=id}#{blacklight_params.fetch(:id)}"
+        end
     end
   end
 end
