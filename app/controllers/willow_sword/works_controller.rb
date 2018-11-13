@@ -2,9 +2,8 @@ require_dependency "willow_sword/application_controller"
 
 module WillowSword
   class WorksController < ApplicationController
-    before_action :fetch_headers, :set_work_klass
+    before_action :set_work_klass
     attr_reader :collection_id, :headers, :file, :dir, :data_content_type, :attributes, :files, :object, :file_ids, :work_klass
-    include WillowSword::FetchHeaders
     include WillowSword::MultipartDeposit
     include WillowSword::AtomEntryDeposit
     include WillowSword::BinaryDeposit

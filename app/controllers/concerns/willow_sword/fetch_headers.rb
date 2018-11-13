@@ -15,6 +15,7 @@ module WillowSword
       fetch_on_behalf_of
       fetch_slug
       fetch_hyrax_work_model
+      fetch_api_key
     end
 
     def fetch_content_type
@@ -55,6 +56,10 @@ module WillowSword
     # custom header for model HyraxWorkModel
     def fetch_hyrax_work_model
       @headers[:hyrax_work_model] = request.headers.fetch('Hyrax-Work-Model', nil)
+    end
+
+    def fetch_api_key
+      @headers[:api_key] = request.headers.fetch('Api-key', nil)
     end
 
   end

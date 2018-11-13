@@ -5,7 +5,6 @@ module WillowSword
     before_action :set_file_set_klass, :set_work_klass
     attr_reader :collection_id, :work_id, :file_set, :object, :headers, :file, :dir,
                 :data_content_type, :attributes, :files, :work_klass, :file_set_klass
-    include WillowSword::FetchHeaders
     include WillowSword::ProcessDeposit
     include Integrator::Hyrax::WorksBehavior
     include Integrator::Hyrax::FileSetsBehavior
@@ -43,7 +42,6 @@ module WillowSword
 
     private
       def fetch_and_add_file
-        fetch_headers
         return false unless save_binary_data
         return false unless validate_binary_data
         process_file
@@ -56,7 +54,6 @@ module WillowSword
       end
 
       def fetch_and_add_metadata
-        fetch_headers
         return false unless save_binary_data
         return false unless validate_binary_data
         fetch_data_content_type

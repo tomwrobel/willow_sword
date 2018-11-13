@@ -15,4 +15,6 @@ WillowSword.setup do |config|
   config.xml_mapping_create = 'DC'
   # The xml mapping to use when a user wnats to read a work
   config.xml_mapping_read = 'DC'
+  # Authorize Sword requests using Api-key header
+  config.authorize_request = false
 end
