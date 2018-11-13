@@ -211,7 +211,9 @@ module WillowSword
     def assign_model
       @model = nil
       unless @metadata.fetch(:type_of_resource, nil).blank?
-        @model = Array(@metadata[:type_of_resource]).map { |t| t.gsub('_', ' ').gsub('-', ' ').downcase }.first
+        @model = Array(@metadata[:type_of_resource]).map {
+          |t| t.underscore.gsub('_', ' ').gsub('-', ' ').downcase
+        }.first
       end
     end
 

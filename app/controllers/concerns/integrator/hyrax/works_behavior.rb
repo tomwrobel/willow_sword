@@ -61,11 +61,13 @@ module Integrator
 
       private
         def set_work_klass
+          # Transform name of model to match across name variations
           work_models = WillowSword.config.work_models
           if work_models.kind_of?(Array)
-            # for backwards compatibility. Remove later
-            work_models = work_models.map {|m| [m.underscore.split('_').join(' ') , m]}.to_h
+            work_models = work_models.map { |m| [m, m] }.to_h
           end
+          work_models.transform_keys!{ |k| k.underscore.gsub('_', ' ').gsub('-', ' ').downcase }
+          # Match with header first, then resource type and finally pick one from list
           hyrax_work_model = headers.fetch(:hyrax_work_model, nil)
           if hyrax_work_model and work_models.include?(hyrax_work_model)
             @work_klass = work_models[hyrax_work_model].constantize
