@@ -135,6 +135,8 @@ module WillowSword
         @error = WillowSword::Error.new(message, type = :bad_request)
         false
       else
+        @resource_type = xw.model
+        set_work_klass
         true
       end
     end

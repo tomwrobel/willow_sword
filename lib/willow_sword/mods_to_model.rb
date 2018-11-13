@@ -97,7 +97,6 @@ module WillowSword
       if @metadata.fetch('type_of_resource', []).any?
         parent = 'item_description_and_embargo_information'
         assign_nested_term(parent, 'type_of_resource', @metadata['type_of_resource'])
-        assign_model(@metadata['type_of_resource'])
       end
       # Deal with double nested attributes
       publishers = @mapped_metadata.fetch('publishers_attributes', [])
@@ -144,18 +143,6 @@ module WillowSword
         @mapped_metadata["#{parent}_attributes"] = [vals]
       else
         @mapped_metadata["#{parent}_attributes"] << values
-      end
-    end
-
-    def assign_model(typ)
-      typ_downcased = Array(typ).map { |t| t.gsub('_', ' ').gsub('-', ' ').downcase }
-      # typ.any?{ |s| s.casecmp('thesis')==0 }
-      if typ_downcased.include? ('journal article')
-        @model = 'JournalArticle'
-      elsif typ_downcased.include? ('thesis')
-        @model = 'Thesis'
-      else
-        @model = 'Work'
       end
     end
 

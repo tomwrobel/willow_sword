@@ -14,6 +14,7 @@ module WillowSword
       read_file
       parse_mods
       assign_mods_to_model
+      assign_model
     end
 
     def read_file
@@ -205,6 +206,13 @@ module WillowSword
     def get_type_of_resource
       vals = get_text(@mods, 'typeOfResource')
       @metadata['type_of_resource'] = vals if vals.any?
+    end
+
+    def assign_model
+      @model = nil
+      unless @metadata.fetch(:type_of_resource, nil).blank?
+        @model = Array(@metadata[:type_of_resource]).map { |t| t.gsub('_', ' ').gsub('-', ' ').downcase }.first
+      end
     end
 
     def get_text_with_tags(node, element)

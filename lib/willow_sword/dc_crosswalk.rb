@@ -1,6 +1,6 @@
 module WillowSword
   class DcCrosswalk
-    attr_reader :metadata, :terms, :translated_terms, :singular
+    attr_reader :metadata, :model, :terms, :translated_terms, :singular
     def initialize(src_file)
       @src_file = src_file
       @metadata = {}
@@ -48,7 +48,16 @@ module WillowSword
         @metadata[key.to_sym] = values unless values.blank?
       end
       f.close
+      assign_model
     end
+
+    def assign_model
+      @model = nil
+      unless @metadata.fetch(:resource_type, nil).blank?
+        @model = Array(@metadata[:resource_type]).map { |t| t.gsub('_', ' ').gsub('-', ' ').downcase }.first
+      end
+    end
+
   end
 end
 

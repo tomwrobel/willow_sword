@@ -55,7 +55,9 @@ module WillowSword
 
     # custom header for model HyraxWorkModel
     def fetch_hyrax_work_model
-      @headers[:hyrax_work_model] = request.headers.fetch('Hyrax-Work-Model', nil)
+      model = request.headers.fetch('Hyrax-Work-Model', nil)
+      model = model.gsub('_', ' ').gsub('-', ' ').downcase unless model.blank?
+      @headers[:hyrax_work_model] = model
     end
 
     def fetch_api_key

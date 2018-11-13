@@ -61,10 +61,18 @@ module Integrator
 
       private
         def set_work_klass
-          if headers[:hyrax_work_model] && WillowSword.config.work_models.include?(headers[:hyrax_work_model])
-            @work_klass = headers[:hyrax_work_model].constantize
+          work_models = WillowSword.config.work_models
+          if work_models.kind_of?(Array)
+            # for backwards compatibility. Remove later
+            work_models = work_models.map {|m| [m.underscore.split('_').join(' ') , m]}.to_h
+          end
+          hyrax_work_model = headers.fetch(:hyrax_work_model, nil)
+          if hyrax_work_model and work_models.include?(hyrax_work_model)
+            @work_klass = work_models[hyrax_work_model].constantize
+          elsif @resource_type and work_models.include?(@resource_type)
+            @work_klass = work_models[@resource_type].constantize
           else
-            @work_klass = WillowSword.config.work_models.first.constantize
+            @work_klass = work_models[work_models.keys.first].constantize
           end
         end
 
