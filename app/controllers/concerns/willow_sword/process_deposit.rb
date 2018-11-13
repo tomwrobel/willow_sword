@@ -130,6 +130,8 @@ module WillowSword
         xw.map_xml
         @attributes = xw.metadata
       end
+      return true unless @object.blank? # updates to the object
+      # new object
       unless @attributes.any?
         message = "Could not extract any metadata"
         @error = WillowSword::Error.new(message, type = :bad_request)

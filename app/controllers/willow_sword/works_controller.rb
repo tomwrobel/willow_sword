@@ -42,6 +42,26 @@ module WillowSword
       end
     end
 
+    def update
+      @collection_id = params[:collection_id]
+      model = find_work_klass(params[:id])
+      @work_klass = model.constantize unless model.blank?
+      @object = find_work
+      unless @object
+        message = "Server cannot find work with id #{params[:id]}"
+        @error = WillowSword::Error.new(message, type = :bad_request)
+        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
+        return
+      end
+      @error = nil
+      if validate_request
+        render status: :updated
+      else
+        @error = WillowSword::Error.new("Error updating work", type = :bad_request) unless @error.present?
+        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
+      end
+    end
+
     private
 
     def validate_request

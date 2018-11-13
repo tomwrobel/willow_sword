@@ -23,7 +23,7 @@ module Integrator
       end
 
       def add_work
-        @object = find_work
+        @object = find_work if @object.blank?
         if @object
           update_work
         else
