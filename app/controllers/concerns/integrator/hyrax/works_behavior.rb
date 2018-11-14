@@ -93,11 +93,13 @@ module Integrator
         # Override if we need to map the attributes from the parser in
         # a way that is compatible with how the factory needs them.
         def transform_attributes
-          if WillowSword.config.allow_only_permitted_attributes
-            attributes.slice(*permitted_attributes).merge(file_attributes)
-          else
-            attributes.merge(file_attributes)
-          end
+          # TODO: attributes are strings and not symbols
+          # if WillowSword.config.allow_only_permitted_attributes
+          #  attributes.slice(*permitted_attributes).merge(file_attributes)
+          # else
+          #  attributes.merge(file_attributes)
+          # end
+          attributes.merge(file_attributes)
         end
 
         def file_attributes

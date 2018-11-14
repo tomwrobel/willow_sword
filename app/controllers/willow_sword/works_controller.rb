@@ -55,7 +55,7 @@ module WillowSword
       end
       @error = nil
       if validate_request
-        render status: :updated
+        render 'update.xml.builder', formats: [:xml], status: :no_content
       else
         @error = WillowSword::Error.new("Error updating work", type = :bad_request) unless @error.present?
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
