@@ -9,20 +9,14 @@ module WillowSword
     include WillowSword::AtomEntryDeposit
     include WillowSword::BinaryDeposit
     include WillowSword::ProcessDeposit
+    include WillowSword::SaveData
     include Integrator::Hyrax::WorksBehavior
     include WillowSword::ModelToMods
 
     def show
       @collection_id = params[:collection_id]
-      model = find_work_klass(params[:id])
-      @work_klass = model.constantize unless model.blank?
-      @object = find_work
-      unless @object
-        message = "Server cannot find work with id #{params[:id]}"
-        @error = WillowSword::Error.new(message, type = :bad_request)
-        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
-        return
-      end
+      find_work_by_query
+      render_not_found and return unless @object
       if (WillowSword.config.xml_mapping_read == 'MODS')
         @mods = assign_model_to_mods
         render '/willow_sword/works/show.mods.xml.builder', formats: [:xml], status: 200
@@ -44,15 +38,8 @@ module WillowSword
 
     def update
       @collection_id = params[:collection_id]
-      model = find_work_klass(params[:id])
-      @work_klass = model.constantize unless model.blank?
-      @object = find_work
-      unless @object
-        message = "Server cannot find work with id #{params[:id]}"
-        @error = WillowSword::Error.new(message, type = :bad_request)
-        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
-        return
-      end
+      find_work_by_query
+      render_not_found and return unless @object
       @error = nil
       if validate_request
         render 'update.xml.builder', formats: [:xml], status: :no_content
@@ -64,6 +51,12 @@ module WillowSword
 
     private
 
+    def find_work_by_query
+      model = find_work_klass(params[:id])
+      @work_klass = model.constantize unless model.blank?
+      @object = find_work
+    end
+
     def validate_request
       # Choose based on content type
       return false unless validate_target_user
@@ -71,37 +64,33 @@ module WillowSword
       when 'multipart/form-data'
         # multipart deposit
         return false unless validate_multi_part
-        fetch_multipart_data_and_deposit
+        return false unless save_multipart_data
       when 'application/atom+xml;type=entry', 'application/xml', 'text/xml'
         # xml deposit
         return false unless validate_atom_entry
-        fetch_raw_data_and_deposit
+        return false unless save_binary_data
       else
         # binary deposit
         return false unless validate_binary_deposit
-        fetch_raw_data_and_deposit
+        return false unless save_binary_data
       end
+      process_deposit
     end
 
-    def fetch_raw_data_and_deposit
-      return false unless save_binary_data
-      return false unless validate_binary_data
-      fetch_data_content_type
-      return false unless process_data
-      upload_files unless @files.blank?
-      add_work
-      true
-    end
-
-    def fetch_multipart_data_and_deposit
-      return false unless save_multipart_data
+    def process_deposit
       if @file.present?
-        return false unless File.file?(@file) and validate_binary_data
+        return false unless File.file?(@file) and validate_payload
       end
       return false unless process_bag
       upload_files unless @files.blank?
       add_work
       true
+    end
+
+    def render_not_found
+      message = "Server cannot find work with id #{params[:id]}"
+      @error = WillowSword::Error.new(message, type = :bad_request)
+      render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
     end
 
   end
