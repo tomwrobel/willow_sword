@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'securerandom'
 
 module WillowSword
   module FetchHeaders

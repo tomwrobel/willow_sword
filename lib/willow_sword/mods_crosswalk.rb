@@ -1,7 +1,6 @@
 module WillowSword
   class ModsCrosswalk
     attr_reader :metadata, :model, :mods, :mapped_metadata
-    include ::WillowSword::ModsToModel
     def initialize(src_file)
       @src_file = src_file
       @mods = nil

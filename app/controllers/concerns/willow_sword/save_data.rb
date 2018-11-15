@@ -46,7 +46,7 @@ module WillowSword
     def fetch_data(data, type, is_metadata)
       # data is saved in @dir
       # if binary, use header for file name otherwise use the original name
-      @dir = File.join('tmp/data', SecureRandom.uuid)
+      @dir = File.join('tmp/data', SecureRandom.uuid) if @dir.blank?
       contents_path = File.join(@dir, 'contents')
       unless File.directory?(contents_path)
         FileUtils.mkdir_p(contents_path)

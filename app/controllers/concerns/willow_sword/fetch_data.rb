@@ -1,5 +1,6 @@
 module WillowSword
   module FetchData
+    extend ActiveSupport::Concern
     include WillowSword::MultipartDeposit
     include WillowSword::AtomEntryDeposit
     include WillowSword::BinaryDeposit

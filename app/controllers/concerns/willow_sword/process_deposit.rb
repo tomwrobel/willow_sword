@@ -1,6 +1,8 @@
 # require 'rack/mime'
 module WillowSword
   module ProcessDeposit
+    extend ActiveSupport::Concern
+    include WillowSword::ExtractMetadata
 
     private
 
@@ -22,7 +24,7 @@ module WillowSword
     end
 
     def process_metadata(file_path)
-      extract_metadata
+      extract_metadata(file_path)
       # updates to the object need not have metadata
       return true unless @object.blank?
       # new object
@@ -31,7 +33,6 @@ module WillowSword
         @error = WillowSword::Error.new(message)
         false
       else
-        @resource_type = xw.model
         set_id_from_header
         true
       end

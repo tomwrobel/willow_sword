@@ -12,7 +12,7 @@ module WillowSword
     def show
       @collection_id = params[:collection_id]
       @work_id = params[:work_id]
-      @file_set = file_set_klass.find(params[:id]) if file_set_klass.exists?(params[:id])
+      @file_set = find_file_set
       unless @file_set
         message = "Server cannot find file set with id #{params[:id]}"
         @error = WillowSword::Error.new(message, type = :bad_request)

@@ -1,9 +1,11 @@
 module WillowSword
   module ExtractMetadata
+    extend ActiveSupport::Concern
+    include Integrator::Hyrax::ModsToModel
 
-    def extract_metadata
+    def extract_metadata(file_path)
+      @attributes = nil
       if WillowSword.config.xml_mapping_create == 'MODS'
-        include Integrator::Hyrax::ModsToModel
         xw = WillowSword::ModsCrosswalk.new(file_path)
         xw.map_xml
         assign_mods_to_model
@@ -13,6 +15,7 @@ module WillowSword
         xw.map_xml
         @attributes = xw.metadata
       end
+      @resource_type = xw.model if @attributes.any?
     end
 
   end
