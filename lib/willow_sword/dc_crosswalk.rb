@@ -45,7 +45,7 @@ module WillowSword
         end
         key = translated_terms.include?(term) ? translated_terms[term] : term
         values = values.first if values.present? && singular.include?(term)
-        @metadata[key] = values unless values.blank?
+        @metadata[key.to_sym] = values unless values.blank?
       end
       f.close
       assign_model
@@ -53,8 +53,8 @@ module WillowSword
 
     def assign_model
       @model = nil
-      unless @metadata.fetch('resource_type', nil).blank?
-        @model = Array(@metadata['resource_type']).map {
+      unless @metadata.fetch(:resource_type, nil).blank?
+        @model = Array(@metadata[:resource_type]).map {
           |t| t.underscore.gsub('_', ' ').gsub('-', ' ').downcase
         }.first
       end
