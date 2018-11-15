@@ -5,13 +5,9 @@ module WillowSword
     before_action :set_work_klass
     attr_reader :collection_id, :headers, :file, :dir, :data_content_type, :attributes,
       :files, :object, :file_ids, :work_klass, :current_user, :resource_type
-    include WillowSword::MultipartDeposit
-    include WillowSword::AtomEntryDeposit
-    include WillowSword::BinaryDeposit
-    include WillowSword::ProcessDeposit
-    include WillowSword::SaveData
+    include WillowSword::FetchData
     include Integrator::Hyrax::WorksBehavior
-    include WillowSword::ModelToMods
+    include Integrator::Hyrax::ModelToMods
 
     def show
       @collection_id = params[:collection_id]
@@ -82,6 +78,7 @@ module WillowSword
         return false unless File.file?(@file) and validate_payload
       end
       return false unless process_bag
+      set_work_klass # to use class from resource type
       upload_files unless @files.blank?
       add_work
       true

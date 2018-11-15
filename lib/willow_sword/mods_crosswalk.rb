@@ -1,4 +1,3 @@
-require 'willow_sword/mods_to_model'
 module WillowSword
   class ModsCrosswalk
     attr_reader :metadata, :model, :mods, :mapped_metadata
@@ -13,7 +12,6 @@ module WillowSword
     def map_xml
       read_file
       parse_mods
-      assign_mods_to_model
       assign_model
     end
 

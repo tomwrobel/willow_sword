@@ -21,17 +21,10 @@ module WillowSword
       end
     end
 
-    def process_xml(file_path)
-      if WillowSword.config.xml_mapping_create == 'MODS'
-        xw = WillowSword::ModsCrosswalk.new(file_path)
-        xw.map_xml
-        @attributes = xw.mapped_metadata
-      else
-        xw = WillowSword::DcCrosswalk.new(file_path)
-        xw.map_xml
-        @attributes = xw.metadata
-      end
-      return true unless @object.blank? # updates to the object
+    def process_metadata(file_path)
+      extract_metadata
+      # updates to the object need not have metadata
+      return true unless @object.blank?
       # new object
       unless @attributes.any?
         message = "Could not extract any metadata"
@@ -39,29 +32,28 @@ module WillowSword
         false
       else
         @resource_type = xw.model
-        set_work_klass
         set_id_from_header
         true
       end
     end
 
-    def process_file
-      @files = [@file.path]
-      @attributes = {}
-    end
+    # def process_file
+    #   @files = [@file.path]
+    #   @attributes = {}
+    # end
 
-    def process_metadata
-      case @data_content_type
-      when 'application/xml'
-        # process xml
-        @files = []
-        process_xml(@file.path)
-      else
-        message = "Server does not support the content type #{@data_content_type}"
-        @error = WillowSword::Error.new(message, :content)
-        false
-      end
-    end
+    # def process_metadata
+    #   case @data_content_type
+    #   when 'application/xml'
+    #     # process xml
+    #     @files = []
+    #     process_metadata(@file.path)
+    #   else
+    #     message = "Server does not support the content type #{@data_content_type}"
+    #     @error = WillowSword::Error.new(message, content)
+    #     false
+    #   end
+    # end
 
     def process_bag
       # The data is processed as a bag
@@ -73,7 +65,7 @@ module WillowSword
       metadata_file = File.join(bag.package.data_dir, 'metadata.xml')
       @files = bag.package.bag_files - [metadata_file]
       # Extract metadata
-      process_xml(metadata_file)
+      process_metadata(metadata_file)
     end
 
     def set_id_from_header
