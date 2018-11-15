@@ -9,6 +9,8 @@ module Integrator
 
       def find_file_set_by_id
         file_set_klass.find(params[:id]) if file_set_klass.exists?(params[:id])
+      rescue ActiveFedora::ActiveFedoraError
+        nil
       end
 
       def update_file_set

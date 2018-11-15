@@ -38,6 +38,8 @@ module Integrator
 
       def find_work_by_id
         work_klass.find(params[:id]) if work_klass.exists?(params[:id])
+      rescue ActiveFedora::ActiveFedoraError
+        nil
       end
 
       def update_work
