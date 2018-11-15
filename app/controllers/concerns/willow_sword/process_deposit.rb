@@ -16,7 +16,7 @@ module WillowSword
         true
       else
         message = "The checksum does not match the header md5 checksum"
-        @error = WillowSword::Error.new(message, type = :checksum_mismatch)
+        @error = WillowSword::Error.new(message, :checksum_mismatch)
         false
       end
     end
@@ -35,7 +35,7 @@ module WillowSword
       # new object
       unless @attributes.any?
         message = "Could not extract any metadata"
-        @error = WillowSword::Error.new(message, type = :bad_request)
+        @error = WillowSword::Error.new(message)
         false
       else
         @resource_type = xw.model
@@ -58,7 +58,7 @@ module WillowSword
         process_xml(@file.path)
       else
         message = "Server does not support the content type #{@data_content_type}"
-        @error = WillowSword::Error.new(message, type = :content)
+        @error = WillowSword::Error.new(message, :content)
         false
       end
     end

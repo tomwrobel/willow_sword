@@ -31,7 +31,7 @@ module WillowSword
         @collection_id = params[:collection_id]
         render 'create.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
       else
-        @error = WillowSword::Error.new("Error creating work", type = :bad_request) unless @error.present?
+        @error = WillowSword::Error.new("Error creating work") unless @error.present?
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
     end
@@ -44,7 +44,7 @@ module WillowSword
       if validate_request
         render 'update.xml.builder', formats: [:xml], status: :no_content
       else
-        @error = WillowSword::Error.new("Error updating work", type = :bad_request) unless @error.present?
+        @error = WillowSword::Error.new("Error updating work") unless @error.present?
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
     end
@@ -89,7 +89,7 @@ module WillowSword
 
     def render_not_found
       message = "Server cannot find work with id #{params[:id]}"
-      @error = WillowSword::Error.new(message, type = :bad_request)
+      @error = WillowSword::Error.new(message)
       render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
     end
 

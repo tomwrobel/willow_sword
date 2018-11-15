@@ -107,7 +107,7 @@ module WillowSword
       contents_path = File.join(@dir, 'contents') unless @dir.blank?
       if @dir.blank? or Dir.empty?(contents_path)
         message = "Content not received"
-        @error = WillowSword::Error.new(message, type = :bad_request)
+        @error = WillowSword::Error.new(message)
         false
       else
         true
