@@ -3,9 +3,8 @@ require_dependency "willow_sword/application_controller"
 module WillowSword
   class WorksController < ApplicationController
     before_action :set_work_klass
-    attr_reader :collection_id, :headers, :file, :dir, :data_content_type, :attributes,
-      :files, :object, :file_ids, :work_klass, :current_user, :resource_type
-    include WillowSword::FetchData
+    attr_reader :collection_id, :object, :current_user
+    include WillowSword::ProcessRequest
     include WillowSword::Integrator::WorksBehavior
     include WillowSword::Integrator::ModelToMods
 
@@ -23,7 +22,7 @@ module WillowSword
 
     def create
       @error = nil
-      if validate_request
+      if perform_create
         @collection_id = params[:collection_id]
         render 'create.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
       else
@@ -37,7 +36,7 @@ module WillowSword
       find_work_by_query
       render_not_found and return unless @object
       @error = nil
-      if validate_request
+      if perform_update
         render 'update.xml.builder', formats: [:xml], status: :no_content
       else
         @error = WillowSword::Error.new("Error updating work") unless @error.present?
@@ -47,32 +46,18 @@ module WillowSword
 
     private
 
-    def validate_request
-      # Choose based on content type
-      return false unless validate_target_user
-      case request.content_type
-      when 'multipart/form-data'
-        # multipart deposit
-        return false unless validate_multi_part
-        return false unless save_multipart_data
-      when 'application/atom+xml;type=entry', 'application/xml', 'text/xml'
-        # xml deposit
-        return false unless validate_atom_entry
-        return false unless save_binary_data
-      else
-        # binary deposit
-        return false unless validate_binary_deposit
-        return false unless save_binary_data
-      end
-      process_deposit
+    def perform_create
+      return false unless validate_and_save_request
+      return false unless parse_metadata(@metadata_file, true)
+      set_work_klass
+      upload_files unless @files.blank?
+      add_work
+      true
     end
 
-    def process_deposit
-      if @file.present?
-        return false unless File.file?(@file) and validate_payload
-      end
-      return false unless process_bag
-      set_work_klass # to use class from resource type
+    def perform_update
+      return false unless validate_and_save_request
+      return false unless parse_metadata(@metadata_file, false)
       upload_files unless @files.blank?
       add_work
       true
