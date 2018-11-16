@@ -1,7 +1,7 @@
 module WillowSword
   module ExtractMetadata
     extend ActiveSupport::Concern
-    include Integrator::Hyrax::ModsToModel
+    include WillowSword::Integrator::ModsToModel
 
     def extract_metadata(file_path)
       @attributes = nil
