@@ -43,7 +43,7 @@ module Integrator
       end
 
       def find_work_by_id
-        work_klass.find(params[:id]) if work_klass.exists?(params[:id])
+        @work_klass.find(params[:id]) if @work_klass.exists?(params[:id])
       rescue ActiveFedora::ActiveFedoraError
         nil
       end
@@ -55,7 +55,7 @@ module Integrator
 
       def create_work
         attrs = create_attributes
-        @object = work_klass.new
+        @object = @work_klass.new
         work_actor.create(environment(attrs))
       end
 
@@ -76,7 +76,7 @@ module Integrator
           end
           work_models.transform_keys!{ |k| k.underscore.gsub('_', ' ').gsub('-', ' ').downcase }
           # Match with header first, then resource type and finally pick one from list
-          hyrax_work_model = headers.fetch(:hyrax_work_model, nil)
+          hyrax_work_model = @headers.fetch(:hyrax_work_model, nil)
           if hyrax_work_model and work_models.include?(hyrax_work_model)
             # Read the class from the header
             @work_klass = work_models[hyrax_work_model].constantize
@@ -106,9 +106,9 @@ module Integrator
         def transform_attributes
           # TODO: attributes are strings and not symbols
           if WillowSword.config.allow_only_permitted_attributes
-           attributes.slice(*permitted_attributes).merge(file_attributes)
+           @attributes.slice(*permitted_attributes).merge(file_attributes)
           else
-           attributes.merge(file_attributes)
+           @attributes.merge(file_attributes)
           end
         end
 
@@ -117,7 +117,7 @@ module Integrator
         end
 
         def permitted_attributes
-          work_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
+          @work_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
         end
 
         def find_work_klass(work_id)
