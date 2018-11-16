@@ -3,13 +3,13 @@ require_dependency "willow_sword/application_controller"
 module WillowSword
   class WorksController < ApplicationController
     before_action :set_work_klass
-    attr_reader :collection_id, :object, :current_user
+    attr_reader :object, :current_user
     include WillowSword::ProcessRequest
     include WillowSword::Integrator::WorksBehavior
     include WillowSword::Integrator::ModelToMods
 
     def show
-      @collection_id = params[:collection_id]
+      # @collection_id = params[:collection_id]
       find_work_by_query
       render_not_found and return unless @object
       if (WillowSword.config.xml_mapping_read == 'MODS')
@@ -23,7 +23,7 @@ module WillowSword
     def create
       @error = nil
       if perform_create
-        @collection_id = params[:collection_id]
+        # @collection_id = params[:collection_id]
         render 'create.xml.builder', formats: [:xml], status: :created, location: collection_work_url(params[:collection_id], @object)
       else
         @error = WillowSword::Error.new("Error creating work") unless @error.present?
@@ -32,7 +32,7 @@ module WillowSword
     end
 
     def update
-      @collection_id = params[:collection_id]
+      # @collection_id = params[:collection_id]
       find_work_by_query
       render_not_found and return unless @object
       @error = nil
