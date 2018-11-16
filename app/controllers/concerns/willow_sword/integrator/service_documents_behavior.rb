@@ -1,6 +1,8 @@
 module WillowSword
-  module ServiceDocumentsBehavior
-    extend ActiveSupport::Concern
-    include Integrator::Hyrax::ServiceDocumentsBehavior
+  module Integrator
+    module ServiceDocumentsBehavior
+      extend ActiveSupport::Concern
+      include ::Integrator::Hyrax::ServiceDocumentsBehavior
+    end
   end
 end
