@@ -47,12 +47,6 @@ module WillowSword
 
     private
 
-    def find_work_by_query
-      model = find_work_klass(params[:id])
-      @work_klass = model.constantize unless model.blank?
-      @object = find_work
-    end
-
     def validate_request
       # Choose based on content type
       return false unless validate_target_user
