@@ -31,19 +31,20 @@ module Integrator
         end
       end
 
-      def find_work_by_query
-        model = find_work_klass(params[:id])
-        @work_klass = model.constantize unless model.blank?
-        @object = find_work
+      def find_work_by_query(work_id = params[:id])
+        model = find_work_klass(work_id)
+        return nil if model.blank?
+        @work_klass = model.constantize
+        @object = find_work(work_id)
       end
 
-      def find_work
+      def find_work(work_id = params[:id])
         # params[:id] = SecureRandom.uuid unless params[:id].present?
-        return find_work_by_id if params[:id]
+        return find_work_by_id(work_id) if work_id
       end
 
-      def find_work_by_id
-        @work_klass.find(params[:id]) if @work_klass.exists?(params[:id])
+      def find_work_by_id(work_id = params[:id])
+        @work_klass.find(work_id)
       rescue ActiveFedora::ActiveFedoraError
         nil
       end

@@ -4,8 +4,8 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom",
   Array(@file_set.title).each do |t|
     xml.title t
   end
-  xml.content(rel:"src", href:collection_work_file_set_url(@collection_id, @work_id, @file_set))
-  xml.link(rel:"edit", href:collection_work_file_set_url(@collection_id, @work_id, @file_set))
+  xml.content(rel:"src", href:collection_work_file_set_url(params[:collection_id], params[:work_id], @file_set))
+  xml.link(rel:"edit", href:collection_work_file_set_url(params[:collection_id], params[:work_id], @file_set))
 
   # Add dc metadata
   xw = WillowSword::DcCrosswalk.new(nil)
