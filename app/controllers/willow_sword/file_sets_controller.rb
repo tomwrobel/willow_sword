@@ -2,81 +2,84 @@ require_dependency "willow_sword/application_controller"
 
 module WillowSword
   class FileSetsController < ApplicationController
-    before_action :set_file_set_klass, :set_work_klass
-    attr_reader :collection_id, :work_id, :file_set, :object, :headers, :file, :dir,
-                :data_content_type, :attributes, :files, :work_klass, :file_set_klass
-    include WillowSword::FetchHeaders
-    include WillowSword::ProcessDeposit
-    include Integrator::Hyrax::WorksBehavior
-    include Integrator::Hyrax::FileSetsBehavior
+    before_action :set_file_set_klass
+    attr_reader :file_set, :object
+    include WillowSword::ProcessRequest
+    include WillowSword::Integrator::WorksBehavior
+    include WillowSword::Integrator::FileSetsBehavior
 
     def show
-      @collection_id = params[:collection_id]
-      @work_id = params[:work_id]
-      @file_set = file_set_klass.find(params[:id]) if file_set_klass.exists?(params[:id])
-      unless @file_set
-        message = "Server cannot find file set with id #{params[:id]}"
-        @error = WillowSword::Error.new(message, type = :bad_request)
-        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
-      end
+      @file_set = find_file_set
+      render_file_set_not_found and return unless @file_set
     end
 
     def create
-      @collection_id = params[:collection_id]
-      @work_id = params[:work_id]
-      if fetch_and_add_file
-        puts "URL #{collection_work_url(params[:collection_id], @object)}"
-        render 'create.xml.builder', formats: [:xml], status: 200
+      # Find work
+      find_work_by_query(params[:work_id])
+      render_work_not_found and return unless @object
+      @error = nil
+      if perform_create
+        # @collection_id = params[:collection_id]
+        render 'create.xml.builder', formats: [:xml], status: :created,
+          location: collection_work_file_set_url(params[:collection_id], @object, @file_set)
       else
+        @error = WillowSword::Error.new("Error creating file set") unless @error.present?
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
     end
 
     def update
-      @collection_id = params[:collection_id]
-      @work_id = params[:work_id]
-      if fetch_and_add_metadata
-        render status: 200
+      # Find work
+      find_work_by_query(params[:work_id])
+      render_work_not_found and return unless @object
+      # Find file set
+      @file_set = find_file_set
+      render_file_set_not_found and return unless @file_set
+      @error = nil
+      if perform_update
+        render 'update.xml.builder', formats: [:xml], status: :no_content
       else
+        @error = WillowSword::Error.new("Error updating file set") unless @error.present?
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
+
     end
 
     private
-      def fetch_and_add_file
-        fetch_headers
-        return false unless save_binary_data
-        return false unless validate_binary_data
-        process_file
-        upload_files
-        @object = work_klass.find(params[:work_id]) if work_klass.exists?(params[:work_id])
-        if @object
-          update_work
+      def perform_create
+        # If there are multiple files, the first one is picked
+        # If there are attributes, it is added to the file set
+        return false unless validate_and_save_request
+        unless @files.any?
+          message = "Content not received"
+          @error = WillowSword::Error.new(message)
+          return false
         end
+        return false unless parse_metadata(@metadata_file, false)
+        create_file_set
         true
       end
 
-      def fetch_and_add_metadata
-        fetch_headers
-        return false unless save_binary_data
-        return false unless validate_binary_data
-        fetch_data_content_type
-        return false unless process_metadata
-        unless params[:id]
-          message = "Missing identifier: Unable to search for existing file set without the ID"
-          @error = WillowSword::Error.new(message, type = :default)
-          return false
-        end
-        @file_set = find_file_set
-        unless @file_set
-          message = "Missing file set: Unable to search for existing file set with the ID #{params[:id]}"
-          @error = WillowSword::Error.new(message, type = :default)
-          return false
-        end
+      def perform_update
+        # If there are multiple files, the first one is picked
+        # If there are attributes, it is added to the file set
+        return false unless validate_and_save_request
+        return false unless parse_metadata(@metadata_file, false)
         update_file_set
         true
       end
 
+      def render_file_set_not_found
+        message = "Server cannot find file set with id #{params[:id]}"
+        @error = WillowSword::Error.new(message)
+        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
+      end
+
+      def render_work_not_found
+        message = "Server cannot find work with id #{params[:work_id]}"
+        @error = WillowSword::Error.new(message)
+        render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
+      end
 
   end
 end

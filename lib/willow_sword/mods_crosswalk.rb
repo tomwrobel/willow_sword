@@ -1,8 +1,6 @@
-require 'willow_sword/mods_to_model'
 module WillowSword
   class ModsCrosswalk
     attr_reader :metadata, :model, :mods, :mapped_metadata
-    include ModsToModel
     def initialize(src_file)
       @src_file = src_file
       @mods = nil
@@ -13,7 +11,7 @@ module WillowSword
     def map_xml
       read_file
       parse_mods
-      assign_mods_to_model
+      assign_model
     end
 
     def read_file
@@ -47,6 +45,7 @@ module WillowSword
       get_subtitle
       get_type_of_resource
       get_title
+      get_headers
     end
 
     def get_abstract
@@ -195,9 +194,24 @@ module WillowSword
       @metadata['title'] = vals if vals.any?
     end
 
+    def get_headers
+      if @headers.any?
+        @metadata['headers'] = stringify_keys(@headers)
+      end
+    end
+
     def get_type_of_resource
       vals = get_text(@mods, 'typeOfResource')
       @metadata['type_of_resource'] = vals if vals.any?
+    end
+
+    def assign_model
+      @model = nil
+      unless @metadata.fetch('type_of_resource', nil).blank?
+        @model = Array(@metadata['type_of_resource']).map {
+          |t| t.underscore.gsub('_', ' ').gsub('-', ' ').downcase
+        }.first
+      end
     end
 
     def get_text_with_tags(node, element)

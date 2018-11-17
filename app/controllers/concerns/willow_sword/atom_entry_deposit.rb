@@ -4,7 +4,7 @@ module WillowSword
     private
     def atom_entry_not_supported
       message = 'Server does not support atom entry content types'
-      @error = WillowSword::Error.new(message, type = :method_not_allowed)
+      @error = WillowSword::Error.new(message, :method_not_allowed)
       false
     end
 

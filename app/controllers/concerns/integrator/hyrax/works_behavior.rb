@@ -11,21 +11,19 @@ module Integrator
       extend ActiveSupport::Concern
 
       def upload_files
-        # puts 'In upload_files'
         @file_ids = []
         @files.each do |file|
           u = ::Hyrax::UploadedFile.new
-          u.user_id = User.find_by_user_key(User.batch_user_key).id unless User.find_by_user_key(User.batch_user_key).nil?
+          @current_user = User.batch_user unless @current_user.present?
+          u.user_id = @current_user.id unless @current_user.nil?
           u.file = ::CarrierWave::SanitizedFile.new(file)
           u.save
           @file_ids << u.id
         end
-        # puts "Files uploaded: #{@file_ids}"
       end
 
       def add_work
-        # puts 'In add_work'
-        @object = find_work
+        @object = find_work if @object.blank?
         if @object
           update_work
         else
@@ -33,46 +31,62 @@ module Integrator
         end
       end
 
-      def find_work
-        # puts 'In find_work'
-        # params[:id] = SecureRandom.uuid unless params[:id].present?
-        return find_work_by_id if params[:id]
+      def find_work_by_query(work_id = params[:id])
+        model = find_work_klass(work_id)
+        return nil if model.blank?
+        @work_klass = model.constantize
+        @object = find_work(work_id)
       end
 
-      def find_work_by_id
-        # puts 'In find_work_by_id'
-        work_klass.find(params[:id]) if work_klass.exists?(params[:id])
+      def find_work(work_id = params[:id])
+        # params[:id] = SecureRandom.uuid unless params[:id].present?
+        return find_work_by_id(work_id) if work_id
+      end
+
+      def find_work_by_id(work_id = params[:id])
+        @work_klass.find(work_id)
+      rescue ActiveFedora::ActiveFedoraError
+        nil
       end
 
       def update_work
-        # puts 'In update_work'
         raise "Object doesn't exist" unless @object
         work_actor.update(environment(update_attributes))
       end
 
       def create_work
-        # puts 'In create_work'
         attrs = create_attributes
-        @object = work_klass.new
+        @object = @work_klass.new
         work_actor.create(environment(attrs))
       end
 
       def create_attributes
-        # puts 'In create_attributes'
         transform_attributes
       end
 
       def update_attributes
-        # puts 'In update_attributes'
-        transform_attributes.except(:id)
+        transform_attributes.except(:id, 'id')
       end
 
       private
         def set_work_klass
-          if headers[:hyrax_work_model] && WillowSword.config.work_models.include?(headers[:hyrax_work_model])
-            @work_klass = headers[:hyrax_work_model].constantize
+          # Transform name of model to match across name variations
+          work_models = WillowSword.config.work_models
+          if work_models.kind_of?(Array)
+            work_models = work_models.map { |m| [m, m] }.to_h
+          end
+          work_models.transform_keys!{ |k| k.underscore.gsub('_', ' ').gsub('-', ' ').downcase }
+          # Match with header first, then resource type and finally pick one from list
+          hyrax_work_model = @headers.fetch(:hyrax_work_model, nil)
+          if hyrax_work_model and work_models.include?(hyrax_work_model)
+            # Read the class from the header
+            @work_klass = work_models[hyrax_work_model].constantize
+          elsif @resource_type and work_models.include?(@resource_type)
+            # Set the class based on the resource type
+            @work_klass = work_models[@resource_type].constantize
           else
-            @work_klass = WillowSword.config.work_models.first.constantize
+            # Chooose the first class from the config
+            @work_klass = work_models[work_models.keys.first].constantize
           end
         end
 
@@ -80,7 +94,8 @@ module Integrator
         # @return [Hyrax::Actors::Environment]
         def environment(attrs)
           # Set Hyrax.config.batch_user_key
-          ::Hyrax::Actors::Environment.new(@object, Ability.new(User.batch_user), attrs)
+          @current_user = User.batch_user unless @current_user.present?
+          ::Hyrax::Actors::Environment.new(@object, Ability.new(@current_user), attrs)
         end
 
         def work_actor
@@ -90,7 +105,12 @@ module Integrator
         # Override if we need to map the attributes from the parser in
         # a way that is compatible with how the factory needs them.
         def transform_attributes
-          attributes.slice(*permitted_attributes).merge(file_attributes)
+          # TODO: attributes are strings and not symbols
+          if WillowSword.config.allow_only_permitted_attributes
+           @attributes.slice(*permitted_attributes).merge(file_attributes)
+          else
+           @attributes.merge(file_attributes)
+          end
         end
 
         def file_attributes
@@ -98,7 +118,21 @@ module Integrator
         end
 
         def permitted_attributes
-          work_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
+          @work_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
+        end
+
+        def find_work_klass(work_id)
+          model = nil
+          blacklight_config = Blacklight::Configuration.new
+          search_builder = Blacklight::SearchBuilder.new([], blacklight_config)
+          search_builder.merge(fl: 'id, has_model_ssim')
+          search_builder.merge(fq: "{!raw f=id}#{work_id}")
+          repository = Blacklight::Solr::Repository.new(blacklight_config)
+          response = repository.search(search_builder.query)
+          if response.dig('response', 'numFound') == 1
+            model = response.dig('response', 'docs')[0]['has_model_ssim'][0]
+          end
+          model
         end
     end
   end

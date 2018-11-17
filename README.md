@@ -26,6 +26,12 @@ mount WillowSword::Engine => '/sword'
 ## Configuration
 The plugin has a few configuration options. To view the current default options and override these, see [configuration options](https://github.com/CottageLabs/willow_sword/wiki/Configuring-willow-sword)
 
+## Configuration
+The plugin has a few configuration options. To view the current default options and override these, see [configuration options](https://github.com/CottageLabs/willow_sword/wiki/Configuring-willow-sword)
+
+## Enable authorization
+If you would like to authorize all Sword requests using an Api-key header, see [Enabling authorization](https://github.com/CottageLabs/willow_sword/wiki/Enabling-Authorization-In-Willow-Sword)
+
 ## Usage
 To use the plugin see [usage](https://github.com/CottageLabs/willow_sword/wiki/Usage)
 
