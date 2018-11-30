@@ -111,6 +111,7 @@ module Integrator
           else
            @attributes.merge(file_attributes)
           end
+          @attributes
         end
 
         def file_attributes

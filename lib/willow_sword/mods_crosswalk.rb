@@ -1,8 +1,9 @@
 module WillowSword
   class ModsCrosswalk
     attr_reader :metadata, :model, :mods, :mapped_metadata
-    def initialize(src_file)
+    def initialize(src_file, headers)
       @src_file = src_file
+      @headers = headers
       @mods = nil
       @metadata = {}
       @mapped_metadata = {}
@@ -196,7 +197,7 @@ module WillowSword
 
     def get_headers
       if @headers.any?
-        @metadata['headers'] = stringify_keys(@headers)
+        @metadata['headers'] = @headers.stringify_keys
       end
     end
 
