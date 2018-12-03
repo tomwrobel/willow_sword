@@ -57,6 +57,13 @@ module Integrator
       def create_work
         attrs = create_attributes
         @object = @work_klass.new
+        # Required to allow inline creation in active jobs
+        # in development mode.
+        # https://github.com/samvera/hyrax/issues/3128
+        if Rails.env == 'development'
+          [::Noid::Rails::Service.new.minter.mint,
+           ::Noid::Rails::Service.new.minter.mint]
+        end
         work_actor.create(environment(attrs))
       end
 

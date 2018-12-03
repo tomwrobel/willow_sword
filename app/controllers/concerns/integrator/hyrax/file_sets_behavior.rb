@@ -14,6 +14,13 @@ module Integrator
       end
 
       def create_file_set
+        # Required to allow inline creation for active jobs
+        # in development mode.
+        # https://github.com/samvera/hyrax/issues/3128
+        if Rails.env == 'development'
+          [::Noid::Rails::Service.new.minter.mint,
+           ::Noid::Rails::Service.new.minter.mint]
+        end
         @file_set = FileSet.create
         @current_user = User.batch_user unless @current_user.present?
         @actor = file_set_actor.new(@file_set, @current_user)
