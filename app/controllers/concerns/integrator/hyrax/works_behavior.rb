@@ -112,6 +112,10 @@ module Integrator
         # Override if we need to map the attributes from the parser in
         # a way that is compatible with how the factory needs them.
         def transform_attributes
+          if WillowSword.config.all_records_public_by_default
+            @attributes['visibility'] = 'open'
+          end
+
           # TODO: attributes are strings and not symbols
           if WillowSword.config.allow_only_permitted_attributes
            @attributes.slice(*permitted_attributes).merge(file_attributes)
