@@ -51,11 +51,7 @@ module WillowSword
       bag_path = File.join(@dir, 'bag')
       # validate or create bag
       bag = WillowSword::BagPackage.new(contents_path, bag_path)
-      if @headers[:filename].present?
-        @metadata_file = File.join(bag.package.data_dir, @headers[:filename])
-      else
-        @metadata_file = File.join(bag.package.data_dir, 'metadata.xml')
-      end
+      @metadata_file = File.join(bag.package.data_dir, 'metadata.xml')
       @files = bag.package.bag_files - [@metadata_file]
     end
 

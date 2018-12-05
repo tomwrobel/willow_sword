@@ -55,7 +55,13 @@ module WillowSword
           @error = WillowSword::Error.new(message)
           return false
         end
-        return false unless parse_metadata(@metadata_file, false)
+        if File.exist?(@metadata_file)
+          return false unless parse_metadata(@metadata_file, false)
+        else
+          # Binary filesets can be created without metadata
+          @attributes = Hash.new
+          @attributes['file_name'] = @headers[:filename]
+        end
         create_file_set
         true
       end
