@@ -8,8 +8,12 @@ xml.repository_file(xmlns:"http://ora.ox.ac.uk/terms/",
                     'xmlns:symp' => "http://symplectic/symplectic-elements:def/model#",
                     'xmlns:ali' => "http://www.niso.org/schemas/ali/1.0/") do
 
+  # Get the server path, it's a hack...
+  server_path = root_url.to_s
+  server_path.slice!(root_path)
   xml.content(rel:"src", href:collection_work_file_set_url(params[:collection_id], params[:work_id], @file_set))
   xml.link(rel:"edit", href:collection_work_file_set_url(params[:collection_id], params[:work_id], @file_set))
+  xml.link(rel:"download", href: "#{server_path}/downloads/#{@file_set.id}")
 
   # Add ORA metadata
   # title
@@ -82,6 +86,5 @@ xml.repository_file(xmlns:"http://ora.ox.ac.uk/terms/",
   Array(@file_set.attributes.fetch('file_public_url', nil)).each do |val|
     xml.tag!('symp:hasPublicUrl', val)
   end
-
 end
 
