@@ -1,13 +1,15 @@
-xml.repository_file(xmlns:"http://ora.ox.ac.uk/terms/",
-                    'xmlns:dcterms' => "http://purl.org/dc/terms/",
-                    'xmlns:dc' => "http://purl.org/dc/elements/1.1/",
-                    'xmlns:rioxxterms' => "http://www.rioxx.net/schema/v2.0/rioxx/",
-                    'xmlns:foxml' => "info:fedora/fedora-system:def/foxml#",
-                    'xmlns:oxds' => "http://vocab.ox.ac.uk/dataset/schema#",
-                    'xmlns:ora' => "http://ora.ox.ac.uk/terms/",
-                    'xmlns:symp' => "http://symplectic/symplectic-elements:def/model#",
-                    'xmlns:ali' => "http://www.niso.org/schemas/ali/1.0/") do
+xml.feed(xmlns:"http://www.w3.org/2005/Atom",
+              'xmlns:dcterms' => "http://purl.org/dc/terms/",
+              'xmlns:dc' => "http://purl.org/dc/elements/1.1/",
+              'xmlns:rioxxterms' => "http://www.rioxx.net/schema/v2.0/rioxx/",
+              'xmlns:foxml' => "info:fedora/fedora-system:def/foxml#",
+              'xmlns:oxds' => "http://vocab.ox.ac.uk/dataset/schema#",
+              'xmlns:ora' => "http://ora.ox.ac.uk/terms/",
+              'xmlns:symp' => "http://symplectic/symplectic-elements:def/model#") do
 
+  Array(@file_set.title).each do |t|
+    xml.title t
+  end
   xml.content(rel:"src", href:collection_work_file_set_url(params[:collection_id], params[:work_id], @file_set))
   xml.link(rel:"edit", href:collection_work_file_set_url(params[:collection_id], params[:work_id], @file_set))
 
@@ -24,7 +26,7 @@ xml.repository_file(xmlns:"http://ora.ox.ac.uk/terms/",
   end
   # extent
   # <dcterms:extent>file_size M</dcterms:extent>
-  Array(@file_set.attributes.fetch('file_size', nil)).each do |val|
+  Array(@file_set.attributes.fetch('extent', nil)).each do |val|
     xml.tag!('dcterms:extent', val)
   end
   # hasVersion
@@ -64,8 +66,8 @@ xml.repository_file(xmlns:"http://ora.ox.ac.uk/terms/",
   end
   # date file made available
   # <ora:dateFileMadeAvailable>file_made_available_date MA</ora:dateFileMadeAvailable>
-  Array(@file_set.attributes.fetch('file_made_available_date', nil)).each do |val|
-    xml.tag!('ali:free_to_read', 'start_date' => val)
+  Array(@file_set.attributes.fetch('ora:dateFileMadeAvailable', nil)).each do |val|
+    xml.tag!('ora:dateFileMadeAvailable', val)
   end
   # access condition at deposit
   # <ora:accessConditionAtDeposit>file_admin_access_condition_at_deposit MA</ora:accessConditionAtDeposit>

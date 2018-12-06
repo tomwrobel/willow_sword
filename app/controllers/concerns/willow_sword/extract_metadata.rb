@@ -20,5 +20,22 @@ module WillowSword
       @resource_type = xw.model if @attributes.any?
     end
 
+    def extract_fileset_metadata(file_path)
+      @attributes = nil
+      begin
+        if WillowSword.config.fileset_xml_mapping_create == 'ORA'
+          xw = WillowSword::OraFilesetCrosswalk.new(file_path)
+        else
+          xw = WillowSword::DcCrosswalk.new(file_path)
+        end
+      rescue NoMethodError
+        # If config option does not exist, don't throw an error
+        xw = WillowSword::DcCrosswalk.new(file_path)
+      end
+      xw.map_xml
+      @attributes = xw.metadata
+      @resource_type = xw.model if @attributes.any?
+    end
+
   end
 end

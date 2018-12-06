@@ -67,7 +67,11 @@ module Integrator
         end
 
         def transform_file_set_attributes
-          @attributes.slice(*permitted_file_set_attributes)
+          if WillowSword.config.allow_only_permitted_attributes
+            @attributes.slice(*permitted_file_set_attributes)
+          else
+            @attributes
+          end
         end
 
         def permitted_file_set_attributes

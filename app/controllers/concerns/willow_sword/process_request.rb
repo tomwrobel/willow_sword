@@ -51,12 +51,27 @@ module WillowSword
       bag_path = File.join(@dir, 'bag')
       # validate or create bag
       bag = WillowSword::BagPackage.new(contents_path, bag_path)
+      #@binary_metadata_file = File.join(contents_path, 'file_metadata.xml')
       @metadata_file = File.join(bag.package.data_dir, 'metadata.xml')
       @files = bag.package.bag_files - [@metadata_file]
     end
 
     def parse_metadata(file_path, required=true)
       extract_metadata(file_path)
+      # updates to the object need not have metadata
+      return true unless required
+      # metadata should exist
+      unless @attributes.any?
+        message = "Could not extract any metadata"
+        @error = WillowSword::Error.new(message)
+        return false
+      end
+      set_id_from_header
+      true
+    end
+
+    def parse_fileset_metadata(file_path, required=true)
+      extract_fileset_metadata(file_path)
       # updates to the object need not have metadata
       return true unless required
       # metadata should exist

@@ -11,6 +11,15 @@ module WillowSword
     def show
       @file_set = find_file_set
       render_file_set_not_found and return unless @file_set
+      begin
+        if (WillowSword.config.fileset_xml_mapping_read == 'ORA')
+          render '/willow_sword/file_sets/show.ora.xml.builder', formats: [:xml], status: 200
+        else
+          render '/willow_sword/file_sets/show.atom.xml.builder', formats: [:xml], status: 200
+        end
+      rescue NoMethodError
+        render '/willow_sword/file_sets/show.atom.xml.builder', formats: [:xml], status: 200
+      end
     end
 
     def create
@@ -56,7 +65,7 @@ module WillowSword
           return false
         end
         if File.exist?(@metadata_file)
-          return false unless parse_metadata(@metadata_file, false)
+          return false unless parse_fileset_metadata(@metadata_file, false)
         else
           # Binary filesets can be created without metadata
           @attributes = Hash.new
@@ -70,7 +79,9 @@ module WillowSword
         # If there are multiple files, the first one is picked
         # If there are attributes, it is added to the file set
         return false unless validate_and_save_request
-        return false unless parse_metadata(@metadata_file, false)
+        if File.exist?(@metadata_file)
+          return false unless parse_fileset_metadata(@metadata_file, false)
+        end
         update_file_set
         true
       end
