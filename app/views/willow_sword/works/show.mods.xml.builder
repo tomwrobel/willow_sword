@@ -167,5 +167,12 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
     Array(@mods.fetch('type_of_resource', [])).each do |val|
       xml.typeOfResource(val)
     end
+
+    # Review status
+    if Array(@mods.fetch('symplectic_review_status', [])).any?
+      Array(@mods.fetch('symplectic_review_status', [])).each do |val|
+        xml.note val, 'type' => 'admin', 'displayLabel' => 'symplectic-review-status'
+      end
+    end
   end
 end

@@ -47,6 +47,7 @@ module WillowSword
       get_type_of_resource
       get_title
       get_headers
+      get_symplectic_review_status
     end
 
     def get_abstract
@@ -195,6 +196,11 @@ module WillowSword
       @metadata['title'] = vals if vals.any?
     end
 
+    def get_symplectic_review_status
+      vals = get_admin_note_text(@mods, 'symplectic-review-status')
+      @metadata['symplectic_review_status'] = vals if vals.any?
+    end
+
     def get_headers
       if @headers.any?
         @metadata['headers'] = @headers.stringify_keys
@@ -241,6 +247,14 @@ module WillowSword
         values[typ.to_s] = new_vals if new_vals.any?
       end
       values
+    end
+
+    def get_admin_note_text(node, label_value)
+      values = []
+      node.search("//note[@type='admin'][@displayLabel='#{label_value}']").each do |ele|
+        values << ele.text.strip if ele.text
+      end
+      values.reject { |c| c.empty? }
     end
   end
 end
