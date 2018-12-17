@@ -52,11 +52,15 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
         # affiliation
         agent.fetch('affiliation', {}).each do |key, vals|
           Array(vals).each do |val|
-            xml.affiliation(val, "type" => key)
+            if key == 'oxford_college'
+                xml.affiliation(val, "type" => 'oxfordCollege')
+            else
+              xml.affiliation(val, "type" => key)
+            end
           end
         end
         # role
-        agent.fetch('role', []).each do |val|
+        agent.fetch('roles', []).each do |val|
           xml.role do
             xml.roleTerm(val)
           end

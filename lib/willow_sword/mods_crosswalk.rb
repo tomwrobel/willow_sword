@@ -7,6 +7,7 @@ module WillowSword
       @mods = nil
       @metadata = {}
       @mapped_metadata = {}
+      @role_order = {}
     end
 
     def map_xml
@@ -107,9 +108,20 @@ module WillowSword
         # display form
         vals = get_text(nam, 'displayForm')
         name_attrs['display_form'] = vals if vals.any?
+
         # role
+        name_attrs['roles'] = Array.new
         vals = get_text(nam, 'role/roleTerm')
-        name_attrs['role'] = vals if vals.any?
+        roles = vals if vals.any?
+        roles.each do |role|
+          if @role_order[role]
+            @role_order[role] += 1
+          else
+            @role_order[role] = 1
+          end
+          name_attrs['roles'].push({'role_title' => role, 'role_order' => @role_order[role]})
+        end
+
         # name_identifier
         vals = get_value_by_type(nam, 'nameIdentifier', 'identifier')
         name_attrs['identifier'] = vals if vals.any?
