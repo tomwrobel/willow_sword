@@ -50,6 +50,7 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
           xml.displayForm(val)
         end
         # affiliation
+        # # TODO: fix funder grantinfo and publisher affiliation types
         agent.fetch('affiliation', {}).each do |key, vals|
           Array(vals).each do |val|
             if key == 'oxford_college'
