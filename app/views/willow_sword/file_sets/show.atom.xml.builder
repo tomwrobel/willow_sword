@@ -35,8 +35,8 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom",
     xml.tag!('dcterms:hasVersion', val)
   end
   # datastream
-  # <foxml:datastream>file_admin_fedora3_datastream_id O</foxml:datastream>
-  Array(@file_set.attributes.fetch('file_admin_fedora3_datastream_id', nil)).each do |val|
+  # <foxml:datastream>file_admin_fedora3_datastream_identifier O</foxml:datastream>
+  Array(@file_set.attributes.fetch('file_admin_fedora3_datastream_identifier', nil)).each do |val|
     xml.tag!('foxml:datastream', val)
   end
   # rioxx version

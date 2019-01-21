@@ -8,7 +8,7 @@ module WillowSword
 
     def translated_terms
       {
-          'datastream' => 'file_admin_fedora3_datastream_id',
+          'datastream' => 'file_admin_fedora3_datastream_identifier',
           'embargoedUntil' => 'file_embargo_end_date',
           'embargoReason' => 'file_embargo_reason',
           'embargoReleaseMethod' => 'file_embargo_release_method',

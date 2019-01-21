@@ -174,7 +174,7 @@ module WillowSword
         ri = {}
         # type
         typ = ele.xpath('@type')
-        ri['type_of_relationship'] = [typ.to_s] unless typ.blank?
+        ri['related_item_type_of_relationship'] = [typ.to_s] unless typ.blank?
         # title
         vals = get_text(ele, 'titleInfo/title')
         ri['related_item_title'] = vals if vals.any?

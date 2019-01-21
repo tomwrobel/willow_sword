@@ -100,7 +100,7 @@ module Integrator
         @mapped_metadata['related_items'] = []
         Array(@object[:related_items]).each do |ri|
           related_item = {}
-          related_item['type'] = Array(ri[:type_of_relationship]) if Array(ri[:type_of_relationship]).any?
+          related_item['type'] = Array(ri[:related_item_type_of_relationship]) if Array(ri[:related_item_type_of_relationship]).any?
           related_item['title'] = Array(ri[:related_item_title]) if Array(ri[:related_item_title]).any?
           related_item['abstract'] = Array(ri[:related_item_abstract]) if Array(ri[:related_item_abstract]).any?
           related_item['identifier'] = Array(ri[:related_item_ID]) if Array(ri[:related_item_ID]).any?

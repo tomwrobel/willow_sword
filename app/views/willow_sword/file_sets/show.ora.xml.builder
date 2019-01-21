@@ -37,8 +37,8 @@ xml.repository_file(xmlns:"http://ora.ox.ac.uk/terms/",
     xml.tag!('dcterms:hasVersion', val)
   end
   # datastream
-  # <foxml:datastream>file_admin_fedora3_datastream_id O</foxml:datastream>
-  Array(@file_set.attributes.fetch('file_admin_fedora3_datastream_id', nil)).each do |val|
+  # <foxml:datastream>file_admin_fedora3_datastream_identifier O</foxml:datastream>
+  Array(@file_set.attributes.fetch('file_admin_fedora3_datastream_identifier', nil)).each do |val|
     xml.tag!('foxml:datastream', val)
   end
   # rioxx version
