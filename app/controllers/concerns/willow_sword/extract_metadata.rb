@@ -1,22 +1,21 @@
 module WillowSword
   module ExtractMetadata
     extend ActiveSupport::Concern
-    include WillowSword::Integrator::ModsToModel
 
-    def extract_metadata(file_path)
+    def extract_metadata(file_path, type)
       @attributes = nil
-      if WillowSword.config.xml_mapping_create == 'MODS'
-        xw = WillowSword::ModsCrosswalk.new(file_path)
-        xw.map_xml
-        assign_mods_to_model
-        @attributes = xw.mapped_metadata
-      else
-        xw = WillowSword::DcCrosswalk.new(file_path)
-        xw.map_xml
-        @attributes = xw.metadata
+      @files_attributes = nil
+      return unless File.exist?(file_path)
+      if type == 'work'
+        xw_klass = WillowSword.config.xw_from_xml_for_work
+      elsif type == 'fileset'
+        xw_klass = WillowSword.config.xw_from_xml_for_fileset
       end
+      xw = xw_klass.new(file_path, @headers)
+      xw.map_xml
+      @attributes = xw.mapped_metadata
+      @files_attributes = xw.files_metadata
       @resource_type = xw.model if @attributes.any?
     end
-
   end
 end
