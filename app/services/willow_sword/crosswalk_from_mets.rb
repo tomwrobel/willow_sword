@@ -29,9 +29,8 @@ module WillowSword
       parse_mods
       parse_admin_metadata
       parse_file_metadata
-      assign_model if @metadata.any?
       assign_mets_to_model if @metadata.any?
-      assign_files_metadata if @files.any?
+      assign_files_metadata if @files_metadata.any?
     end
 
   end

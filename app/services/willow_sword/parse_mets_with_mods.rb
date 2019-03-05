@@ -13,6 +13,7 @@ module WillowSword
       get_name
       get_note
       get_origin_info
+      get_patent_extension
       get_physical_description
       get_related_item
       get_subject_genre
@@ -23,12 +24,12 @@ module WillowSword
     end
 
     def parse_admin_metadata
-      get_rights_declaration
-      get_record_info
-      get_ora_admin
-      get_ref_admin
-      get_thesis_admin
       get_embargo_info
+      get_ora_admin
+      get_record_info
+      get_ref_admin
+      get_rights_declaration
+      get_thesis_admin
     end
 
     def parse_file_metadata
@@ -37,6 +38,9 @@ module WillowSword
       get_files_metadata
     end
 
+    # ========================
+    # Descriptive metadata
+    # ========================
     def get_abstract
       # Map to abstract
       # get text with html tags
@@ -392,22 +396,13 @@ module WillowSword
       end
     end
 
-    def get_record_info
-      ele = @amd.xpath('sourceMD/mdWrap/xmlData/mods/recordInfo')
-      return unless ele.present?
-      fields = %w(recordContentSource recordCreationDate)
-      fields.each do |field|
-        vals = get_text(ele, field)
-        @metadata[field] = vals if vals.any?
-      end
-      # recordInfoNote
-      vals = get_text_by_type(ele, 'recordInfoNote', 'other')
-      @metadata['recordInfoNote'] = vals if vals.any?
-    end
-
-    def get_rights_declaration
-      vals = get_text_with_tags(@amd, 'rightsMD/mdWrap/xmlData/RightsDeclarationMD/RightsDeclaration')
-      @metadata['record_ora_deposit_licence'] = vals if vals.any?
+    # ========================
+    # Admin metadata
+    # ========================
+    def get_embargo_info
+      ele = @amd.xpath('sourceMD/mdWrap/xmlData/mods')
+      vals = get_text_by_type(ele, 'accessCondition', 'other')
+      @metadata['embargo_info'] = vals if vals.any?
     end
 
     def get_ora_admin
@@ -437,6 +432,19 @@ module WillowSword
       @metadata['admin_info'] = ri if ri.any?
     end
 
+    def get_record_info
+      ele = @amd.xpath('sourceMD/mdWrap/xmlData/mods/recordInfo')
+      return unless ele.present?
+      fields = %w(recordContentSource recordCreationDate)
+      fields.each do |field|
+        vals = get_text(ele, field)
+        @metadata[field] = vals if vals.any?
+      end
+      # recordInfoNote
+      vals = get_text_by_type(ele, 'recordInfoNote', 'other')
+      @metadata['recordInfoNote'] = vals if vals.any?
+    end
+
     def get_ref_admin
       ele = @amd.xpath('sourceMD/mdWrap/xmlData/mods/extension/ref_admin')
       fields = %w(apc_admin_apc_number apc_admin_review_status apc_admin_spreadsheet_identifier
@@ -448,6 +456,11 @@ module WillowSword
         ra[field] = vals if vals.any?
       end
       @metadata['ref_admin'] = ra if ra.any?
+    end
+
+    def get_rights_declaration
+      vals = get_text_with_tags(@amd, 'rightsMD/mdWrap/xmlData/RightsDeclarationMD/RightsDeclaration')
+      @metadata['record_ora_deposit_licence'] = vals if vals.any?
     end
 
     def get_thesis_admin
@@ -462,18 +475,16 @@ module WillowSword
       @metadata['thesis_admin'] = ta if ta.any?
     end
 
-    def get_embargo_info
-      ele = @amd.xpath('sourceMD/mdWrap/xmlData/mods')
-      vals = get_text_by_type(ele, 'accessCondition', 'other')
-      @metadata['embargo_info'] = vals if vals.any?
-    end
-
+    # ========================
+    # File metadata
+    # ========================
     def get_file_ids
-      @mets.search("./structMap/div/div").each do |ele|
+      @mets.search("./mets/structMap/div/div").each do |ele|
         file_data = {}
         dmdid = ele.xpath("@DMDID").text
         file_data['dmdid'] = dmdid unless dmdid.blank?
-        fileid = ele.xpath("./fptr[@FILEID]")
+        fptr = ele.xpath('./fptr')
+        fileid = fptr.xpath("@FILEID").text
         file_data['fileid'] = fileid unless fileid.blank?
         @files_metadata << file_data if file_data.any?
       end

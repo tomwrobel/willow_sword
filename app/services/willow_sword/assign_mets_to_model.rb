@@ -4,17 +4,18 @@ module WillowSword
     def assign_mets_to_model
       # descriptive metadata
       assign_model
-      assign_access_condition
       assign_abstract
+      assign_access_condition
       assign_dataset
       assign_genre
       assign_identifiers
       assign_in_progress
       assign_language
+      assign_location
       assign_name
       assign_note
-      assign_origin_info
       assign_patent
+      assign_origin_info
       assign_physical_description
       assign_related_item
       assign_subject
@@ -22,11 +23,11 @@ module WillowSword
       assign_title
       # Admin metadata
       assign_deposit_license
-      assign_record_info
+      assign_embargo_info
       assign_ora_admin
+      assign_record_info
       assign_ref_admin
       assign_thesis_admin
-      assign_embargo_info
     end
 
     def assign_files_metadata
@@ -34,7 +35,7 @@ module WillowSword
       @files_metadata.each do |file|
         file_md = file.fetch('metadata', {})
         next unless file_md.any?
-        @files_metadata['mapped_metadata'] = assign_file_metadata(file_md)
+        file['mapped_metadata'] = assign_file_metadata(file_md)
       end
     end
 
@@ -184,9 +185,9 @@ module WillowSword
 
     def assign_in_progress
       # Add in-progress header
-      return unless @metadata.dig('headers', 'in_progress').blank?
+      return if @metadata.dig('headers', 'in_progress').blank?
       admin_attrs = {}
-      vals = Array(@metadata['headers'].fetch('in_progress', []))
+      vals = Array(@metadata['headers']['in_progress'])
       admin_attrs['deposit_in_progress'] = vals[0] if vals.any?
       assign_nested_hash('admin_information', admin_attrs)
     end
@@ -435,7 +436,7 @@ module WillowSword
           assign_ri_host_dataset(ri) if @model == 'dataset'
           assign_ri_host_artile(ri) if @model == 'article'
         elsif typ == 'series'
-          assign_ri_series
+          assign_ri_series(ri)
         end
       end
     end
@@ -580,7 +581,7 @@ module WillowSword
     end
 
     # =================================
-    # administritive metadata
+    # administrative metadata
     # =================================
 
     def assign_deposit_license
@@ -590,49 +591,15 @@ module WillowSword
       assign_nested_hash('admin_information', admin_attrs)
     end
 
-    def assign_record_info
-      admin_attrs = {}
-      bib_attrs = {}
-      license_attrs = {}
-
-      # recordCreationDate
-      vals = Array(@metadata.fetch('recordCreationDate', []))
-      admin_attrs['record_creation_date'] = vals[0] if vals.any?
-
-      # recordContentSource
-      vals = Array(@metadata.fetch('recordContentSource', []))
-      admin_attrs['record_content_source'] = vals[0] if vals.any?
-
-      # recordInfoNote
-      info_note_fields = {
-        'accept_updates' => 'record_accept_updates',
-        'admin_notes' => 'admin_notes',
-        'confidential_report' => 'confidential_report',
-        'deposit_note' => 'deposit_note',
-        'ora_data_model_version' => 'ora_data_model_version',
-        'pre_counter_downloads' => 'pre_counter_downloads',
-        'pre_counter_views' => 'pre_counter_views',
-        'requires_review' => 'record_requires_review',
-      }
-      admin_fields = %w(record_accept_updates admin_notes
-                        ora_data_model_version record_requires_review)
-      bib_fields = %w(confidential_report)
-      license_fields = %w(deposit_note)
-      if @metadata.fetch('recordInfoNote', {}).any?
-        info_note_fields.each do |data_fld, model_fld|
-          vals = Array(@metadata['recordInfoNote'].fetch(data_fld, []))
-          if admin_fields.include? model_fld
-            admin_attrs[model_fld] = vals[0] if vals.any?
-          elsif bib_fields.include? model_fld
-            bib_attrs[model_fld] = vals[0] if vals.any?
-          elsif license_fields.include? model_fld
-            license_attrs[model_fld] = vals[0] if vals.any?
-          end
-        end
+    def assign_embargo_info
+      fields = %w(record_embargo_end_date record_embargo_reason record_embargo_release_method)
+      desc_attrs = {}
+      @metadata.fetch('embargo_info', {}).each do |key, val|
+        next unless fields.include?(key)
+        desc_attrs[key] = Array(val)[0] if Array(val).any?
       end
-      assign_nested_hash('admin_information', admin_attrs) if admin_attrs.any?
-      assign_nested_hash('bibliographic_information', bib_attrs) if bib_attrs.any?
-      assign_nested_hash('license_and_rights_information', license_attrs) if license_attrs.any?
+      parent = 'item_description_and_embargo_information'
+      assign_nested_hash(parent, desc_attrs) if desc_attrs.any?
     end
 
     def assign_ora_admin
@@ -689,6 +656,51 @@ module WillowSword
       assign_nested_hash(parent, rights_attrs) if rights_attrs.any?
     end
 
+    def assign_record_info
+      admin_attrs = {}
+      bib_attrs = {}
+      license_attrs = {}
+
+      # recordCreationDate
+      vals = Array(@metadata.fetch('recordCreationDate', []))
+      admin_attrs['record_creation_date'] = vals[0] if vals.any?
+
+      # recordContentSource
+      vals = Array(@metadata.fetch('recordContentSource', []))
+      admin_attrs['record_content_source'] = vals[0] if vals.any?
+
+      # recordInfoNote
+      info_note_fields = {
+        'accept_updates' => 'record_accept_updates',
+        'admin_notes' => 'admin_notes',
+        'confidential_report' => 'confidential_report',
+        'deposit_note' => 'deposit_note',
+        'ora_data_model_version' => 'ora_data_model_version',
+        'pre_counter_downloads' => 'pre_counter_downloads',
+        'pre_counter_views' => 'pre_counter_views',
+        'requires_review' => 'record_requires_review',
+      }
+      admin_fields = %w(record_accept_updates admin_notes
+                        ora_data_model_version record_requires_review)
+      bib_fields = %w(confidential_report)
+      license_fields = %w(deposit_note)
+      if @metadata.fetch('recordInfoNote', {}).any?
+        info_note_fields.each do |data_fld, model_fld|
+          vals = Array(@metadata['recordInfoNote'].fetch(data_fld, []))
+          if admin_fields.include? model_fld
+            admin_attrs[model_fld] = vals[0] if vals.any?
+          elsif bib_fields.include? model_fld
+            bib_attrs[model_fld] = vals[0] if vals.any?
+          elsif license_fields.include? model_fld
+            license_attrs[model_fld] = vals[0] if vals.any?
+          end
+        end
+      end
+      assign_nested_hash('admin_information', admin_attrs) if admin_attrs.any?
+      assign_nested_hash('bibliographic_information', bib_attrs) if bib_attrs.any?
+      assign_nested_hash('license_and_rights_information', license_attrs) if license_attrs.any?
+    end
+
     def assign_ref_admin
       fields = {
         'apc_admin_apc_number' => 'apc_admin_apc_number',
@@ -722,16 +734,9 @@ module WillowSword
       assign_nested_hash('admin_information', admin_attrs) if admin_attrs.any?
     end
 
-    def assign_embargo_info
-      fields = %w(record_embargo_end_date record_embargo_reason record_embargo_release_method)
-      desc_attrs = {}
-      @metadata.fetch('thesis_admin', {}).each do |key, val|
-        next unless fields.include?(key)
-        desc_attrs[key] = Array(val)[0] if Array(val).any?
-      end
-      parent = 'item_description_and_embargo_information'
-      assign_nested_hash(parent, desc_attrs) if desc_attrs.any?
-    end
+    # =================================
+    # file metadata
+    # =================================
 
     def assign_file_metadata(file_metadata)
       mapped_file_metadata = {}
@@ -754,7 +759,7 @@ module WillowSword
         'hasPublicUrl' => 'file_public_url',
       }
       fields.each do |data_fld, model_fld|
-        vals = Array(file_metadata.fetch(data,fld, []))
+        vals = Array(file_metadata.fetch(data_fld, []))
         mapped_file_metadata[model_fld] = vals[0] if vals.any?
       end
       mapped_file_metadata
