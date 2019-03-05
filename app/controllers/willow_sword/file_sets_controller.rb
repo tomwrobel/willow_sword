@@ -5,12 +5,17 @@ module WillowSword
     before_action :set_file_set_klass
     attr_reader :file_set, :object
     include WillowSword::ProcessRequest
-    include WillowSword::Integrator::WorksBehavior
-    include WillowSword::Integrator::FileSetsBehavior
+    include WillowSword::WorksBehavior
+    include WillowSword::FileSetsBehavior
 
     def show
       @file_set = find_file_set
       render_file_set_not_found and return unless @file_set
+      if (WillowSword.config.fileset_xml_mapping_read == 'ORA')
+        render '/willow_sword/file_sets/show.ora.xml.builder', formats: [:xml], status: 200
+      else
+        render '/willow_sword/file_sets/show.atom.xml.builder', formats: [:xml], status: 200
+      end
     end
 
     def create
@@ -55,7 +60,7 @@ module WillowSword
           @error = WillowSword::Error.new(message)
           return false
         end
-        return false unless parse_metadata(@metadata_file, false)
+        return false unless parse_metadata(@metadata_file, 'fileset')
         create_file_set
         true
       end
@@ -64,7 +69,7 @@ module WillowSword
         # If there are multiple files, the first one is picked
         # If there are attributes, it is added to the file set
         return false unless validate_and_save_request
-        return false unless parse_metadata(@metadata_file, false)
+        return false unless parse_metadata(@metadata_file, 'fileset', false)
         update_file_set
         true
       end
