@@ -1,17 +1,19 @@
-xml.feed(xmlns:"http://www.w3.org/2005/Atom",
-  'xmlns:dcterms':"http://purl.org/dc/terms/",
-  'xmlns:dc':"http://purl.org/dc/elements/1.1/",
-  'xmlns:rioxxterms':"http://www.rioxx.net/schema/v2.0/rioxx/",
-  'xmlns:foxml':"info:fedora/fedora-system:def/foxml#",
-  'xmlns:oxds':"http://vocab.ox.ac.uk/dataset/schema#",
-  'xmlns:ora':"http://ora.ox.ac.uk/terms/",
-  'xmlns:symp':"http://symplectic/symplectic-elements:def/model#") do
+xml.repository_file(xmlns:"http://ora.ox.ac.uk/terms/",
+  'xmlns:dcterms' => "http://purl.org/dc/terms/",
+  'xmlns:dc' => "http://purl.org/dc/elements/1.1/",
+  'xmlns:rioxxterms' => "http://www.rioxx.net/schema/v2.0/rioxx/",
+  'xmlns:foxml' => "info:fedora/fedora-system:def/foxml#",
+  'xmlns:oxds' => "http://vocab.ox.ac.uk/dataset/schema#",
+  'xmlns:ora' => "http://ora.ox.ac.uk/terms/",
+  'xmlns:symp' => "http://symplectic/symplectic-elements:def/model#",
+  'xmlns:ali' => "http://www.niso.org/schemas/ali/1.0/") do
 
-  Array(@file_set.title).each do |t|
-    xml.title t
-  end
+  # Get the server path, it's a hack...
+  server_path = root_url.to_s
+  server_path.slice!(root_path)
   xml.content(rel:"src", href:collection_work_file_set_url(params[:collection_id], params[:work_id], @file_set))
   xml.link(rel:"edit", href:collection_work_file_set_url(params[:collection_id], params[:work_id], @file_set))
+  xml.link(rel:"download", href: "#{server_path}/downloads/#{@file_set.id}")
 
   # Add ORA metadata
   # title
@@ -35,8 +37,8 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom",
     xml.tag!('dcterms:hasVersion', val)
   end
   # datastream
-  # <foxml:datastream>file_admin_fedora3_datastream_id O</foxml:datastream>
-  Array(@file_set.attributes.fetch('file_admin_fedora3_datastream_id', nil)).each do |val|
+  # <foxml:datastream>file_admin_fedora3_datastream_identifier O</foxml:datastream>
+  Array(@file_set.attributes.fetch('file_admin_fedora3_datastream_identifier', nil)).each do |val|
     xml.tag!('foxml:datastream', val)
   end
   # rioxx version
@@ -66,8 +68,8 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom",
   end
   # date file made available
   # <ora:dateFileMadeAvailable>file_made_available_date MA</ora:dateFileMadeAvailable>
-  Array(@file_set.attributes.fetch('ora:dateFileMadeAvailable', nil)).each do |val|
-    xml.tag!('ora:dateFileMadeAvailable', val)
+  Array(@file_set.attributes.fetch('file_made_available_date', nil)).each do |val|
+    xml.tag!('ali:free_to_read', 'start_date' => val)
   end
   # access condition at deposit
   # <ora:accessConditionAtDeposit>file_admin_access_condition_at_deposit MA</ora:accessConditionAtDeposit>
@@ -84,6 +86,5 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom",
   Array(@file_set.attributes.fetch('file_public_url', nil)).each do |val|
     xml.tag!('symp:hasPublicUrl', val)
   end
-
 end
 

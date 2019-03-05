@@ -16,11 +16,11 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
   end
   # Add MODS metadata
   # x.Hello("World!", "type" => "global")
-  xml.mods({'xmlns:xlink':'http://www.w3.org/1999/xlink',
-    'version':'3.7',
-    'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance',
-    'xmlns':'http://www.loc.gov/mods/v3',
-    'xsi:schemaLocation':'http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd'
+  xml.mods({'xmlns:xlink' => 'http://www.w3.org/1999/xlink',
+            'version' => '3.7',
+            'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
+            'xmlns' => 'http://www.loc.gov/mods/v3',
+            'xsi:schemaLocation' => 'http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd'
   }) do
     # Abstract
     Array(@mods.fetch('abstract', [])).each do |val|
@@ -50,13 +50,18 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
           xml.displayForm(val)
         end
         # affiliation
+        # TODO: fix funder grantinfo and publisher affiliation types
         agent.fetch('affiliation', {}).each do |key, vals|
           Array(vals).each do |val|
-            xml.affiliation(val, "type" => key)
+            if key == 'oxford_college'
+                xml.affiliation(val, "type" => 'oxfordCollege')
+            else
+              xml.affiliation(val, "type" => key)
+            end
           end
         end
         # role
-        agent.fetch('role', []).each do |val|
+        agent.fetch('roles', []).each do |val|
           xml.role do
             xml.roleTerm(val)
           end
@@ -166,6 +171,13 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
     # type of resource
     Array(@mods.fetch('type_of_resource', [])).each do |val|
       xml.typeOfResource(val)
+    end
+
+    # Review status
+    if Array(@mods.fetch('symplectic_review_status', [])).any?
+      Array(@mods.fetch('symplectic_review_status', [])).each do |val|
+        xml.note val, 'type' => 'admin', 'displayLabel' => 'symplectic-review-status'
+      end
     end
   end
 end
