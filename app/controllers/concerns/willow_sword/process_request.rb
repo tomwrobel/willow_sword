@@ -55,10 +55,17 @@ module WillowSword
       @files = bag.package.bag_files - [@metadata_file]
     end
 
-    def parse_metadata(file_path, required=true)
-      extract_metadata(file_path)
-      # updates to the object need not have metadata
+    def parse_metadata(file_path, type, required=true)
+      if ['work', 'fileset'].include? type
+        extract_metadata(file_path, type)
+      else
+        message = "Unknown type #{type} to extract metadata. has to be work or fileset"
+        @error = WillowSword::Error.new(message)
+        return false
+      end
       return true unless required
+      # set default attribute for fileset if none
+      @attributes = { 'file_name' => @headers[:filename] } if @attributes.blank? and type == 'fileset'
       # metadata should exist
       unless @attributes.any?
         message = "Could not extract any metadata"

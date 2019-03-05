@@ -12,13 +12,20 @@ module Integrator
 
       def upload_files
         @file_ids = []
+        @uploaded_files = {}
         @files.each do |file|
           u = ::Hyrax::UploadedFile.new
           @current_user = User.batch_user unless @current_user.present?
           u.user_id = @current_user.id unless @current_user.nil?
           u.file = ::CarrierWave::SanitizedFile.new(file)
           u.save
-          @file_ids << u.id
+          chosen_file = @files_attributes.select{ |fa| File.basename(fa['filepath']) == File.basename(file) }
+          if chosen_file.any?
+            chosen_file[0]['uploaded_file'] = u
+            @uploaded_files[File.basename(file)] = chosen_file[0]
+          else
+            @file_ids << u.id
+          end
         end
       end
 
@@ -28,6 +35,12 @@ module Integrator
           update_work
         else
           create_work
+        end
+      end
+
+      def upload_files_with_attributes
+        @uploaded_files.each do |file_name, uploaded_file|
+          create_file_set_with_attributes(uploaded_file)
         end
       end
 
@@ -60,15 +73,15 @@ module Integrator
         work_actor.create(environment(attrs))
       end
 
-      def create_attributes
-        transform_attributes
-      end
-
-      def update_attributes
-        transform_attributes.except(:id, 'id')
-      end
-
       private
+        def create_attributes
+          transform_attributes
+        end
+
+        def update_attributes
+          transform_attributes.except(:id, 'id')
+        end
+
         def set_work_klass
           # Transform name of model to match across name variations
           work_models = WillowSword.config.work_models
@@ -106,6 +119,7 @@ module Integrator
         # a way that is compatible with how the factory needs them.
         def transform_attributes
           # TODO: attributes are strings and not symbols
+          @attributes['visibility'] = WillowSword.config.default_visibility if @attributes.fetch('visibility', nil).blank?
           if WillowSword.config.allow_only_permitted_attributes
            @attributes.slice(*permitted_attributes).merge(file_attributes)
           else
@@ -133,6 +147,35 @@ module Integrator
             model = response.dig('response', 'docs')[0]['has_model_ssim'][0]
           end
           model
+        end
+
+        def create_file_set_with_attributes(file_attributes)
+          @file_set_klass = WillowSword.config.file_set_models.first.constantize
+          file_set = @file_set_klass.create
+          current_user = User.batch_user unless @current_user.present?
+          actor = file_set_actor.new(file_set, current_user)
+          actor.file_set.permissions_attributes = @object.permissions.map(&:to_hash)
+          # Add file
+          actor.create_content(file_attributes['uploaded_file'])
+          actor.file_set.title = [File.basename(chosen_file)]
+          # update_metadata
+          if file_attributes['metadata'].any?
+            chosen_attributes = file_set_attributes(file_attributes['metadata'])
+            actor.create_metadata(chosen_attributes)
+          end
+          actor.attach_to_work(@object) if @object
+        end
+
+        def file_set_attributes(attributes)
+          if WillowSword.config.allow_only_permitted_attributes
+            attributes.slice(*permitted_file_attributes).except(:id, 'id')
+          else
+            attributes.except(:id, 'id')
+          end
+        end
+
+        def permitted_file_attributes
+          @file_set_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
         end
     end
   end

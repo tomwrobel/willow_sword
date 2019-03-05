@@ -5,8 +5,8 @@ module WillowSword
     before_action :set_work_klass
     attr_reader :object, :current_user
     include WillowSword::ProcessRequest
-    include WillowSword::Integrator::WorksBehavior
-    include WillowSword::Integrator::ModelToMods
+    include WillowSword::WorksBehavior
+    include WillowSword::ModelToMods
 
     def show
       # @collection_id = params[:collection_id]
@@ -48,18 +48,20 @@ module WillowSword
 
     def perform_create
       return false unless validate_and_save_request
-      return false unless parse_metadata(@metadata_file, true)
+      return false unless parse_metadata(@metadata_file, 'work', true)
       set_work_klass
       upload_files unless @files.blank?
       add_work
+      upload_files_with_attributes unless @files_attributes.blank?
       true
     end
 
     def perform_update
       return false unless validate_and_save_request
-      return false unless parse_metadata(@metadata_file, false)
+      return false unless parse_metadata(@metadata_file, 'work', false)
       upload_files unless @files.blank?
       add_work
+      upload_files_with_attributes unless @files_attributes.blank?
       true
     end
 
