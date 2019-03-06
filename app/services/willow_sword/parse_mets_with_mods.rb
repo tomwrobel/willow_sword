@@ -206,7 +206,7 @@ module WillowSword
         vals = get_text(nam, "namePart[@type='given']")
         name_attrs['given'] = vals if vals.any?
         # name_part - family
-        vals = get_text(nam, "name_part[@type='family']")
+        vals = get_text(nam, "namePart[@type='family']")
         name_attrs['family'] = vals if vals.any?
         # name identifier
         vals = get_text_by_type(nam, 'nameIdentifier', 'identifier')

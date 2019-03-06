@@ -214,14 +214,16 @@ module WillowSword
     def assign_name
       @metadata.fetch('names', []).each do |nam|
         typ = nam.fetch('type', nil)
-        roles = nam.fetch('roles', []).map { |r| r['role_term'] }
-        if typ == 'corporate' and roles.include?('Commissioning body')
+        roles = nam.fetch('roles', [])
+        role_titles = []
+        role_titles = roles[0].fetch('role_title', []) if roles.any?
+        if typ == 'corporate' and role_titles.include?('Commissioning body')
           assign_name_commissioning_body(nam)
-        elsif typ == 'corporate' and roles.include?('Copyright holder')
+        elsif typ == 'corporate' and role_titles.include?('Copyright holder')
           assign_name_rights_holder(nam)
-        elsif typ == 'corporate' and roles.include?('Funder')
+        elsif typ == 'corporate' and role_titles.include?('Funder')
           assign_name_funder(nam)
-        elsif typ == 'corporate' and roles.include?('Publisher')
+        elsif typ == 'corporate' and role_titles.include?('Publisher')
           assign_name_publisher(nam)
         else
           assign_name_person(nam)
@@ -276,8 +278,10 @@ module WillowSword
         'orcid_identifier' => 'orcid_identifier'
       }
       mapped_name = {}
+      name_added = false
       nam.each do |key, val|
         if name_fields.include?(key)
+          name_added = true if key != 'type' and Array(val).any?
           mapped_name[name_fields[key]] = Array(val).first if Array(val).any?
         elsif key == 'affiliation'
           val.each do |aff_key, aff_val|
@@ -321,8 +325,8 @@ module WillowSword
           end
           mapped_name['roles_attributes'] = roles if roles.any?
         end
-        assign_nested_hash('creators_and_contributors', mapped_name, false)
       end
+      assign_nested_hash('creators_and_contributors', mapped_name, false) if name_added
     end
 
     def assign_name_funder(nam)
