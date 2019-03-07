@@ -183,21 +183,20 @@ module WillowSword
         else
           etal = false
         end
-        # funding_programme
-        vals = get_text(nam, 'affiliation/funding/funding_programme')
-        name_attrs['funding_programme'] = vals if vals.any?
-        # funder_compliance
-        vals = get_text(nam, 'affiliation/funding/funder_compliance')
-        name_attrs['funder_compliance'] = vals if vals.any?
-        # grants
         grants = []
-        nam.search('affiliation/funding/funder_grant').each do |grant_node|
+        nam.search('./affiliation/funding').each do |funding_node|
           grant = {}
+          # funding_programme
+          vals = get_text(funding_node, 'funding_programme')
+          grant['funding_programme'] = vals if vals.any?
+          # funder_compliance
+          vals = get_text(funding_node, 'funder_compliance')
+          name_attrs['funder_compliance'] = vals if vals.any?
           # grant_identifier
-          vals = get_text(grant_node, 'grant_identifier')
+          vals = get_text(funding_node, 'funder_grant/grant_identifier')
           grant['grant_identifier'] = vals if vals.any?
           # is_funding_for
-          vals = get_text(grant_node, 'is_funding_for')
+          vals = get_text(funding_node, 'funder_grant/is_funding_for')
           grant['is_funding_for'] = vals if vals.any?
           grants << grant if grant.any?
         end

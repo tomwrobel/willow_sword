@@ -62,12 +62,18 @@ module WillowSword
     def assign_access_condition
       # access_condition
       return unless @metadata.fetch('access_condition', []).any?
-      li_fields = %w(license license_statement license_start_date license_url rights_statement)
+      li_fields = {
+        'license' => 'licence',
+        'license_statement' => 'licence_statement',
+        'license_start_date' => 'licence_start_date',
+        'license_url' => 'licence_url',
+        'rights_statement' => 'rights_statement'
+      }
       li_attrs = {}
       admin_attrs = {}
       @metadata['access_condition'].each do |key, vals|
         if li_fields.include?(key)
-          li_attrs[key] = Array(vals)[0] if Array(vals).any?
+          li_attrs[li_fields[key]] = Array(vals)[0] if Array(vals).any?
         elsif key == 'record_ora_deposit_licence'
           admin_attrs[key] = Array(vals)[0] if Array(vals).any?
         end
@@ -243,7 +249,7 @@ module WillowSword
     def assign_name_rights_holder(nam)
       vals = Array(nam.fetch('display_form', []))
       if vals.any?
-        parent = 'license_and_rights_information'
+        parent = 'licence_and_rights_information'
         rights_attr = { 'rights_holders' => vals[0] }
         assign_nested_hash(parent, rights_attr)
       end
@@ -274,7 +280,7 @@ module WillowSword
         'email_address' => 'contributor_email',
         'website' => 'contributor_website_url',
         'contributor_record_identifier' => 'contributor_record_identifier',
-        'sso' => 'contributor_institutional_identifier',
+        'sso' => 'institutional_identifier',
         'orcid_identifier' => 'orcid_identifier'
       }
       mapped_name = {}
@@ -308,7 +314,7 @@ module WillowSword
               other_ids << id
             end
           end
-          mapped_name['contributor_identifier_attributes'] = other_ids if other_ids.any?
+          mapped_name['schemes_attributes'] = other_ids if other_ids.any?
         elsif key == 'roles'
           # Ensuring all values are singular
           roles = []
@@ -331,27 +337,27 @@ module WillowSword
 
     def assign_name_funder(nam)
       funder = {}
-      funder_fields = {
-        'display_form' => 'funder_name',
-        'identifier' => 'funder_identifier',
-        'funding_programme' => 'funder_funding_programme',
-        'funder_compliance' => 'funder_compliance_met'
-      }
-      funder_fields.each do |data_field, model_field|
-        vals = Array(nam.fetch(data_field, []))
-        funder[model_field] = vals.first if vals.any?
+      vals = Array(nam.fetch('display_form', []))
+      funder['funder_name'] = vals[0] if vals.any?
+      nam.fetch('identifier', []).each do |k, v|
+        funder['funder_identifier'] = Array(v).first if k == 'funder_identifier' && Array(v).any?
       end
       grants = []
-      grant_fields = %w(grant_identifier is_funding_for)
+      grant_fields = {
+        'funding_programme' => 'funder_funding_programme',
+        'funder_compliance' => 'funder_compliance_met',
+        'grant_identifier' => 'grant_identifier',
+        'is_funding_for' => 'is_funding_for'
+      }
       nam.fetch('grants', []).each do |grant|
         mapped_grant = {}
-        grant_fields.each do |field|
-          vals = Array(grant.fetch(field, []))
-          mapped_grant[field] = vals.first if vals.any?
+        grant_fields.each do |data_field, model_field|
+          vals = Array(grant.fetch(data_field, []))
+          mapped_grant[model_field] = vals.first if vals.any?
         end
         grants << mapped_grant if mapped_grant.any?
       end
-      funder['funder_grant_attributes'] = grants if grants.any?
+      funder['grant_information_attributes'] = grants if grants.any?
       assign_nested_hash('funders', funder, false)
     end
 
@@ -406,11 +412,11 @@ module WillowSword
       parent = 'bibliographic_information'
       child = 'publishers'
       assign_second_nested_hash(parent, child, pub_attrs) if pub_attrs.any?
-      # license_and_rights_information
+      # licence_and_rights_information
       rights_attrs = {}
       vals = Array(@metadata.fetch('copyright_date', []))
       rights_attrs['rights_copyright_date'] = vals[0] if vals.any?
-      parent = 'license_and_rights_information'
+      parent = 'licence_and_rights_information'
       assign_nested_hash(parent, rights_attrs)
     end
 
@@ -467,7 +473,7 @@ module WillowSword
       ri = {}
       fields = {
         'related_item_title' => 'related_item_title',
-        'related_item_url' => 'related_item_identifier',
+        'related_item_url' => 'related_item_url',
         'related_item_citation_text' => 'related_item_citation_text'
       }
       fields.each do |data_fld, model_fld|
@@ -578,7 +584,7 @@ module WillowSword
     def assign_title
       # title
       vals = Array(@metadata.fetch('title', []))
-      @mapped_metadata['title'] = vals.first if vals.any?
+      @mapped_metadata['title'] = vals if vals.any?
       # subtitle
       vals = Array(@metadata.fetch('subtitle', []))
       @mapped_metadata['alternative_title'] = vals.first if vals.any?
@@ -635,7 +641,13 @@ module WillowSword
       admin_attrs = {}
       admin_fields.each do |field|
         vals = Array(@metadata['admin_info'].fetch(field, []))
-        admin_attrs[field] = vals[0] if vals.any?
+        label = field
+        label = 'admin_incorrect_version_deposited' if field == 'incorrect_version_deposited'
+        if label == 'rt_ticket_number'
+          admin_attrs[label] = vals if vals.any?
+        else
+          admin_attrs[label] = vals[0] if vals.any?
+        end
       end
       # assign history action wthin admin
       history = []
@@ -648,7 +660,7 @@ module WillowSword
         end
         history << history_action if history_action.any?
       end
-      admin_attrs['history_attributes'] = history if history.any?
+      admin_attrs['history_information_attributes'] = history if history.any?
       assign_nested_hash('admin_information', admin_attrs) if admin_attrs.any?
       # Assign rights attributes
       rights_attrs = {}
@@ -667,7 +679,7 @@ module WillowSword
 
       # recordCreationDate
       vals = Array(@metadata.fetch('recordCreationDate', []))
-      admin_attrs['record_creation_date'] = vals[0] if vals.any?
+      admin_attrs['record_created_date'] = vals[0] if vals.any?
 
       # recordContentSource
       vals = Array(@metadata.fetch('recordContentSource', []))
@@ -702,7 +714,7 @@ module WillowSword
       end
       assign_nested_hash('admin_information', admin_attrs) if admin_attrs.any?
       assign_nested_hash('bibliographic_information', bib_attrs) if bib_attrs.any?
-      assign_nested_hash('license_and_rights_information', license_attrs) if license_attrs.any?
+      assign_nested_hash('licence_and_rights_information', license_attrs) if license_attrs.any?
     end
 
     def assign_ref_admin
