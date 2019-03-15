@@ -11,6 +11,7 @@ module Integrator
       extend ActiveSupport::Concern
 
       def upload_files
+        return if @files.blank?
         @file_ids = []
         @uploaded_files = {}
         @files.each do |file|
@@ -19,7 +20,7 @@ module Integrator
           u.user_id = @current_user.id unless @current_user.nil?
           u.file = ::CarrierWave::SanitizedFile.new(file)
           u.save
-          chosen_file = @files_attributes.select{ |fa| File.basename(fa['filepath']) == File.basename(file) }
+          chosen_file = @files_attributes.select{ |fa| File.basename(fa['filepath'][0]) == File.basename(file) }
           if chosen_file.any?
             chosen_file[0]['uploaded_file'] = u
             @uploaded_files[File.basename(file)] = chosen_file[0]
@@ -39,6 +40,7 @@ module Integrator
       end
 
       def upload_files_with_attributes
+        return if @uploaded_files.blank?
         @uploaded_files.each do |file_name, uploaded_file|
           create_file_set_with_attributes(uploaded_file)
         end
@@ -152,15 +154,20 @@ module Integrator
         def create_file_set_with_attributes(file_attributes)
           @file_set_klass = WillowSword.config.file_set_models.first.constantize
           file_set = @file_set_klass.create
-          current_user = User.batch_user unless @current_user.present?
-          actor = file_set_actor.new(file_set, current_user)
+          @current_user = User.batch_user unless @current_user.present?
+          actor = file_set_actor.new(file_set, @current_user)
           actor.file_set.permissions_attributes = @object.permissions.map(&:to_hash)
           # Add file
           actor.create_content(file_attributes['uploaded_file'])
-          actor.file_set.title = [File.basename(chosen_file)]
+          title = Array(file_attributes.dig('mapped_metadata', 'file_name'))
+          unless title.any?
+            filepath = Array(file_attributes.fetch('filepath', nil))
+            title = Array(File.basename(filepath[0])) if filepath.any?
+          end
+          actor.file_set.title = title
           # update_metadata
-          if file_attributes['metadata'].any?
-            chosen_attributes = file_set_attributes(file_attributes['metadata'])
+          if file_attributes['mapped_metadata'].any?
+            chosen_attributes = file_set_attributes(file_attributes['mapped_metadata'])
             actor.create_metadata(chosen_attributes)
           end
           actor.attach_to_work(@object) if @object
@@ -172,6 +179,10 @@ module Integrator
           else
             attributes.except(:id, 'id')
           end
+        end
+
+        def file_set_actor
+          ::Hyrax::Actors::FileSetActor
         end
 
         def permitted_file_attributes
