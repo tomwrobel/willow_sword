@@ -20,7 +20,7 @@ WillowSword.setup do |config|
   # XML crosswalk for creating a work
   config.xw_from_xml_for_work = WillowSword::CrosswalkFromMets
   # XML crosswalk for creating a fileset
-  config.xw_from_xml_for_fileset = WillowSword::CrosswalkFromDc
+  config.xw_from_xml_for_fileset = WillowSword::CrosswalkFromOra
   # XML crosswalk when requesting a work
   # config.xw_to_xml_for_work = WillowSword::CrosswalkToMods
   # XML crosswalk when requesting a fileet

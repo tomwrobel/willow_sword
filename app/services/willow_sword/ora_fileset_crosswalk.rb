@@ -8,17 +8,22 @@ module WillowSword
 
     def translated_terms
       {
-          'datastream' => 'file_admin_fedora3_datastream_id',
-          'embargoedUntil' => 'file_embargo_end_date',
-          'embargoReason' => 'file_embargo_reason',
-          'embargoReleaseMethod' => 'file_embargo_release_method',
-          'dateFileMadeAvailable' => 'file_made_available_date',
-          'extent' => 'file_size',
-          'free_to_read' => 'file_made_available_date',
-          'hasPublicUrl' => 'file_public_url',
-          'format' => 'file_format',
-          'title' => 'file_name',
-          'version' => 'file_rioxx_version'
+        'accessConditionAtDeposit' => 'access_condition_at_deposit',
+        'datastream' => 'file_admin_fedora3_datastream_identifier',
+        'embargoComment' => 'file_embargo_comment',
+        'embargoReleaseMethod' => 'file_embargo_release_method',
+        'embargoedUntil' => 'file_embargo_end_date',
+        'extent' => 'file_size',
+        'fileOrder' => 'file_order',
+        'fileAndRecordDoNotMatch' => 'file_admin_file_and_record_do_not_match',
+        'format' => 'file_format',
+        'hasPublicUrl' => 'file_public_url',
+        'hasVersion' => 'file_version',
+        'lastAccessRequestDate' => 'file_last_access_request_date',
+        'location' => 'file_path',
+        'reasonForEmbargo' => 'file_embargo_reason',
+        'title' => 'file_name',
+        'version' => 'file_rioxx_version'
       }
     end
 
@@ -32,9 +37,9 @@ module WillowSword
       translated_terms.each do |term,mapped_value|
         values = []
         doc.xpath("//#{term}").each do |t|
-          values << t.text if t.text.present?
+          values << t.text unless t.text.blank?
         end
-        values = values.first if values.present?
+        values = values.first unless values.blank?
         @metadata[mapped_value] = values unless values.blank?
       end
       f.close
