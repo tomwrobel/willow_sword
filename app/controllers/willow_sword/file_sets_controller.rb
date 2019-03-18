@@ -55,7 +55,7 @@ module WillowSword
         # If there are multiple files, the first one is picked
         # If there are attributes, it is added to the file set
         return false unless validate_and_save_request
-        unless @files.any?
+        if @files.blank?
           message = "Content not received"
           @error = WillowSword::Error.new(message)
           return false

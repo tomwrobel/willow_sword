@@ -33,6 +33,8 @@ module WillowSword
     end
 
     def parse_file_metadata
+      # generates an array of hashes
+      # hash has keys fileid, dmdid, filepath, metadata
       get_file_ids
       get_file_paths
       get_files_metadata

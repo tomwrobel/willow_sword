@@ -67,7 +67,7 @@ module WillowSword
       # set default attribute for fileset if none
       @attributes = { 'file_name' => @headers[:filename] } if @attributes.blank? and type == 'fileset'
       # metadata should exist
-      unless @attributes.any?
+      if @attributes.blank?
         message = "Could not extract any metadata"
         @error = WillowSword::Error.new(message)
         return false

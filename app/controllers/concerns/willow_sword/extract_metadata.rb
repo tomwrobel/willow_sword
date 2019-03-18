@@ -15,7 +15,7 @@ module WillowSword
       xw.map_xml
       @attributes = xw.mapped_metadata
       @files_attributes = xw.files_metadata
-      @resource_type = xw.model if @attributes.any?
+      @resource_type = xw.model unless @attributes.blank?
     end
   end
 end

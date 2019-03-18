@@ -47,7 +47,7 @@ module WillowSword
 
     def assign_abstract
       # abstract
-      if @metadata.fetch('abstract', []).any?
+      unless @metadata.fetch('abstract', []).blank?
         @mapped_metadata['abstract'] = Array(@metadata['abstract']).first
       end
       # abstract - summary_documentation
@@ -61,7 +61,7 @@ module WillowSword
 
     def assign_access_condition
       # access_condition
-      return unless @metadata.fetch('access_condition', []).any?
+      return if @metadata.fetch('access_condition', []).blank?
       li_fields = {
         'license' => 'licence',
         'license_statement' => 'licence_statement',
@@ -119,7 +119,7 @@ module WillowSword
 
     def assign_identifiers
       ids = @metadata.fetch('identifiers', [])
-      return unless ids.any?
+      return if ids.blank?
 
       # map attribute names to model fields
       pub_keys = {
@@ -200,7 +200,7 @@ module WillowSword
 
     def assign_language
       # Language
-      if @metadata.fetch('language', []).any?
+      unless @metadata.fetch('language', []).blank?
         @mapped_metadata['language'] = Array(@metadata['language'])
       end
     end
@@ -220,7 +220,7 @@ module WillowSword
     def assign_name
       @metadata.fetch('names', []).each do |nam|
         typ = nam.fetch('type', nil)
-        roles = nam.fetch('roles', [])
+        roles = Array(nam.fetch('roles', []))
         role_titles = []
         role_titles = roles[0].fetch('role_title', []) if roles.any?
         if typ == 'corporate' and role_titles.include?('Commissioning body')
@@ -444,7 +444,7 @@ module WillowSword
         elsif typ == 'host'
           assign_ri_host(ri)
           assign_ri_host_dataset(ri) if @model == 'dataset'
-          assign_ri_host_artile(ri) if @model == 'article'
+          assign_ri_host_article(ri) if @model == 'article'
         elsif typ == 'series'
           assign_ri_series(ri)
         end
@@ -640,6 +640,8 @@ module WillowSword
       # Assign admin attributes
       admin_attrs = {}
       admin_fields.each do |field|
+        label = field
+        label = 'admin_incorrect_version_deposited' if field == 'incorrect_version_deposited'
         vals = Array(@metadata['admin_info'].fetch(field, []))
         label = field
         label = 'admin_incorrect_version_deposited' if field == 'incorrect_version_deposited'

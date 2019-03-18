@@ -158,7 +158,9 @@ module Integrator
           actor = file_set_actor.new(file_set, @current_user)
           actor.file_set.permissions_attributes = @object.permissions.map(&:to_hash)
           # Add file
-          actor.create_content(file_attributes['uploaded_file'])
+          if file_attributes.fetch('uploaded_file', nil)
+            actor.create_content(file_attributes['uploaded_file'])
+          end
           title = Array(file_attributes.dig('mapped_metadata', 'file_name'))
           unless title.any?
             filepath = Array(file_attributes.fetch('filepath', nil))
@@ -166,7 +168,7 @@ module Integrator
           end
           actor.file_set.title = title
           # update_metadata
-          if file_attributes['mapped_metadata'].any?
+          unless file_attributes['mapped_metadata'].blank?
             chosen_attributes = file_set_attributes(file_attributes['mapped_metadata'])
             actor.create_metadata(chosen_attributes)
           end

@@ -13,7 +13,7 @@ module Integrator
         @actor = file_set_actor.new(@file_set, @current_user)
         @actor.file_set.permissions_attributes = @object.permissions.map(&:to_hash)
         # Add file
-        if @files.any?
+        unless @files.blank?
           chosen_file = @files.first
           f = upload_file(chosen_file)
           @actor.create_content(f)
@@ -30,7 +30,7 @@ module Integrator
         @actor = file_set_actor.new(@file_set, @current_user)
         @actor.file_set.permissions_attributes = @object.permissions.map(&:to_hash)
         # update file
-        if @files.any?
+        unless @files.blank?
           chosen_file = @files.first
           f = upload_file(chosen_file)
           @actor.update_content(f)
