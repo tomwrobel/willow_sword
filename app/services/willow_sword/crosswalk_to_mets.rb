@@ -12,7 +12,7 @@ module WillowSword
       mods_xw = WillowSword::CrosswalkToMods.new(@work)
       mods_xw.to_xml
       add_dmdsec(mods_xw.doc)
-      add_amdsec
+      add_amdsec(mods_xw.rights, mods_xw.admin_doc)
       add_files
     end
 
@@ -46,8 +46,8 @@ module WillowSword
       end
     end
 
-    def add_amdsec(rights, xml_data)
-      amdsec = "<mets:amdSec ID='AMDLOG_0000'>
+    def add_amdsec(rights, mods_xml)
+      amdsec_str = "<mets:amdSec ID='AMDLOG_0000'>
         <mets:rightsMD ID='RIGHTSMD_01'>
           <mets:mdWrap MDTYPE='METSRIGHTS'>
             <mets:xmlData>
@@ -58,16 +58,23 @@ module WillowSword
             </mets:xmlData>
           </mets:mdWrap>
         </mets:rightsMD>
-        <mets:sourceMD ID='SOURCEMD_01'>
-          <mets:mdWrap MDTYPE='MODS'>
-            <mets:xmlData>#{xml_data}</mets:xmlData>
-          </mets:mdWrap>
-        </mets:sourceMD>
       </mets:amdSec>"
-      LibXML::XML::Document.string(amdsec)
+      amdsec = LibXML::XML::Document.string(amdsec_str)
+      src_md = create_node('mets:sourceMD', nil, {'ID' => 'SOURCEMD_01'})
+      md_wrap = create_node('mets:mdWrap', nil, {'MDTYPE' => 'MODS'})
+      xml_data = create_node('mets:xmlData')
+      amdsec_node = @doc.import(amdsec.root)
+      @doc.root << amdsec_node
+      amdsec.root << src_md
+      src_md << md_wrap
+      md_wrap << xml_data
+      unless mods_xml.blank?
+        node = @doc.import(mods_xml.root)
+        xml_data << node
+      end
     end
 
-    def add_files(files)
+    def add_files
       # file sections
       file_sec = create_node('mets:fileSec')
       file_grp = create_node('mets:fileGrp')
@@ -112,7 +119,6 @@ module WillowSword
       @doc.root << node1
       node1 << node2
       node2 << node3
-      # file_metadata = LibXML::XML::Document.string(xml_data)
       node = @doc.import(file_metadata.root)
       node3 << node
     end
