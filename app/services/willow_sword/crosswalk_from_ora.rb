@@ -39,7 +39,7 @@ module WillowSword
     def translated_terms
       {
         'accessConditionAtDeposit' => 'access_condition_at_deposit',
-        'datastream' => 'file_admin_fedora3_datastream_identifier',
+        'datastream' => 'file_admin_fedora3_datastream_id',
         'embargoComment' => 'file_embargo_comment',
         'embargoReleaseMethod' => 'file_embargo_release_method',
         'embargoedUntil' => 'file_embargo_end_date',
@@ -53,7 +53,7 @@ module WillowSword
         'location' => 'file_path',
         'reasonForEmbargo' => 'file_embargo_reason',
         'title' => 'file_name',
-        'version' => 'file_rioxx_version',
+        'version' => 'file_rioxx_file_version',
       }
     end
   end
