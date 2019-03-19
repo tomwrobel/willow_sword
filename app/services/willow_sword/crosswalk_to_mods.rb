@@ -291,7 +291,7 @@ module WillowSword
             # grant_identifier
             grant_node << create_node('ora_admin:grant_identifier', val1) unless val1.blank?
             # is_funding_for
-            grant_node << create_node('ora_admin:is_funding_for', val2)  unless val1.blank?
+            grant_node << create_node('ora_admin:is_funding_for', val2)  unless val2.blank?
           end
         end
       end
@@ -385,8 +385,10 @@ module WillowSword
         Array(get_content('schemes', creator)).each do |scheme|
           key = get_content('contributor_identifier_scheme', scheme)
           val = get_content('contributor_identifier', scheme)
-          unless key.blank? or val.blank?
-            nam_node << create_node('mods:nameIdentifier', val, {'type' => key})
+          attributes = {}
+          attributes = {'type' => key} unless key.blank?
+          unless attributes.blank? or val.blank?
+            nam_node << create_node('mods:nameIdentifier', val, attributes)
           end
         end
         # affiliation
@@ -398,11 +400,10 @@ module WillowSword
         #   institution
         val1 = get_content('institution', creator)
         val2 = get_content('institution_identifier', creator)
+        attributes = {'type' => 'institution'}
+        attributes['institution_id'] = val2 unless val2.blank?
         unless val1.blank? and val2.blank?
-          aff_node << create_node('ora:affiliationComponent', val1, {
-            'type' => 'institution',
-            'institution_id' => val2
-          })
+          aff_node << create_node('ora:affiliationComponent', val1, attributes)
         end
         #   division
         val = get_content('division', creator)
@@ -825,6 +826,20 @@ module WillowSword
         xmlns:dcterms='http://purl.org/dc/terms/'
         xmlns:mods='http://www.loc.gov/mods/v3'/>"
       oe = LibXML::XML::Document.string(ora_extension)
+      # doi_requested
+      parent = 'bibliographic_information'
+      child = 'publishers'
+      val = get_grand_child_content(parent, child, 'doi_requested')
+      oe << create_node('ora_admin:doi_requested', val) unless val.blank?
+      admin_fields = %w(depositor_contacted depositor_contact_email_template
+      record_first_reviewed_by incorrect_version_deposited record_deposit_date
+      record_publication_date record_review_status record_review_status_other
+      record_version rt_ticket_number)
+      # admin_fields.each do |fld|
+      # 
+      # end
+      rights_fields = %w(rights_third_party_copyright_material
+                        rights_third_party_copyright_permission_received)
     end
 
     def add_record_info
