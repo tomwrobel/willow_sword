@@ -40,33 +40,33 @@ module WillowSword
       dmdsec << md_wrap
       md_wrap << xml_data
       unless mods_xml.blank?
-        # mods = LibXML::XML::Document.string(mods_xml)
         node = @doc.import(mods_xml.root)
         xml_data << node
       end
     end
 
     def add_amdsec(rights, mods_xml)
-      amdsec_str = "<mets:amdSec ID='AMDLOG_0000'>
-        <mets:rightsMD ID='RIGHTSMD_01'>
-          <mets:mdWrap MDTYPE='METSRIGHTS'>
-            <mets:xmlData>
-              <metsrights:RightsDeclarationMD RIGHTSCATEGORY='LICENSED'
-                xmlns:metsrights='http://http://cosimo.stanford.edu/sdr/metsrights/'>
-                <metsrights:RightsDeclaration>#{rights}</metsrights:RightsDeclaration>
-              </metsrights:RightsDeclarationMD>
-            </mets:xmlData>
-          </mets:mdWrap>
-        </mets:rightsMD>
-      </mets:amdSec>"
-      amdsec = LibXML::XML::Document.string(amdsec_str)
+      amdsec = create_node('mets:amdSec', nil, {'ID' => 'AMDLOG_0000'})
+      @doc.root << amdsec
+      # rights
+      rights_md = create_node('mets:rightsMD', nil, {'ID' => 'RIGHTSMD_01'})
+      amdsec << rights_md
+      md_wrap1 = create_node('mets:mdWrap', nil, {'MDTYPE' => 'METSRIGHTS'})
+      rights_md << md_wrap1 
+      xml_data1 = create_node('mets:xmlData')
+      md_wrap1 << xml_data1
+      rights_dec = create_node('metsrights:RightsDeclarationMD', nil, {
+        'RIGHTSCATEGORY' => 'LICENSED'
+      })
+      add_namespaces(rights_dec, {'metsrights' => 'http://cosimo.stanford.edu/sdr/metsrights/'})
+      xml_data1 << rights_dec
+      rights_dec << create_node('metsrights:RightsDeclaration', rights)
+      # source
       src_md = create_node('mets:sourceMD', nil, {'ID' => 'SOURCEMD_01'})
+      amdsec << src_md
       md_wrap = create_node('mets:mdWrap', nil, {'MDTYPE' => 'MODS'})
-      xml_data = create_node('mets:xmlData')
-      amdsec_node = @doc.import(amdsec.root)
-      @doc.root << amdsec_node
-      amdsec.root << src_md
       src_md << md_wrap
+      xml_data = create_node('mets:xmlData')
       md_wrap << xml_data
       unless mods_xml.blank?
         node = @doc.import(mods_xml.root)
@@ -94,7 +94,7 @@ module WillowSword
       @work.file_sets.each do |file_set|
         count += 1
         mimetype = file_set.file_format
-        filepath = file_set.hasPublicUrl
+        filepath = file_set.file_public_url
         # Add file dmdsec
         xw = WillowSword::CrosswalkToOra.new(file_set)
         xw.to_xml
@@ -102,7 +102,7 @@ module WillowSword
         # Add file group
         file_grp << add_file_group(count, filepath, mimetype)
         # struct div2
-        div1 << add_file_struct_div(id)
+        div1 << add_file_struct_div(count)
       end
       # complete file sections
       file_sec << file_grp
@@ -113,8 +113,8 @@ module WillowSword
     end
 
     def add_file_dmdsec(id, file_metadata)
-      node1 = create_node('mets:dmdSec', {'ID'=>file_dmdid(id)})
-      node2 = create_node('mets:mdWrap', {'MDTYPE'=>'OTHER'})
+      node1 = create_node('mets:dmdSec', nil, {'ID'=>file_dmdid(id)})
+      node2 = create_node('mets:mdWrap', nil, {'MDTYPE'=>'OTHER'})
       node3 = create_node('mets:xmlData')
       @doc.root << node1
       node1 << node2
@@ -124,13 +124,19 @@ module WillowSword
     end
 
     def add_file_group(id, filepath, mimetype)
-      filepath = "file:///#{filepath}" unless filepath.starts_with?('http')
-      filesec = "
-        <mets:file ID='#{file_id(id)}' MIMETYPE='#{mimetype}'>
-            <mets:FLocat xmlns:xlink='http://www.w3.org/1999/xlink' LOCTYPE='URL'
-                xlink:href='#{filepath}'/>
-        </mets:file>"
-      LibXML::XML::Document.string(filesec)
+      unless filepath.blank?
+        filepath = "file:///#{filepath}" unless filepath.starts_with?('http')
+      end
+      attributes = {}
+      attributes['ID'] = file_id(id) unless id.blank?
+      attributes['MIMETYPE'] = mimetype unless mimetype.blank?
+      file_node = create_node('mets:file', nil, attributes)
+      attributes = {'LOCTYPE' => 'URL'}
+      attributes['xlink:href'] = filepath unless filepath.blank?
+      file_loc = create_node('mets:FLocat', nil, attributes)
+      add_namespaces(file_loc, {'xlink' => 'http://www.w3.org/1999/xlink'})
+      file_node << file_loc
+      file_node
     end
 
     def add_file_struct_div(id)
@@ -139,7 +145,7 @@ module WillowSword
         'LABEL' => file_id(id),
         'TYPE' => 'Repository file'
       })
-      div << fptr
+      div << create_node('mets:fptr', nil, {'FILEID' => file_id(id)})
       div
     end
 
@@ -148,7 +154,7 @@ module WillowSword
     end
 
     def file_id(id)
-      "FILENAME1#{id}"
+      "FILENAME#{id}"
     end
 
   end

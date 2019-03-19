@@ -14,7 +14,8 @@ module WillowSword
       render_not_found and return unless @object
       xw_klass = WillowSword.config.xw_to_xml_for_work
       xw = xw_klass.new(@object).to_xml
-      render xw.doc.to_s, formats: [:xml], status: 200
+      @xml_data = xw.doc.to_s
+      render 'show.xml', formats: [:xml], status: 200
     end
 
     def create

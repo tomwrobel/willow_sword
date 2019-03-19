@@ -133,7 +133,7 @@ module WillowSword
     def add_etd_extension
       extn = create_node('mods:extension')
       etd_extension = "<uketd_dc:uketddc
-        xmlns:uketdterms='http://naca.central.cranfield.ac.uk/ethos-oai/terms/''
+        xmlns:uketdterms='http://naca.central.cranfield.ac.uk/ethos-oai/terms/'
         xmlns:uketd_dc='http://naca.central.cranfield.ac.uk/ethos-oai/2.0/'
         xmlns:dcterms='http://purl.org/dc/terms/'/>"
       fields = {
@@ -257,7 +257,7 @@ module WillowSword
       funders = get_content('funders')
       funders.each do |funder|
         funder_node = create_node('mods:name', nil, {'type' => 'corporate'})
-        @dco.root << funder_node
+        @doc.root << funder_node
         # funder_name
         val = get_content('funder_name', funder)
         funder_node << create_node('mods:displayForm', val) unless val.blank?
@@ -272,7 +272,7 @@ module WillowSword
         aff_node = create_node('mods:affiliation')
         funder_node << aff_node
         # grants
-        funder.grants.each do |grant|
+        funder.grant_information.each do |grant|
           funding_node = create_node('ora_admin:funding')
           add_namespaces(funding_node, {'ora_admin' => 'http://ora.ox.ac.uk/vocabs/admin'})
           funder_node << funding_node
@@ -301,7 +301,7 @@ module WillowSword
       parent = 'bibliographic_information'
       Array(get_child_content(parent, 'publishers')).each do |publisher|
         pub_node = create_node('mods:name', nil, {'type' => 'corporate'})
-        @dco.root << pub_node
+        @doc.root << pub_node
         # funder_name
         val = get_content('publisher_name', publisher)
         pub_node << create_node('mods:displayForm', val) unless val.blank?
@@ -711,7 +711,7 @@ module WillowSword
       # physicalDescription
       val1 = get_content('host_publication_status')
       val2 = get_content('host_peer_review_status')
-      unless val1.blank? ands val2.blank?
+      unless val1.blank? and val2.blank?
         pd_node = create_node('mods:physicalDescription')
         ri_node << pd_node
         pd_node << create_node('mods:form', val1, {'type' => 'status'}) unless val1.blank?
@@ -747,7 +747,7 @@ module WillowSword
 
     def add_subject
       val1 = get_content('keyword')
-      val2 = get_child_content('subject')
+      val2 = get_content('subject')
       unless val1.blank? and val2.blank?
         subject_node = create_node('mods:subject')
         @doc.root << subject_node
@@ -758,7 +758,7 @@ module WillowSword
 
     def add_title
       val1 = get_content('title')
-      val2 = get_child_content('alternative_title')
+      val2 = get_content('alternative_title')
       unless val1.blank? and val2.blank?
         title_node = create_node('mods:titleInfo')
         @doc.root << title_node
