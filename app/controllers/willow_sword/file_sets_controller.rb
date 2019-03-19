@@ -12,7 +12,8 @@ module WillowSword
       @file_set = find_file_set
       render_file_set_not_found and return unless @file_set
       xw_klass = WillowSword.config.xw_to_xml_for_fileset
-      xw = xw_klass.new(@file_set).to_xml
+      xw = xw_klass.new(@file_set)
+      xw.to_xml
       @xml_data = xw.doc.to_s
       render 'show.xml', formats: [:xml], status: 200
     end

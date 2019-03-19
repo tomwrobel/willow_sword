@@ -26,7 +26,7 @@ module WillowSword
 
     def add_nodes
       translated_terms.each do |model_key, xml_tag|
-        @doc.root << create_node(xml_tag, @fileset[model_key]) unless @fileset[model_key].blank?
+        @doc.root << create_node(xml_tag, Array(@fileset[model_key])[0]) unless Array(@fileset[model_key]).blank?
       end
       unless @fileset['file_made_available_date'].blank?
         node = create_node('ali:free_to_read')
