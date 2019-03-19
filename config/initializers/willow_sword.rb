@@ -13,19 +13,14 @@ WillowSword.setup do |config|
   config.allow_only_permitted_attributes = true
   # Default visibility for works
   config.default_visibility = 'open'
-  # The xml mapping to use when a user wants to create a work
-  # config.xml_mapping_create = 'DC'
-  # The xml mapping to use when a user wnats to read a work
-  # config.xml_mapping_read = 'DC'
   # XML crosswalk for creating a work
   config.xw_from_xml_for_work = WillowSword::CrosswalkFromMets
   # XML crosswalk for creating a fileset
   config.xw_from_xml_for_fileset = WillowSword::CrosswalkFromOra
   # XML crosswalk when requesting a work
-  # config.xw_to_xml_for_work = WillowSword::CrosswalkToMods
+  config.xw_to_xml_for_work = WillowSword::CrosswalkToMets
   # XML crosswalk when requesting a fileet
-  config.fileset_xml_mapping_read ='ORA'
-  # config.xw_to_xml_for_fileset = WillowSword::CrosswalkToDc
+  config.xw_to_xml_for_fileset = WillowSword::CrosswalkToOra
   # Authorize Sword requests using Api-key header
   config.authorize_request = false
 end

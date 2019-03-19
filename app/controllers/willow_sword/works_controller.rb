@@ -12,12 +12,9 @@ module WillowSword
       # @collection_id = params[:collection_id]
       find_work_by_query
       render_not_found and return unless @object
-      if (WillowSword.config.xml_mapping_read == 'MODS')
-        @mods = assign_model_to_mods
-        render '/willow_sword/works/show.mods.xml.builder', formats: [:xml], status: 200
-      else
-        render '/willow_sword/works/show.dc.xml.builder', formats: [:xml], status: 200
-      end
+      xw_klass = WillowSword.config.xw_to_xml_for_work
+      xw = xw_klass.new(@object).to_xml
+      render xw.doc.to_s, formats: [:xml], status: 200
     end
 
     def create

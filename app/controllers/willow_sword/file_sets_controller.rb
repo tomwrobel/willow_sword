@@ -11,11 +11,9 @@ module WillowSword
     def show
       @file_set = find_file_set
       render_file_set_not_found and return unless @file_set
-      if (WillowSword.config.fileset_xml_mapping_read == 'ORA')
-        render '/willow_sword/file_sets/show.ora.xml.builder', formats: [:xml], status: 200
-      else
-        render '/willow_sword/file_sets/show.atom.xml.builder', formats: [:xml], status: 200
-      end
+      xw_klass = WillowSword.config.xw_to_xml_for_fileset
+      xw = xw_klass.new(@file_set).to_xml
+      render xw.doc.to_s, formats: [:xml], status: 200
     end
 
     def create
