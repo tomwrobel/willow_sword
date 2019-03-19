@@ -20,7 +20,8 @@ module Integrator
           @actor.file_set.title = [File.basename(chosen_file)]
         end
         # update_metadata
-        @actor.create_metadata(create_file_set_attributes) unless @attributes.blank?
+        @actor.file_set.update(create_file_set_attributes) unless @attributes.blank?
+        @actor.file_set.save!
         @actor.attach_to_work(@object) if @object
       end
 
@@ -37,7 +38,8 @@ module Integrator
           @actor.file_set.title = [File.basename(chosen_file)]
         end
         # update_metadata
-        @actor.update_metadata(update_file_set_attributes) unless @attributes.blank?
+        @actor.file_set.update(update_file_set_attributes) unless @attributes.blank?
+        @actor.file_set.save!
       end
 
       private

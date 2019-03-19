@@ -170,7 +170,8 @@ module Integrator
           # update_metadata
           unless file_attributes['mapped_metadata'].blank?
             chosen_attributes = file_set_attributes(file_attributes['mapped_metadata'])
-            actor.create_metadata(chosen_attributes)
+            actor.file_set.update(chosen_attributes)
+            actor.file_set.save!
           end
           actor.attach_to_work(@object) if @object
         end

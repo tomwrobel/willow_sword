@@ -527,7 +527,7 @@ module WillowSword
       file_metadata = {}
       fields.each do |field|
         vals = get_text(file_ele, field)
-        file_metadata[field] = vals if vals.any?
+        file_metadata[field] = vals unless vals.blank?
       end
       dates = []
       file_ele.xpath("./free_to_read").each do |fr|

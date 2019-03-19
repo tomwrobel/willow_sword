@@ -763,8 +763,8 @@ module WillowSword
         'extent' => 'file_size',
         'hasVersion' => 'file_version',
         'location' => 'file_path',
-        'datastream' => 'file_admin_fedora3_datastream_identifier',
-        'version' => 'file_rioxx_version',
+        'datastream' => 'file_admin_fedora3_datastream_id',
+        'version' => 'file_rioxx_file_version',
         'embargoedUntil' => 'file_embargo_end_date',
         'embargoComment' => 'file_embargo_comment',
         'embargoReleaseMethod' => 'file_embargo_release_method',
@@ -777,7 +777,11 @@ module WillowSword
       }
       fields.each do |data_fld, model_fld|
         vals = Array(file_metadata.fetch(data_fld, []))
-        mapped_file_metadata[model_fld] = vals[0] if vals.any?
+        if data_fld == 'extent'
+          mapped_file_metadata[model_fld] = vals unless vals.blank?
+        else
+          mapped_file_metadata[model_fld] = vals[0] unless vals.blank?
+        end
       end
       mapped_file_metadata
     end
