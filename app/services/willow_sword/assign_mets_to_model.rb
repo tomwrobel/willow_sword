@@ -256,8 +256,7 @@ module WillowSword
     end
 
     def assign_name_person(nam)
-      # NOT in model
-      #   preferred_initials
+      # TODO: preferred_initials - not in model
       name_fields = {
         'family' => 'family_name',
         'given' => 'given_names',
