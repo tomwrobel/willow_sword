@@ -1,11 +1,12 @@
 module WillowSword
   class CrosswalkToMods < CrosswalkToXml
-    attr_reader :work, :doc
+    attr_reader :work, :doc, :admin_doc, :rights
 
     def initialize(work)
       @work = work
       @doc = nil
       @admin_doc = nil
+      @rights = nil
     end
 
     def to_xml
