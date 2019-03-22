@@ -199,15 +199,17 @@ module WillowSword
     end
 
     def add_language
-      val = get_content('language')
+      vals = get_content('language')
       unless val.blank?
         lang = create_node('mods:language')
         @doc.root << lang
-        langterm = create_node('mods:languageTerm', val, {
-          'authority' => 'iso639-2b',
-          'type' => 'text'
-        })
-        lang << langterm
+        vals.each do |val|
+          langterm = create_node('mods:languageTerm', val, {
+            'authority' => 'iso639-2b',
+            'type' => 'text'
+          })
+          lang << langterm
+        end
       end
     end
 
