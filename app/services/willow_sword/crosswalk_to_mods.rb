@@ -819,7 +819,7 @@ module WillowSword
                         rights_third_party_copyright_permission_received)
       parent = 'licence_and_rights_information'
       rights_fields.each do |fld|
-        val = get_child_content(parent, field)
+        val = get_child_content(parent, fld)
         oe.root << create_node("ora_admin:#{fld}", val)
       end
       # history action
