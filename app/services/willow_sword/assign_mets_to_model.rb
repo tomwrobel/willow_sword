@@ -642,8 +642,6 @@ module WillowSword
         label = field
         label = 'admin_incorrect_version_deposited' if field == 'incorrect_version_deposited'
         vals = Array(@metadata['admin_info'].fetch(field, []))
-        label = field
-        label = 'admin_incorrect_version_deposited' if field == 'incorrect_version_deposited'
         if label == 'rt_ticket_number'
           admin_attrs[label] = vals if vals.any?
         else
@@ -697,8 +695,8 @@ module WillowSword
         'pre_counter_views' => 'pre_counter_views',
         'requires_review' => 'record_requires_review',
       }
-      admin_fields = %w(record_accept_updates admin_notes
-                        ora_data_model_version record_requires_review)
+      admin_fields = %w(record_accept_updates admin_notes ora_data_model_version
+        record_requires_review pre_counter_downloads pre_counter_views)
       bib_fields = %w(confidential_report)
       license_fields = %w(deposit_note)
       if @metadata.fetch('recordInfoNote', {}).any?

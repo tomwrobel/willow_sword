@@ -52,7 +52,7 @@ module WillowSword
       rights_md = create_node('mets:rightsMD', nil, {'ID' => 'RIGHTSMD_01'})
       amdsec << rights_md
       md_wrap1 = create_node('mets:mdWrap', nil, {'MDTYPE' => 'METSRIGHTS'})
-      rights_md << md_wrap1 
+      rights_md << md_wrap1
       xml_data1 = create_node('mets:xmlData')
       md_wrap1 << xml_data1
       rights_dec = create_node('metsrights:RightsDeclarationMD', nil, {

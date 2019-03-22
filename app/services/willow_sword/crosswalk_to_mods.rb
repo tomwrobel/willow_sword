@@ -789,36 +789,6 @@ module WillowSword
     end
 
     def add_ora_admin
-     # <mods:extension>
-     #     <ora_admin:admin
-     #         xmlns:ora_admin="http://ora.ox.ac.uk/vocabs/admin"
-     #         xmlns:dc="http://purl.org/dc/elements/1.1/"
-     #         xmlns:dcterms="http://purl.org/dc/terms/"
-     #         xmlns:mods="http://www.loc.gov/mods/v3">
-     #         <ora_admin:doi_requested>field:doi_requested</ora_admin:doi_requested>
-     #         <ora_admin:depositor_contacted>field:depositor_contacted</ora_admin:depositor_contacted>
-     #         <ora_admin:depositor_contact_email_template>field:depositor_contact_email_template</ora_admin:depositor_contact_email_template>
-     #         <ora_admin:record_first_reviewed_by>field:record_first_reviewed_by</ora_admin:record_first_reviewed_by>
-     #         <ora_admin:incorrect_version_deposited>field:admin_incorrect_version_deposited</ora_admin:incorrect_version_deposited>
-     #         <ora_admin:record_deposit_date>field:record_deposit_date</ora_admin:record_deposit_date>
-     #         <ora_admin:record_publication_date>field:record_publication_date</ora_admin:record_publication_date>
-     #         <ora_admin:record_review_status>field:record_review_status</ora_admin:record_review_status>
-     #         <ora_admin:record_review_status_other>field:record_review_status_other</ora_admin:record_review_status_other>
-     #         <ora_admin:record_version>field:record_version</ora_admin:record_version>
-     #         <ora_admin:rights_third_party_copyright_material>field:rights_third_party_copyright_material</ora_admin:rights_third_party_copyright_material>
-     #         <ora_admin:rights_third_party_copyright_permission_received>field:rights_third_party_copyright_permission_received</ora_admin:rights_third_party_copyright_permission_received>
-     #         <ora_admin:rt_ticket_number>field:rt_ticket_number</ora_admin:rt_ticket_number>
-     #         <ora_admin:history>
-     #             <ora_admin:history_action>
-     #                 <mods:note>field:action_comment</mods:note>
-     #                 <dc:date>field:action_date</dc:date>
-     #                 <dc:description>field:action_description</dc:description>
-     #                 <dcterms:temporal>field:action_duration</dcterms:temporal>
-     #                 <dc:contributor>field:action_responsibility</dc:contributor>
-     #             </ora_admin:history_action>
-     #         </ora_admin:history>
-     #     </ora_admin:admin>
-     # </mods:extension>
       extn = create_node('mods:extension')
       ora_extension = "<ora_admin:admin
         xmlns:ora_admin='http://ora.ox.ac.uk/vocabs/admin'
@@ -830,59 +800,124 @@ module WillowSword
       parent = 'bibliographic_information'
       child = 'publishers'
       val = get_grand_child_content(parent, child, 'doi_requested')
-      oe << create_node('ora_admin:doi_requested', val) unless val.blank?
+      oe.root << create_node('ora_admin:doi_requested', val) unless val.blank?
+      # other admin fields
       admin_fields = %w(depositor_contacted depositor_contact_email_template
-      record_first_reviewed_by incorrect_version_deposited record_deposit_date
+      record_first_reviewed_by admin_incorrect_version_deposited record_deposit_date
       record_publication_date record_review_status record_review_status_other
       record_version rt_ticket_number)
-      # admin_fields.each do |fld|
-      # 
-      # end
+      admin_fields.each do |fld|
+        vals = get_child_content('admin_information', fld)
+        label = fld
+        label = 'incorrect_version_deposited' if fld == 'admin_incorrect_version_deposited'
+        Array(vals).each do |val|
+          oe.root << create_node("ora_admin:#{label}", val)
+        end
+      end
+      # more admin fields
       rights_fields = %w(rights_third_party_copyright_material
                         rights_third_party_copyright_permission_received)
+      parent = 'licence_and_rights_information'
+      rights_fields.each do |fld|
+        val = get_child_content(parent, field)
+        oe.root << create_node("ora_admin:#{fld}", val)
+      end
+      # history action
+      ha_node = create_node('ora_admin:history')
+      oe.root << ha_node
+      action_fields = {
+        "action_comment" => "mods:note",
+        "action_date" => "dc:date",
+        "action_description" => "dc:description",
+        "action_duration" => "dcterms:temporal",
+        "action_responsibility" => "dc:contributor"
+      }
+      actions = get_child_content('admin_information', 'history_information')
+      actions.each do |action|
+        action_node = create_node('ora_admin:history_action')
+        ha_node << action_node
+        action_fields.each do |data_fld, xml_fld|
+          val = get_content(data_fld, action)
+          action_node << create_node(xml_fld, val) unless val.blank?
+        end
+      end
+      node = @admin_doc.import(oe.root)
+      @admin_doc.root << extn
+      extn << node
     end
 
     def add_record_info
-      # <mods:recordInfo>
-      #   <mods:recordCreationDate>field:record_created_date</mods:recordCreationDate>
-      #   <mods:recordContentSource>field:record_content_source</mods:recordContentSource>
-      #   <mods:recordInfoNote type="accept_updates">field:record_accept_updates</mods:recordInfoNote>
-      #   <mods:recordInfoNote type="admin_notes">field:admin_notes</mods:recordInfoNote>
-      #   <mods:recordInfoNote type="confidential_report">field:confidential_report</mods:recordInfoNote>
-      #   <mods:recordInfoNote type="deposit_note">field:deposit_note</mods:recordInfoNote>
-      #   <mods:recordInfoNote type="ora_data_model_version">field:ora_data_model_version</mods:recordInfoNote>
-      #   <mods:recordInfoNote type="pre_counter_downloads">field:pre_counter_downloads</mods:recordInfoNote>
-      #   <mods:recordInfoNote type="pre_counter_views">field:pre_counter_views</mods:recordInfoNote>
-      #   <mods:recordInfoNote type="requires_review">field:record_requires_review</mods:recordInfoNote>
-      # </mods:recordInfo>
+      ri = create_node('mods:recordInfo')
+      @admin_doc.root << ri
+      # recordCreationDate
+      val = get_child_content('admin_information', 'record_created_date')
+      ri << create_node('mods:recordCreationDate', val) unless val.blank?
+      # recordContentSource
+      val = get_child_content('admin_information', 'record_content_source')
+      ri << create_node('mods:recordContentSource', val) unless val.blank?
+      info_note_fields = {
+        'accept_updates' => ['record_accept_updates', 'admin_information'],
+        'admin_notes' => ['admin_notes', 'admin_information'],
+        'confidential_report' => ['confidential_report', 'bibliographic_information'],
+        'deposit_note' => ['deposit_note', 'licence_and_rights_information'],
+        'ora_data_model_version' => ['ora_data_model_version', 'admin_information'],
+        'pre_counter_downloads' => ['pre_counter_downloads', 'admin_information'],
+        'pre_counter_views' => ['pre_counter_views', 'admin_information'],
+        'requires_review' => ['record_requires_review', 'admin_information'],
+      }
+      info_note_fields.each do |xml_fld, data_fld|
+        val = get_child_content(data_fld[1], data_fld[0])
+        ri << create_node('mods:recordInfoNote', val, {'type' => xml_fld}) unless val.blank?
+      end
     end
 
     def add_ref_admin
-      # <mods:extension>
-      #   <ora_open_access_admin:ref_admin xmlns:ora_open_access_admin="http://ora.ox.ac.uk/vocabs/open_access_admin">
-      #     <ora_open_access_admin:apc_admin_apc_number>field:apc_admin_apc_number</ora_open_access_admin:apc_admin_apc_number>
-      #     <ora_open_access_admin:apc_admin_review_status>field:apc_admin_review_status</ora_open_access_admin:apc_admin_review_status>
-      #     <ora_open_access_admin:apc_admin_spreadsheet_identifier>field:apc_admin_spreadsheet_identifier</ora_open_access_admin:apc_admin_spreadsheet_identifier>
-      #     <ora_open_access_admin:ref_compliant_at_deposit>field:ref_compliant_at_deposit</ora_open_access_admin:ref_compliant_at_deposit>
-      #     <ora_open_access_admin:ref_compliant_avialability>field:ref_compliant_avialability</ora_open_access_admin:ref_compliant_avialability>
-      #     <ora_open_access_admin:ref_exception_required>field:ref_exception_required</ora_open_access_admin:ref_exception_required>
-      #     <ora_open_access_admin:ref_exception_note>field:ref_exception_note</ora_open_access_admin:ref_exception_note>
-      #   </ora_open_access_admin:ref_admin>
-      # </mods:extension>
+      extn = create_node('mods:extension')
+      oa_admin = "<ora_open_access_admin:ref_admin
+         xmlns:ora_open_access_admin=\"http://ora.ox.ac.uk/vocabs/open_access_admin\"/>"
+      oa = LibXML::XML::Document.string(oa_admin)
+      fields = {
+        'apc_admin_apc_number' => 'apc_admin_apc_number',
+        'apc_admin_review_status' => 'apc_admin_apc_review_status',
+        'apc_admin_spreadsheet_identifier' => 'apc_admin_apc_spreadsheet_identifier',
+        'ref_compliant_at_deposit' => 'ref_compliant_at_deposit',
+        'ref_compliant_availability' => 'ref_compliant_availability',
+        'ref_exception_required' => 'ref_exception_required',
+        'ref_exception_note' => 'ref_other_exception_note',
+      }
+      fields.each do |xml_fld, data_fld|
+        val = get_child_content('admin_information', data_fld)
+        oa.root << create_node(xml_fld, val) unless val.blank?
+      end
+      node = admin_doc.import(oa.root)
+      @admin_doc.root << extn
+      extn << node
     end
 
     def add_rights_declaration
+      @rights = nil
+      val = get_child_content('admin_information', 'record_ora_deposit_licence')
+      @rights = val unless val.blank?
     end
 
     def add_thesis_admin
-      # <mods:extension>
-      #   <ora_thesis:thesis_admin xmlns:ora_thesis="https://ora.ox.ac.uk/vocabs/thesis">
-      #     <ora_thesis:thesis_archive_version_completed>field:thesis_archive_version_completed</ora_thesis:thesis_archive_version_completed>
-      #     <ora_thesis:thesis_student_system_updated>field:thesis_student_system_updated</ora_thesis:thesis_student_system_updated>
-      #     <ora_thesis:thesis_dispensation_from_consultation_granted>field:thesis_dispensation_from_consultation_granted</ora_thesis:thesis_dispensation_from_consultation_granted>
-      #     <ora_thesis:thesis_voluntary_deposit>field:thesis_voluntary_deposit</ora_thesis:thesis_voluntary_deposit>
-      #   </ora_thesis:thesis_admin>
-      # </mods:extension>
+      extn = create_node('mods:extension')
+      thesis_admin = "<ora_thesis:thesis_admin
+         xmlns:ora_thesis='https://ora.ox.ac.uk/vocabs/thesis'/>"
+      ta = LibXML::XML::Document.string(thesis_admin)
+      fields = {
+        'thesis_archive_version_completed' => 'thesis_archive_version_complete',
+        'thesis_student_system_updated' => 'thesis_student_system_updated',
+        'thesis_dispensation_from_consultation_granted' => 'thesis_dispensation_from_consultation_granted',
+        'thesis_voluntary_deposit' => 'thesis_voluntary_deposit'
+      }
+      fields.each do |xml_fld, data_fld|
+        val = get_child_content('admin_information', data_fld)
+        ta.root << create_node(xml_fld, val) unless val.blank?
+      end
+      node = @admin_doc.import(ta.root)
+      @admin_doc.root << extn
+      extn << node
     end
 
     # ========================
