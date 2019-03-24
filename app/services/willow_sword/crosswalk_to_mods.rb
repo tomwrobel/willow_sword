@@ -200,7 +200,7 @@ module WillowSword
 
     def add_language
       vals = get_content('language')
-      unless val.blank?
+      unless vals.blank?
         lang = create_node('mods:language')
         @doc.root << lang
         vals.each do |val|
