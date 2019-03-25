@@ -256,7 +256,7 @@ module WillowSword
       @metadata['publication_place'] = vals if vals.any?
       # originInfo - place type=code
       vals = get_text(@mods, 'originInfo/place/placeTerm[@type="code"]')
-      @metadata[':publication_url'] = vals if vals.any?
+      @metadata['publication_url'] = vals if vals.any?
 
     end
 
