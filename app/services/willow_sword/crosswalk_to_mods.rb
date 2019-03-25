@@ -168,9 +168,8 @@ module WillowSword
     def add_identifier
       # identifier fields
       fields = {
-        'pii' => ['item_description_and_embargo_information', 'pii'],
         'identifier_pmid' => ['item_description_and_embargo_information', 'pmid'],
-        'identifier_pubs_identifier' => ['item_description_and_embargo_information', 'pubs_id'],
+        # 'identifier_pubs_identifier' => ['item_description_and_embargo_information', 'pubs_id'],
         'tinypid' => ['item_description_and_embargo_information', 'tinypid'],
         'identifier_uuid' => ['item_description_and_embargo_information', 'uuid'],
         'identifier_source_identifier' => ['admin_information', 'source_identifier'],
@@ -188,12 +187,14 @@ module WillowSword
         'identifier_eissn'=>'eissn',
         'identifier_isbn_10'=>'isbn',
         'identifier_isbn_13'=>'isbn13',
-        'identifier_issn'=>'issn'
+        'identifier_issn'=>'issn',
+        'identifier_pii'=>'pii'
       }
       parent = 'bibliographic_information'
       child = 'publishers'
       fields.each do |field, tag|
         val = get_grand_child_content(parent, child, field)
+        val = val[0] if field == 'identifier_doi'
         @doc.root << create_node('mods:identifier', val, {'type' => tag}) unless val.blank?
       end
     end

@@ -124,7 +124,7 @@ module WillowSword
 
     def get_identifier
       vals = get_text_by_type(@mods, 'identifier', 'other')
-      @metadata['identifiers'] = [vals] if vals.any?
+      @metadata['identifiers'] = vals if vals.any?
     end
 
     def get_language

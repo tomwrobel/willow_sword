@@ -118,7 +118,7 @@ module WillowSword
     end
 
     def assign_identifiers
-      ids = @metadata.fetch('identifiers', [])
+      ids = @metadata.fetch('identifiers', {})
       return if ids.blank?
 
       # map attribute names to model fields
@@ -129,16 +129,14 @@ module WillowSword
         'isbn' => 'identifier_isbn_10',
         'isbn13' => 'identifier_isbn_13',
         'issn' => 'identifier_issn',
-
+        'pii' => 'identifier_pii'
       }
       item_desc_keys = {
         # item_description_and_embargo_information
-        'pii' => 'pii',
         'pmid' => 'identifier_pmid',
-        'pubs_id' => 'identifier_pubs_identifier',
+        # 'pubs_id' => 'identifier_pubs_identifier',
         'tinypid' => 'tinypid',
         'uuid' => 'identifier_uuid'
-
       }
       admin_keys = {
         'source_identifier' => 'identifier_source_identifier',
@@ -147,7 +145,6 @@ module WillowSword
       bib_keys = {
         'paper_number' => 'paper_number'
       }
-
       # Extract the identifier values for each identifier
       pub_attrs = {}
       item_desc_attrs = {}
@@ -157,7 +154,11 @@ module WillowSword
       ids.each do |key,vals|
         next unless Array(vals).any?
         if pub_keys.include?(key)
-          pub_attrs[pub_keys[key]] = Array(vals).first
+          if key == 'doi'
+            pub_attrs[pub_keys[key]] = Array(vals)
+          else
+            pub_attrs[pub_keys[key]] = Array(vals).first
+          end
         elsif item_desc_keys.include?(key)
           item_desc_attrs[item_desc_keys[key]] = Array(vals).first
         elsif admin_keys.include?(key)
@@ -173,7 +174,6 @@ module WillowSword
         end
       end
       item_desc_attrs['record_identifiers_attributes'] = record_attrs if record_attrs.any?
-
       # Assign the identifiers
       # bibliographic_information identifiers
       parent = 'bibliographic_information'
