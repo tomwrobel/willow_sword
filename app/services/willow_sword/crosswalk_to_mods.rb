@@ -244,7 +244,7 @@ module WillowSword
     end
 
     def add_name_rights_holder
-      parent = 'license_and_rights_information'
+      parent = 'licence_and_rights_information'
       val = get_child_content(parent, 'rights_holders')
       unless val.blank?
         name_node = create_node('mods:name', nil, {'type' => 'corporate'})
@@ -504,7 +504,7 @@ module WillowSword
       val = get_grand_child_content(parent, child, 'publication_url')
       place << create_node('mods:placeTerm', val, {'type' => 'code'}) unless val.blank?
       # copyright date
-      parent = 'license_and_rights_information'
+      parent = 'licence_and_rights_information'
       val = get_child_content(parent, 'rights_copyright_date')
       origin << create_node('mods:copyrightDate', val, {
         'encoding' => 'iso8601'
