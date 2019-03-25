@@ -442,8 +442,8 @@ module WillowSword
           assign_ri_ri(ri)
         elsif typ == 'host'
           assign_ri_host(ri)
-          assign_ri_host_dataset(ri) if @model == 'dataset'
-          assign_ri_host_article(ri) if @model == 'article'
+          assign_ri_host_dataset(ri) if @model == 'dataset' or @model == 'universal test object'
+          assign_ri_host_article(ri) if @model == 'article' or @model == 'universal test object'
         elsif typ == 'series'
           assign_ri_series(ri)
         end
