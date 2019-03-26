@@ -166,6 +166,8 @@ module WillowSword
     end
 
     def add_identifier
+      # export pid
+      @doc.root << create_node('mods:identifier', @work.id, {'type' => 'pid'})
       # identifier fields
       fields = {
         'identifier_pmid' => ['item_description_and_embargo_information', 'pmid'],
