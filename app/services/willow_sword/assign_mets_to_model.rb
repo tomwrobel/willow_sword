@@ -134,7 +134,7 @@ module WillowSword
       item_desc_keys = {
         # item_description_and_embargo_information
         'pmid' => 'identifier_pmid',
-        # 'pubs_id' => 'identifier_pubs_identifier',
+        'pubs_id' => 'identifier_pubs_identifier',
         'tinypid' => 'tinypid',
         'uuid' => 'identifier_uuid'
       }
