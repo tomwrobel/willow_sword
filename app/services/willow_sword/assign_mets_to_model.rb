@@ -154,11 +154,7 @@ module WillowSword
       ids.each do |key,vals|
         next unless Array(vals).any?
         if pub_keys.include?(key)
-          if key == 'doi'
-            pub_attrs[pub_keys[key]] = Array(vals)
-          else
-            pub_attrs[pub_keys[key]] = Array(vals).first
-          end
+          pub_attrs[pub_keys[key]] = Array(vals).first
         elsif item_desc_keys.include?(key)
           item_desc_attrs[item_desc_keys[key]] = Array(vals).first
         elsif admin_keys.include?(key)
