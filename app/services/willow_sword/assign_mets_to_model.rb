@@ -1,3 +1,4 @@
+require 'iso-639'
 module WillowSword
   module AssignMetsToModel
 
@@ -197,7 +198,27 @@ module WillowSword
     def assign_language
       # Language
       unless @metadata.fetch('language', []).blank?
-        @mapped_metadata['language'] = Array(@metadata['language'])
+        languages = Array(@metadata['language'])
+        # strip invalid languages
+        validated_languages = languages.map { |lang| validate_language(lang) }.compact
+        @mapped_metadata['language'] = validated_languages
+      end
+    end
+
+    def validate_language(language)
+      # Validate language against ISO-639
+      # Params:
+      #   language(string): unvalidated language string
+      # Returns:
+      #   validated_language (string): validated language string
+      @language_match = ISO_639.find_by_english_name(language)
+      if @language_match.present?
+        return @language_match.english_name
+      end
+      @language_search = ISO_639.search(language)
+      if @language_search.present?
+        # Look for the language on a best-guess basis
+        return @language_search[0].english_name
       end
     end
 
