@@ -1,3 +1,4 @@
+require 'iso-639'
 module WillowSword
   module AssignMetsToModel
 
@@ -134,7 +135,7 @@ module WillowSword
       item_desc_keys = {
         # item_description_and_embargo_information
         'pmid' => 'identifier_pmid',
-        # 'pubs_id' => 'identifier_pubs_identifier',
+        'pubs_id' => 'identifier_pubs_identifier',
         'tinypid' => 'tinypid',
         'uuid' => 'identifier_uuid'
       }
@@ -154,11 +155,7 @@ module WillowSword
       ids.each do |key,vals|
         next unless Array(vals).any?
         if pub_keys.include?(key)
-          if key == 'doi'
-            pub_attrs[pub_keys[key]] = Array(vals)
-          else
-            pub_attrs[pub_keys[key]] = Array(vals).first
-          end
+          pub_attrs[pub_keys[key]] = Array(vals).first
         elsif item_desc_keys.include?(key)
           item_desc_attrs[item_desc_keys[key]] = Array(vals).first
         elsif admin_keys.include?(key)
@@ -201,7 +198,27 @@ module WillowSword
     def assign_language
       # Language
       unless @metadata.fetch('language', []).blank?
-        @mapped_metadata['language'] = Array(@metadata['language'])
+        languages = Array(@metadata['language'])
+        # strip invalid languages
+        validated_languages = languages.map { |lang| validate_language(lang) }.compact
+        @mapped_metadata['language'] = validated_languages
+      end
+    end
+
+    def validate_language(language)
+      # Validate language against ISO-639
+      # Params:
+      #   language(string): unvalidated language string
+      # Returns:
+      #   validated_language (string): validated language string
+      @language_match = ISO_639.find_by_english_name(language)
+      if @language_match.present?
+        return @language_match.english_name
+      end
+      @language_search = ISO_639.search(language)
+      if @language_search.present?
+        # Look for the language on a best-guess basis
+        return @language_search[0].english_name
       end
     end
 

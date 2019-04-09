@@ -166,10 +166,12 @@ module WillowSword
     end
 
     def add_identifier
+      # export pid
+      @doc.root << create_node('mods:identifier', @work.id, {'type' => 'pid'})
       # identifier fields
       fields = {
         'identifier_pmid' => ['item_description_and_embargo_information', 'pmid'],
-        # 'identifier_pubs_identifier' => ['item_description_and_embargo_information', 'pubs_id'],
+        'identifier_pubs_identifier' => ['item_description_and_embargo_information', 'pubs_id'],
         'tinypid' => ['item_description_and_embargo_information', 'tinypid'],
         'identifier_uuid' => ['item_description_and_embargo_information', 'uuid'],
         'identifier_source_identifier' => ['admin_information', 'source_identifier'],
