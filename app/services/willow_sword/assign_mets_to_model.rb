@@ -191,8 +191,11 @@ module WillowSword
       return if @metadata.dig('headers', 'in_progress').blank?
       admin_attrs = {}
       vals = Array(@metadata['headers']['in_progress'])
-      admin_attrs['deposit_in_progress'] = vals[0] if vals.any?
-      assign_nested_hash('admin_information', admin_attrs)
+      return if vals.any? and vals[0] == 'True'
+      if vals.any? and vals[0] == 'False'
+          admin_attrs['requires_review'] = vals[0] if vals.any?
+          assign_nested_hash('admin_information', admin_attrs)
+      end
     end
 
     def assign_language
