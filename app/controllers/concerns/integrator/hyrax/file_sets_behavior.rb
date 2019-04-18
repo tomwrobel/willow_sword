@@ -23,6 +23,7 @@ module Integrator
         @actor.file_set.update(create_file_set_attributes) unless @attributes.blank?
         @actor.file_set.save!
         @actor.attach_to_work(@object) if @object
+        set_in_progress_status_for_parent_work
       end
 
       def update_file_set
@@ -40,9 +41,27 @@ module Integrator
         # update_metadata
         @actor.file_set.update(update_file_set_attributes) unless @attributes.blank?
         @actor.file_set.save!
+        set_in_progress_status_for_parent_work
       end
 
       private
+        def set_in_progress_status_for_parent_work
+          # If a deposit is in progress, or has been completed, set the relevant
+          # in progress and requires review flags
+          # Add in-progress header
+          return if @headers[:in_progress].blank?
+          status = @headers[:in_progress]
+          if status.downcase == 'true'
+            @object.admin_information.first['deposit_in_progress'] = true
+            @object.save
+          elsif status.downcase == 'false'
+            @object.admin_information.first['deposit_in_progress'] = false
+            @object.admin_information.first['requires_review'] = true
+            @object.save
+          end
+        end
+
+
         def find_file_set_by_id
           @file_set_klass.find(params[:id]) if @file_set_klass.exists?(params[:id])
         rescue ActiveFedora::ActiveFedoraError
