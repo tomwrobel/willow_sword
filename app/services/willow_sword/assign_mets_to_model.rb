@@ -191,10 +191,14 @@ module WillowSword
       return if @metadata.dig('headers', 'in_progress').blank?
       admin_attrs = {}
       vals = Array(@metadata['headers']['in_progress'])
-      return if vals.any? and vals[0] == 'True'
-      if vals.any? and vals[0] == 'False'
-          admin_attrs['requires_review'] = vals[0] if vals.any?
-          assign_nested_hash('admin_information', admin_attrs)
+      if vals.any? and vals[0].downcase == 'true'
+        admin_attrs['deposit_in_progress'] = true
+        assign_nested_hash('admin_information', admin_attrs)
+      end
+      if vals.any? and vals[0].downcase == 'false'
+        admin_attrs['deposit_in_progress'] = false
+        admin_attrs['record_requires_review'] = true
+        assign_nested_hash('admin_information', admin_attrs)
       end
     end
 
