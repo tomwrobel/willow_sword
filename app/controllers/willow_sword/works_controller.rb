@@ -6,7 +6,6 @@ module WillowSword
     attr_reader :object, :current_user
     include WillowSword::ProcessRequest
     include WillowSword::WorksBehavior
-    include WillowSword::ModelToMods
 
     def show
       # @collection_id = params[:collection_id]
