@@ -28,6 +28,9 @@ module WillowSword
       translated_terms.each do |model_key, xml_tag|
         @doc.root << create_node(xml_tag, Array(@fileset[model_key])[0]) unless Array(@fileset[model_key]).blank?
       end
+      # add the FileSet ID so that downstream users can map
+      # files to Hyrax filesets for downloads
+      @doc.root << create_node('ora:filesetId', @fileset.id)
       unless @fileset['file_made_available_date'].blank?
         node = create_node('ali:free_to_read')
         add_attributes(node, {'start_date' => @fileset['file_made_available_date']})
