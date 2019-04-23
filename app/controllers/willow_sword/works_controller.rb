@@ -65,7 +65,7 @@ module WillowSword
 
     def render_not_found
       message = "Server cannot find work with id #{params[:id]}"
-      @error = WillowSword::Error.new(message)
+      @error = WillowSword::Error.new(message, :not_found)
       render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
     end
 
