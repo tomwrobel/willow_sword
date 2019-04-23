@@ -27,6 +27,8 @@ RSpec.describe WillowSword::ZipPackage do
       # md5 does not match due to different compression mechanisms
       # src_md5 = get_md5(@zip_src)
       expect(File.exist?(dst)).to be true
+      puts '-'*50
+      puts dst
       expect(test_zip(dst)).to include('Noerrors')
     end
   end
@@ -45,5 +47,5 @@ def get_md5(src_file)
 end
 
 def test_zip(zip_file)
-  `unzip -t /tmp/sandbox20180712-18403-1iwsqff/zip_file.zip | awk '{w=$1 $2} END{print w}'`
+  `unzip -t "#{zip_file}" | awk '{w=$1 $2} END{print w}'`
 end
