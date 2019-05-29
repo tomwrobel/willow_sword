@@ -710,7 +710,8 @@ module WillowSword
 
       # recordContentSource
       vals = Array(@metadata.fetch('recordContentSource', []))
-      admin_attrs['record_content_source'] = vals[0] if vals.any?
+      # admin_attrs['record_content_source'] = vals[0] if vals.any?
+      admin_attrs['record_content_source'] = vals if vals.any?
 
       # recordInfoNote
       info_note_fields = {
