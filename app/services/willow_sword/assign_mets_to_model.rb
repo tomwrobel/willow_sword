@@ -355,7 +355,7 @@ module WillowSword
           mapped_name['roles_attributes'] = roles if roles.any?
         end
       end
-      assign_nested_hash('creators_and_contributors', mapped_name, false) if name_added
+      assign_contributor_hash(mapped_name) if name_added
     end
 
     def assign_name_funder(nam)
@@ -826,6 +826,15 @@ module WillowSword
       else
         @mapped_metadata["#{parent}_attributes"] << values
       end
+    end
+
+    def assign_contributor_hash(values)
+      @mapped_metadata["authors_and_contributors_attributes"] ||= []
+      @mapped_metadata["authors_and_contributors_attributes"][0] ||= {}
+      @mapped_metadata["authors_and_contributors_attributes"][0]["contributors"] ||= []
+      contributor = ContributorInfo.new
+      contributor.attributes = values.slice(*contributor.attributes.keys)
+      @mapped_metadata["authors_and_contributors_attributes"][0]["contributors"] << contributor
     end
 
     def assign_second_nested_hash(parent, child, values, merge=true)

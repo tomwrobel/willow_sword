@@ -324,7 +324,8 @@ module WillowSword
 
     def add_name_person
       etal_roles = []
-      Array(get_content('creators_and_contributors')).each do |creator|
+      contributors = @work.authors_and_contributors[0].contributors
+      contributors.each do |creator|
         val = get_content('contributor_type', creator)
         val = 'personal' if val.blank?
         nam_node = create_node('mods:name', nil, {'type' => val})
