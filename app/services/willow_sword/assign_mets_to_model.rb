@@ -829,11 +829,34 @@ module WillowSword
     end
 
     def assign_contributor_hash(values)
+      # Assign a contributor hash (values)to an author_and_contributor object.
+      #
+      # This method assigns a contributor hash to the Hyrax contributors list.
+      # The model here is quite idiosyncratic, and this method expects
+      #
+      #   work.authors_and_contributors[0].contributors
+      #
+      # to contain the contributor array for all non Examiners and Supervisors.
+      #
+      # In addition, each contributor contains RoleInfo roles
+
+      # Create contributor attributes if they do not exist
       @mapped_metadata["authors_and_contributors_attributes"] ||= []
       @mapped_metadata["authors_and_contributors_attributes"][0] ||= {}
       @mapped_metadata["authors_and_contributors_attributes"][0]["contributors"] ||= []
+
+      # Create the contributor and assign hash values via slice
       contributor = ContributorInfo.new
       contributor.attributes = values.slice(*contributor.attributes.keys)
+
+      values["roles_attributes"].each do | role |
+        # Create the role object and assign hash values via slice
+        contributor_role = RoleInfo.new
+        contributor_role.attributes = role.slice(*contributor_role.attributes.keys)
+        contributor.roles << contributor_role
+      end
+
+      # Add completed contributor to the work
       @mapped_metadata["authors_and_contributors_attributes"][0]["contributors"] << contributor
     end
 
