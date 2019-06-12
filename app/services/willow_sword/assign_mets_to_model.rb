@@ -191,8 +191,15 @@ module WillowSword
       return if @metadata.dig('headers', 'in_progress').blank?
       admin_attrs = {}
       vals = Array(@metadata['headers']['in_progress'])
-      admin_attrs['deposit_in_progress'] = vals[0] if vals.any?
-      assign_nested_hash('admin_information', admin_attrs)
+      if vals.any? and vals[0].downcase == 'true'
+        admin_attrs['deposit_in_progress'] = true
+        assign_nested_hash('admin_information', admin_attrs)
+      end
+      if vals.any? and vals[0].downcase == 'false'
+        admin_attrs['deposit_in_progress'] = false
+        admin_attrs['record_requires_review'] = true
+        assign_nested_hash('admin_information', admin_attrs)
+      end
     end
 
     def assign_language
@@ -348,7 +355,7 @@ module WillowSword
           mapped_name['roles_attributes'] = roles if roles.any?
         end
       end
-      assign_nested_hash('creators_and_contributors', mapped_name, false) if name_added
+      assign_contributor_hash(mapped_name) if name_added
     end
 
     def assign_name_funder(nam)
@@ -664,6 +671,10 @@ module WillowSword
         else
           admin_attrs[label] = vals[0] if vals.any?
         end
+        # Set record as deposited if no review status otherwise set
+        if admin_attrs['record_review_status'].blank?
+          admin_attrs['record_review_status'] = 'Deposited'
+        end
       end
       # assign history action wthin admin
       history = []
@@ -699,7 +710,8 @@ module WillowSword
 
       # recordContentSource
       vals = Array(@metadata.fetch('recordContentSource', []))
-      admin_attrs['record_content_source'] = vals[0] if vals.any?
+      # admin_attrs['record_content_source'] = vals[0] if vals.any?
+      admin_attrs['record_content_source'] = vals if vals.any?
 
       # recordInfoNote
       info_note_fields = {
@@ -814,6 +826,38 @@ module WillowSword
       else
         @mapped_metadata["#{parent}_attributes"] << values
       end
+    end
+
+    def assign_contributor_hash(values)
+      # Assign a contributor hash (values)to an author_and_contributor object.
+      #
+      # This method assigns a contributor hash to the Hyrax contributors list.
+      # The model here is quite idiosyncratic, and this method expects
+      #
+      #   work.authors_and_contributors[0].contributors
+      #
+      # to contain the contributor array for all non Examiners and Supervisors.
+      #
+      # In addition, each contributor contains RoleInfo roles
+
+      # Create contributor attributes if they do not exist
+      @mapped_metadata["authors_and_contributors_attributes"] ||= []
+      @mapped_metadata["authors_and_contributors_attributes"][0] ||= {}
+      @mapped_metadata["authors_and_contributors_attributes"][0]["contributors"] ||= []
+
+      # Create the contributor and assign hash values via slice
+      contributor = ContributorInfo.new
+      contributor.attributes = values.slice(*contributor.attributes.keys)
+
+      values["roles_attributes"].each do | role |
+        # Create the role object and assign hash values via slice
+        contributor_role = RoleInfo.new
+        contributor_role.attributes = role.slice(*contributor_role.attributes.keys)
+        contributor.roles << contributor_role
+      end
+
+      # Add completed contributor to the work
+      @mapped_metadata["authors_and_contributors_attributes"][0]["contributors"] << contributor
     end
 
     def assign_second_nested_hash(parent, child, values, merge=true)
