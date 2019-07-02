@@ -849,14 +849,6 @@ module WillowSword
       contributor = ContributorInfo.new
       contributor.attributes = values.slice(*contributor.attributes.keys)
 
-      # Debug block for object save
-      begin
-        values["roles_attributes"].each do | role |
-        end
-      rescue
-        byebug
-      end
-
       values["roles_attributes"].each do | role |
         # Create the role object and assign hash values via slice
         contributor_role = RoleInfo.new
