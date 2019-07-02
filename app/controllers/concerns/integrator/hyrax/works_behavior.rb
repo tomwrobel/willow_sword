@@ -74,12 +74,16 @@ module Integrator
         attrs = create_attributes
         @object = @work_klass.new
         # Assign pid to object if it doesn't exist
+        # Ensure pid becomes object ID (but don't try to save it, as pid isn't
+        # a field in the Hyrax model)
         if attrs['pid'].blank?
           uuid = SecureRandom.uuid
           pid = "uuid_#{uuid}"
-          attrs['pid'] = pid
+        else
+          pid = attrs['pid']
+          attrs.except!('pid')
         end
-        @object.id = attrs['pid']
+        @object.id = pid
         work_actor.create(environment(attrs))
       end
 
