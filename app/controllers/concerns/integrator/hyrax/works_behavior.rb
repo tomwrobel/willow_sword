@@ -4,6 +4,7 @@
 # https://github.com/leaf-research-technologies/leaf_addons/blob/master/lib/generators/leaf_addons/templates/lib/importer/factory/object_factory.rb
 # https://github.com/leaf-research-technologies/leaf_addons/blob/master/lib/generators/leaf_addons/templates/lib/importer/files_parser.rb
 # https://github.com/leaf-research-technologies/leaf_addons/blob/9643b649df513e404c96ba5b9285d83abc4b2c9a/lib/generators/leaf_addons/templates/lib/importer/factory/base_factory.rb
+require 'securerandom'
 
 module Integrator
   module Hyrax
@@ -72,6 +73,13 @@ module Integrator
       def create_work
         attrs = create_attributes
         @object = @work_klass.new
+        # Assign pid to object if it doesn't exist
+        if attrs['pid'].blank?
+          uuid = SecureRandom.uuid
+          pid = "uuid_#{uuid}"
+          attrs['pid'] = pid
+        end
+        @object.id = attrs['pid']
         work_actor.create(environment(attrs))
       end
 
