@@ -355,7 +355,8 @@ module WillowSword
           mapped_name['roles_attributes'] = roles if roles.any?
         end
       end
-      assign_contributor_hash(mapped_name) if name_added
+      # assign_contributor_hash(mapped_name) if name_added
+      assign_nested_hash('contributors', mapped_name, false) if name_added
     end
 
     def assign_name_funder(nam)
