@@ -196,6 +196,9 @@ module WillowSword
       child = 'publishers'
       fields.each do |field, tag|
         val = get_grand_child_content(parent, child, field)
+        if val != nil and field == 'identifier_doi'
+          val = val[0]
+        end
         @doc.root << create_node('mods:identifier', val, {'type' => tag}) unless val.blank?
       end
     end
@@ -241,28 +244,6 @@ module WillowSword
         role_node = create_node('mods:role')
         name_node << role_node
         role_node << create_node('mods:roleTerm', 'Commissioning body', {'type' => 'text'})
-      end
-    end
-
-    def add_name_manufacturer
-      parent = 'bibliographic_information'
-      manufacturer = get_child_content(parent, 'manufacturer')
-      manufacturer_website_url = get_child_content(parent, 'manufacturer_website_url')
-
-      unless manufacturer.blank? and manufacturer_website_url.blank?
-        name_node = create_node('mods:name', nil, {'type' => 'corporate'})
-        @doc.root << name_node
-        unless manufacturer.blank?
-          name_node << create_node('mods:displayForm', manufacturer)
-        end
-        unless manufacturer_website_url.blank?
-          name_node << create_node('mods:nameIdentifier',
-                                   manufacturer_website_url,
-                                   {'type' => 'website'})
-        end
-        role_node = create_node('mods:role')
-        name_node << role_node
-        role_node << create_node('mods:roleTerm', 'Manufacturer', {'type' => 'text'})
       end
     end
 
@@ -521,17 +502,11 @@ module WillowSword
       origin << create_node('mods:dateIssued', val, {
         'encoding' => 'iso8601'
       }) unless val.blank?
-      # date of acceptance
+      # date other
       val = get_grand_child_content(parent, child, 'acceptance_date')
       origin << create_node('mods:dateOther', val, {
         'type' => 'date_of_acceptance',
         'encoding' => 'iso8601'
-      }) unless val.blank?
-      # date of production
-      val = get_grand_child_content(parent, child, 'production_date')
-      origin << create_node('mods:dateOther', val, {
-          'type' => 'production_date',
-          'encoding' => 'iso8601'
       }) unless val.blank?
       # place
       val = get_grand_child_content(parent, child, 'citation_place_of_publication')
@@ -580,7 +555,7 @@ module WillowSword
       origin = create_node('mods:originInfo')
       @doc.root << origin
       parent = 'bibliographic_information'
-      fields = %w(physical_form physical_dimensions collection_name)
+      fields = %w(physical_form physical_dimensions)
       fields.each do |field|
         val = get_child_content(parent, field)
         origin << create_node('mods:form', val, {'type' => field}) unless val.blank?
