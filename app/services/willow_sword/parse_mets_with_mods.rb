@@ -256,7 +256,7 @@ module WillowSword
       @metadata['publication_place'] = vals if vals.any?
       # originInfo - place type=code
       vals = get_text(@mods, 'originInfo/place/placeTerm[@type="code"]')
-      @metadata['publication_url'] = vals if vals.any?
+      @metadata['publication_website_url'] = vals if vals.any?
 
     end
 
@@ -412,7 +412,7 @@ module WillowSword
       record_first_reviewed_by incorrect_version_deposited record_deposit_date
       record_publication_date record_review_status record_review_status_other
       record_version rights_third_party_copyright_material rt_ticket_number
-      rights_third_party_copyright_permission_received)
+      rights_third_party_copyright_permission_received record_check_back_date)
       ri = {}
       fields.each do |field|
         vals = get_text(ele, field)
@@ -449,8 +449,8 @@ module WillowSword
     def get_ref_admin
       ele = @amd.xpath('sourceMD/mdWrap/xmlData/mods/extension/ref_admin')
       fields = %w(apc_admin_apc_number apc_admin_review_status apc_admin_spreadsheet_identifier
-      ref_compliant_at_deposit ref_compliant_avialability ref_exception_required
-      ref_exception_note)
+      apc_admin_apc_requested ref_compliant_at_deposit ref_compliant_avialability
+      ref_exception_required ref_exception_note)
       ra = {}
       fields.each do |field|
         vals = get_text(ele, field)

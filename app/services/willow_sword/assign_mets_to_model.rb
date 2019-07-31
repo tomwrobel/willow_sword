@@ -255,6 +255,8 @@ module WillowSword
           assign_name_funder(nam)
         elsif typ == 'corporate' and role_titles.include?('Publisher')
           assign_name_publisher(nam)
+        elsif typ == 'corporate' and role_titles.include('Manufacturer')
+          assign_name_manufacturer(nam)
         else
           assign_name_person(nam)
         end
@@ -297,7 +299,8 @@ module WillowSword
         'sub_department' => 'sub_department',
         'research_group' => 'research_group',
         'oxford_college' => 'oxford_college',
-        'sub_unit' => 'sub_unit'
+        'sub_unit' => 'sub_unit',
+        'ora3_affiliation' => 'ora3_affiliation'
       }
       id_fields = {
         'email_address' => 'contributor_email',
@@ -399,6 +402,19 @@ module WillowSword
       assign_second_nested_hash(parent, child, pub_attrs) if pub_attrs.any?
     end
 
+    def assign_name_manufacturer(nam)
+      pub_attrs = {}
+      vals = Array(nam.fetch('display_form', []))
+      pub_attrs['manufacturer'] = vals[0] if vals.any?
+      urls = []
+      nam.fetch('identifier', []).each do |k, v|
+        urls << Array(v).first if k == 'website' && Array(v).any?
+      end
+      pub_attrs['manufacturer_website_url'] = urls[0] if urls.any?
+      parent = 'bibliographic_information'
+      assign_nested_hash(parent, pub_attrs) if pub_attrs.any?
+    end
+
     def assign_note
       # note - additional_information
       vals = Array(@metadata.fetch('additional_information', []))
@@ -426,8 +442,9 @@ module WillowSword
       fields = {
         'date_of_acceptance' => 'acceptance_date',
         'date_issued' => 'citation_publication_date',
+        'production_date' => 'production_date',
         'publication_place' => 'citation_place_of_publication',
-        'publication_url' => 'publication_url'
+        'publication_website_url' => 'publication_website_url'
       }
       fields.each do |data_field, model_field|
         vals = Array(@metadata.fetch(data_field, []))
@@ -447,7 +464,7 @@ module WillowSword
     def assign_physical_description
       return unless @metadata.fetch('form', {}).any?
       # physicalDescription - form
-      fields = %w(physical_form physical_dimensions)
+      fields = %w(physical_form physical_dimensions, collection_name)
       form = {}
       fields.each do |field|
         vals = @metadata['form'].fetch(field, [])
@@ -641,7 +658,7 @@ module WillowSword
       admin_fields = %w(depositor_contacted depositor_contact_email_template
       record_first_reviewed_by incorrect_version_deposited record_deposit_date
       record_publication_date record_review_status record_review_status_other
-      record_version rt_ticket_number)
+      record_version rt_ticket_number record_check_back_date)
       rights_fields = %w(rights_third_party_copyright_material
                         rights_third_party_copyright_permission_received)
       action_fields = {
@@ -649,7 +666,8 @@ module WillowSword
         'date' => 'action_date',
         'description' => 'action_description',
         'temporal' =>'action_duration',
-        'contributor' => 'action_responsibility'
+        'contributor' => 'action_responsibility',
+        'category' => 'action_category'
       }
       return unless @metadata.fetch('admin_info', {}).any?
       # Assign publisher attributes
@@ -723,7 +741,7 @@ module WillowSword
         'ora_data_model_version' => 'ora_data_model_version',
         'pre_counter_downloads' => 'pre_counter_downloads',
         'pre_counter_views' => 'pre_counter_views',
-        'requires_review' => 'record_requires_review',
+        'record_requires_review' => 'record_requires_review',
       }
       admin_fields = %w(record_accept_updates admin_notes ora_data_model_version
         record_requires_review pre_counter_downloads pre_counter_views)
@@ -751,6 +769,7 @@ module WillowSword
         'apc_admin_apc_number' => 'apc_admin_apc_number',
         'apc_admin_review_status' => 'apc_admin_apc_review_status',
         'apc_admin_spreadsheet_identifier' => 'apc_admin_apc_spreadsheet_identifier',
+        'apc_admin_apc_requested' => 'apc_admin-apc_requested',
         'ref_compliant_at_deposit' => 'ref_compliant_at_deposit',
         'ref_compliant_availability' => 'ref_compliant_availability',
         'ref_exception_required' => 'ref_exception_required',

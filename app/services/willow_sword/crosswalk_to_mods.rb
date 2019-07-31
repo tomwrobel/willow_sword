@@ -247,6 +247,28 @@ module WillowSword
       end
     end
 
+    def add_name_manufacturer
+      parent = 'bibliographic_information'
+      manufacturer = get_child_content(parent, 'manufacturer')
+      manufacturer_website_url = get_child_content(parent, 'manufacturer_website_url')
+
+      unless manufacturer.blank? and manufacturer_website_url.blank?
+        name_node = create_node('mods:name', nil, {'type' => 'corporate'})
+        @doc.root << name_node
+        unless manufacturer.blank?
+          name_node << create_node('mods:displayForm', manufacturer)
+        end
+        unless manufacturer_website_url.blank?
+          name_node << create_node('mods:nameIdentifier',
+                                   manufacturer_website_url,
+                                   {'type' => 'website'})
+        end
+        role_node = create_node('mods:role')
+        name_node << role_node
+        role_node << create_node('mods:roleTerm', 'Manufacturer', {'type' => 'text'})
+      end
+    end
+
     def add_name_rights_holder
       parent = 'licence_and_rights_information'
       val = get_child_content(parent, 'rights_holders')
@@ -444,6 +466,11 @@ module WillowSword
         aff_node << create_node('ora:affiliationComponent', val, {
           'type' => 'oxford_college'
         }) unless val.blank?
+        #   ora3_affiliation
+        val = get_content('ora3_affiliation', creator)
+        aff_node << create_node('ora:affiliationComponent', val, {
+            'type' => 'ora3_affiliation'
+        }) unless val.blank?
         # roles
         Array(get_content('roles', creator)).each do |role|
           role_title = get_content('role_title', role)
@@ -497,17 +524,23 @@ module WillowSword
       origin << create_node('mods:dateIssued', val, {
         'encoding' => 'iso8601'
       }) unless val.blank?
-      # date other
+      # date of acceptance
       val = get_grand_child_content(parent, child, 'acceptance_date')
       origin << create_node('mods:dateOther', val, {
         'type' => 'date_of_acceptance',
         'encoding' => 'iso8601'
       }) unless val.blank?
+      # date of production
+      val = get_grand_child_content(parent, child, 'production_date')
+      origin << create_node('mods:dateOther', val, {
+          'type' => 'production_date',
+          'encoding' => 'iso8601'
+      }) unless val.blank?
       # place
       val = get_grand_child_content(parent, child, 'citation_place_of_publication')
       place << create_node('mods:placeTerm', val, {'type' => 'text'}) unless val.blank?
       # url
-      val = get_grand_child_content(parent, child, 'publication_url')
+      val = get_grand_child_content(parent, child, 'publication_website_url')
       place << create_node('mods:placeTerm', val, {'type' => 'code'}) unless val.blank?
       # copyright date
       parent = 'licence_and_rights_information'
@@ -550,7 +583,7 @@ module WillowSword
       origin = create_node('mods:originInfo')
       @doc.root << origin
       parent = 'bibliographic_information'
-      fields = %w(physical_form physical_dimensions)
+      fields = %w(physical_form physical_dimensions collection_name)
       fields.each do |field|
         val = get_child_content(parent, field)
         origin << create_node('mods:form', val, {'type' => field}) unless val.blank?
@@ -814,7 +847,7 @@ module WillowSword
       admin_fields = %w(depositor_contacted depositor_contact_email_template
       record_first_reviewed_by admin_incorrect_version_deposited record_deposit_date
       record_publication_date record_review_status record_review_status_other
-      record_version rt_ticket_number)
+      record_version rt_ticket_number record_check_back_date)
       admin_fields.each do |fld|
         vals = get_child_content('admin_information', fld)
         label = fld
@@ -839,7 +872,8 @@ module WillowSword
         "action_date" => "dc:date",
         "action_description" => "dc:description",
         "action_duration" => "dcterms:temporal",
-        "action_responsibility" => "dc:contributor"
+        "action_responsibility" => "dc:contributor",
+        "action_category" => "dc:keyword"
       }
       actions = get_child_content('admin_information', 'history_information')
       actions.each do |action|
@@ -872,7 +906,7 @@ module WillowSword
         'ora_data_model_version' => ['ora_data_model_version', 'admin_information'],
         'pre_counter_downloads' => ['pre_counter_downloads', 'admin_information'],
         'pre_counter_views' => ['pre_counter_views', 'admin_information'],
-        'requires_review' => ['record_requires_review', 'admin_information'],
+        'record_requires_review' => ['record_requires_review', 'admin_information'],
       }
       info_note_fields.each do |xml_fld, data_fld|
         val = get_child_content(data_fld[1], data_fld[0])
@@ -889,6 +923,7 @@ module WillowSword
         'apc_admin_apc_number' => 'apc_admin_apc_number',
         'apc_admin_review_status' => 'apc_admin_apc_review_status',
         'apc_admin_spreadsheet_identifier' => 'apc_admin_apc_spreadsheet_identifier',
+        'apc_admin_apc_requested' => 'apc_admin_apc_requested',
         'ref_compliant_at_deposit' => 'ref_compliant_at_deposit',
         'ref_compliant_availability' => 'ref_compliant_availability',
         'ref_exception_required' => 'ref_exception_required',
