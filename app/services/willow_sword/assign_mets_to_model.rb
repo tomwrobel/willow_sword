@@ -779,7 +779,7 @@ module WillowSword
         'apc_admin_apc_number' => 'apc_admin_apc_number',
         'apc_admin_review_status' => 'apc_admin_apc_review_status',
         'apc_admin_spreadsheet_identifier' => 'apc_admin_apc_spreadsheet_identifier',
-        'apc_admin_apc_requested' => 'apc_admin-apc_requested',
+        'apc_admin_apc_requested' => 'apc_admin_apc_requested',
         'ref_compliant_at_deposit' => 'ref_compliant_at_deposit',
         'ref_compliant_availability' => 'ref_compliant_availability',
         'ref_exception_required' => 'ref_exception_required',
