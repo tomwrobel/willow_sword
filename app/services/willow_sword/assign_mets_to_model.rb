@@ -299,7 +299,7 @@ module WillowSword
         'initials' => 'initials',
         'display_form' => 'display_name',
         'preferred_family' => 'preferred_family_name',
-        'preferred_given' => 'preferred_given_name',
+        'preferred_given' => 'preferred_given_names',
         'preferred_email' => 'preferred_contributor_email',
         'type' => 'contributor_type',
       }
