@@ -166,9 +166,9 @@ module WillowSword
         elsif admin_keys.include?(key)
           # Set multivalued fields
           if %w(source_identifier tombstone).include?(key)
-            admin_attrs[pub_keys[key]] = vals
+            admin_attrs[admin_keys[key]] = vals if vals.any?
           else
-            admin_attrs[pub_keys[key]] = Array(vals).first
+            admin_attrs[admin_keys[key]] = Array(vals).first
           end
         elsif bib_keys.include?(key)
           bib_attrs[bib_keys[key]] = Array(vals).first
