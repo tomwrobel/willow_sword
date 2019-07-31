@@ -164,7 +164,12 @@ module WillowSword
         elsif item_desc_keys.include?(key)
           item_desc_attrs[item_desc_keys[key]] = Array(vals).first
         elsif admin_keys.include?(key)
-          admin_attrs[admin_keys[key]] = Array(vals).first
+          # Set multivalued fields
+          if %w(source_identifier tombstone).include?(key)
+            pub_attrs[pub_keys[key]] = vals
+          else
+            pub_attrs[pub_keys[key]] = Array(vals).first
+          end
         elsif bib_keys.include?(key)
           bib_attrs[bib_keys[key]] = Array(vals).first
         else
