@@ -155,7 +155,8 @@ module WillowSword
       ids.each do |key,vals|
         next unless Array(vals).any?
         if pub_keys.include?(key)
-          if key == 'doi'
+          # Set multivalued fields
+          if %w(doi issn).include?(key)
             pub_attrs[pub_keys[key]] = vals
           else
             pub_attrs[pub_keys[key]] = Array(vals).first
