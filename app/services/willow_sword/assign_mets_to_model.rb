@@ -260,7 +260,7 @@ module WillowSword
           assign_name_funder(nam)
         elsif typ == 'corporate' and role_titles.include?('Publisher')
           assign_name_publisher(nam)
-        elsif typ == 'corporate' and role_titles.include('Manufacturer')
+        elsif typ == 'corporate' and role_titles.include?('Manufacturer')
           assign_name_manufacturer(nam)
         else
           assign_name_person(nam)
