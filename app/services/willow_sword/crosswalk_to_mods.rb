@@ -300,10 +300,10 @@ module WillowSword
         funder_node << aff_node
         # funding_programme
         programme = get_content('funder_funding_programme', funder)
-        funder_programme_node << create_node('ora_admin:funding_programme', programme) unless programme.blank?
+        funder_programme_node = create_node('ora_admin:funding_programme', programme) unless programme.blank?
         # funder_compliance
         compliance = get_content('funder_compliance_met', funder)
-        funder_compliance_node << create_node('ora_admin:funder_compliance', compliance) unless compliance.blank?
+        funder_compliance_node = create_node('ora_admin:funder_compliance', compliance) unless compliance.blank?
         # grants
         funder.grant_information.each do |grant|
           funding_node = create_node('ora_admin:funding')
