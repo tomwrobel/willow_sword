@@ -511,7 +511,7 @@ module WillowSword
         event[model_fld] = vals[0] if vals.any?
       end
       parent = 'bibliographic_information'
-      child = 'event'
+      child = 'events'
       assign_second_nested_hash(parent, child, event, false)
     end
 

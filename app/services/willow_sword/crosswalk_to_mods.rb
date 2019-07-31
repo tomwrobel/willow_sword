@@ -595,7 +595,7 @@ module WillowSword
     end
 
     def add_ri_event
-      events = get_child_content('bibliographic_information', 'event')
+      events = get_child_content('bibliographic_information', 'events')
       unless events.blank?
         events.each do |event|
           ri_node = create_node('mods:relatedItem', nil, {'otherType' => 'event'})
