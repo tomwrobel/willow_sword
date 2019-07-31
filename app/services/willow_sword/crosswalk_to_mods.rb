@@ -196,9 +196,6 @@ module WillowSword
       child = 'publishers'
       fields.each do |field, tag|
         val = get_grand_child_content(parent, child, field)
-        if val != nil and field == 'identifier_doi'
-          val = val[0]
-        end
         @doc.root << create_node('mods:identifier', val, {'type' => tag}) unless val.blank?
       end
     end
