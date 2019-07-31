@@ -157,7 +157,7 @@ module WillowSword
         if pub_keys.include?(key)
           # Set multivalued fields
           if %w(doi issn).include?(key)
-            pub_attrs[pub_keys[key]] = vals
+            pub_attrs[pub_keys[key]] = vals if vals.any?
           else
             pub_attrs[pub_keys[key]] = Array(vals).first
           end
@@ -166,9 +166,9 @@ module WillowSword
         elsif admin_keys.include?(key)
           # Set multivalued fields
           if %w(source_identifier tombstone).include?(key)
-            pub_attrs[pub_keys[key]] = vals
+            admin_attrs[pub_keys[key]] = vals
           else
-            pub_attrs[pub_keys[key]] = Array(vals).first
+            admin_attrs[pub_keys[key]] = Array(vals).first
           end
         elsif bib_keys.include?(key)
           bib_attrs[bib_keys[key]] = Array(vals).first
@@ -187,13 +187,13 @@ module WillowSword
       assign_nested_hash(parent, bib_attrs)
       # bibliographic_information - publisher identifiers
       child = 'publishers'
-      assign_second_nested_hash(parent, child, pub_attrs)
+      assign_second_nested_hash(parent, child, pub_attrs) if pub_attrs.any?
       # item_description_and_embargo_information identifiers
       parent = 'item_description_and_embargo_information'
-      assign_nested_hash(parent, item_desc_attrs)
+      assign_nested_hash(parent, item_desc_attrs) if item_desc_attrs.any?
       # admin_information identifiers
       parent = 'admin_information'
-      assign_nested_hash(parent, admin_attrs)
+      assign_nested_hash(parent, admin_attrs) if admin_attrs.any?
     end
 
     def assign_in_progress

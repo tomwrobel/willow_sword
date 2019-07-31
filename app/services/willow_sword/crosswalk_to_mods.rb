@@ -225,6 +225,7 @@ module WillowSword
 
     def add_name
       add_name_commissioning_body
+      add_name_manufacturer
       add_name_rights_holder
       add_name_funder
       add_name_publisher
