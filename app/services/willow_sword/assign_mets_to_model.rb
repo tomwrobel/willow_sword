@@ -390,8 +390,10 @@ module WillowSword
         mapped_grant = {}
         grant_fields.each do |data_field, model_field|
           vals = Array(grant.fetch(data_field, []))
-          if %w(grant_identifier is_funding_for).include? model_field
+          if model_field == 'grant_identifier'
             mapped_grant[model_field] = vals.first if vals.any?
+          elsif model_field == 'is_funding_for'
+            mapped_grant[model_field] = vals if vals.any?
           else
             funder[model_field] = vals.first if vals.any?
           end
