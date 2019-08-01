@@ -311,15 +311,18 @@ module WillowSword
           funder_node << funding_node
           # grant
           val1 = get_content('grant_identifier', grant)
-          # TODO: change from activetriples to proper value
-          val2 = get_content('is_funding_for', grant)
-          unless val1.blank? and val2.blank?
+          funding_for = get_content('is_funding_for', grant)
+          unless val1.blank? and funding_for.blank?
             grant_node = create_node('ora_admin:funder_grant')
             funding_node << grant_node
             # grant_identifier
             grant_node << create_node('ora_admin:grant_identifier', val1) unless val1.blank?
             # is_funding_for
-            grant_node << create_node('ora_admin:is_funding_for', val2)  unless val2.blank?
+            unless funding_for.blank?
+              funding_for.each do |val|
+                  grant_node << create_node('ora_admin:is_funding_for', val)  unless val.blank?
+              end
+            end
 
             # Note, if we're moving funder programme and compliance, then roll back to
             # 220204b837db313d4a01589bfe8fcb08f1bfdccb for funders
