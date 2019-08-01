@@ -28,7 +28,11 @@ module WillowSword
         @ora.xpath("//#{term}").each do |t|
           vals << t.text unless t.text.blank?
         end
-        @metadata[mapped_value] = Array(vals)[0] unless vals.blank?
+        if term == 'extent'
+          @metadata[mapped_value] = Array(vals) unless vals.blank?
+        else
+          @metadata[mapped_value] = Array(vals)[0] unless vals.blank?
+        end
       end
       # free to read - start date
       node = @ora.xpath('//free_to_read')

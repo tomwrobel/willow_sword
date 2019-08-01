@@ -842,7 +842,11 @@ module WillowSword
       }
       fields.each do |data_fld, model_fld|
         vals = Array(file_metadata.fetch(data_fld, []))
-        mapped_file_metadata[model_fld] = vals[0] unless vals.blank?
+        if data_fld == 'extent'
+          mapped_file_metadata[model_fld] = vals unless vals.blank?
+        else
+          mapped_file_metadata[model_fld] = vals[0] unless vals.blank?
+        end
       end
       mapped_file_metadata
     end
