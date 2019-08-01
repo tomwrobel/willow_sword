@@ -480,7 +480,7 @@ module WillowSword
     def assign_physical_description
       return unless @metadata.fetch('form', {}).any?
       # physicalDescription - form
-      fields = %w(physical_form physical_dimensions, collection_name)
+      fields = %w(physical_form physical_dimensions collection_name)
       form = {}
       fields.each do |field|
         vals = @metadata['form'].fetch(field, [])
