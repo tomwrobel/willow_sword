@@ -83,9 +83,13 @@ module Integrator
         def transform_file_set_attributes
           if WillowSword.config.allow_only_permitted_attributes
             @attributes.slice(*permitted_file_set_attributes)
-          else
-            @attributes
           end
+          if WillowSword.config.check_back_by_default
+            unless @attributes['file_embargo_release_method']
+              @attributes['file_embargo_release_method'] = 'Check back'
+            end
+          end
+          @attributes
         end
 
         def permitted_file_set_attributes
