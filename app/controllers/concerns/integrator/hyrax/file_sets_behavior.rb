@@ -84,6 +84,7 @@ module Integrator
           if WillowSword.config.allow_only_permitted_attributes
             @attributes.slice(*permitted_file_set_attributes)
           end
+          # Code needs to be here in order to fire on create OR update
           if WillowSword.config.check_back_by_default
             unless @attributes['file_embargo_release_method']
               @attributes['file_embargo_release_method'] = 'Check back'
