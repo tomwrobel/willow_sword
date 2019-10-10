@@ -38,6 +38,7 @@ module Integrator
         else
           create_work
         end
+        set_in_progress_status_and_push
       end
 
       def upload_files_with_attributes
@@ -202,6 +203,28 @@ module Integrator
 
         def permitted_file_attributes
           @file_set_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
+        end
+
+        def set_in_progress_status_and_push
+          # If a deposit is in progress, or has been completed, set the relevant
+          # in progress and requires review flags and push to review if required
+          # Add in-progress header
+          return if @headers[:in_progress].blank?
+          status = @headers[:in_progress]
+          if status.downcase == 'true'
+            @object.admin_information.first['deposit_in_progress'] = true
+            @object.save
+          elsif status.downcase == 'false'
+            @object.admin_information.first['deposit_in_progress'] = false
+            @object.admin_information.first['record_requires_review'] = true
+            @object.save
+            push_work_to_review
+          end
+        end
+
+        def push_work_to_review
+          # Push a work to the review server for further processing
+          # Hyrax::Workflow::TransferToReview.call(target: @object)
         end
     end
   end
