@@ -64,7 +64,7 @@ module Integrator
 
         def push_work_to_review
           # Push a work to the review server for further processing
-          # Hyrax::Workflow::TransferToReview.call(target: @object)
+          Hyrax::Workflow::TransferToReview.call(target: @object)
         end
 
         def find_file_set_by_id
