@@ -234,7 +234,7 @@ module WillowSword
         return validated_date.to_s
       rescue ArgumentError => ex
         if date.length == 4 and date.to_i
-          new_date += '-01-01'
+          new_date = date + '-01-01'
           validated_date = validate_date(new_date)
           return validated_date
         else
