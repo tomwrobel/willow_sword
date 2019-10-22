@@ -240,8 +240,8 @@ module WillowSword
         else
           return nil
         end
-      else
-        return nil
+      end
+      return nil
     end
 
     def validate_language(language)
