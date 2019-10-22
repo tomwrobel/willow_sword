@@ -495,7 +495,7 @@ module WillowSword
       rights_attrs = {}
       vals = Array(@metadata.fetch('copyright_date', []))
       copyright_date = vals[0] if vals.any?
-      copyright_date = validate_date(copyright_date)
+      # copyright_date = validate_date(copyright_date)
       rights_attrs['rights_copyright_date'] = copyright_date if copyright_date
       parent = 'licence_and_rights_information'
       assign_nested_hash(parent, rights_attrs)
