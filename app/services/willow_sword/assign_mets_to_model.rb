@@ -232,7 +232,7 @@ module WillowSword
       begin
         validated_date = Date.parse(date)
         return validated_date.to_s
-      rescue ArgumentError as ex
+      rescue ArgumentError => ex
         if date.length == 4 and date.to_i
           new_date += '-01-01'
           validated_date = validate_date(new_date)
