@@ -76,13 +76,13 @@ module WillowSword
 
       def render_file_set_not_found
         message = "Server cannot find file set with id #{params[:id]}"
-        @error = WillowSword::Error.new(message)
+        @error = WillowSword::Error.new(message, :not_found)
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
 
       def render_work_not_found
         message = "Server cannot find work with id #{params[:work_id]}"
-        @error = WillowSword::Error.new(message)
+        @error = WillowSword::Error.new(message, :not_found)
         render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
       end
 

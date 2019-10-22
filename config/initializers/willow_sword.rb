@@ -23,4 +23,6 @@ WillowSword.setup do |config|
   config.xw_to_xml_for_fileset = WillowSword::CrosswalkToOra
   # Authorize Sword requests using Api-key header
   config.authorize_request = false
+  # Set new filesets to check_back by default
+  config.check_back_by_default = true
 end

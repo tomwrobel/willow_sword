@@ -4,6 +4,7 @@
 # https://github.com/leaf-research-technologies/leaf_addons/blob/master/lib/generators/leaf_addons/templates/lib/importer/factory/object_factory.rb
 # https://github.com/leaf-research-technologies/leaf_addons/blob/master/lib/generators/leaf_addons/templates/lib/importer/files_parser.rb
 # https://github.com/leaf-research-technologies/leaf_addons/blob/9643b649df513e404c96ba5b9285d83abc4b2c9a/lib/generators/leaf_addons/templates/lib/importer/factory/base_factory.rb
+require 'securerandom'
 
 module Integrator
   module Hyrax
@@ -37,6 +38,7 @@ module Integrator
         else
           create_work
         end
+        set_in_progress_status_and_push
       end
 
       def upload_files_with_attributes
@@ -72,6 +74,17 @@ module Integrator
       def create_work
         attrs = create_attributes
         @object = @work_klass.new
+        # Assign pid to object if it doesn't exist
+        # Ensure pid becomes object ID (but don't try to save it, as pid isn't
+        # a field in the Hyrax model)
+        if attrs['pid'].blank?
+          uuid = SecureRandom.uuid
+          pid = "uuid_#{uuid}"
+        else
+          pid = attrs['pid']
+          attrs.except!('pid')
+        end
+        @object.id = pid
         work_actor.create(environment(attrs))
       end
 
@@ -190,6 +203,28 @@ module Integrator
 
         def permitted_file_attributes
           @file_set_klass.properties.keys.map(&:to_sym) + [:id, :edit_users, :edit_groups, :read_groups, :visibility]
+        end
+
+        def set_in_progress_status_and_push
+          # If a deposit is in progress, or has been completed, set the relevant
+          # in progress and requires review flags and push to review if required
+          # Add in-progress header
+          return if @headers[:in_progress].blank?
+          status = @headers[:in_progress]
+          if status.downcase == 'true'
+            @object.admin_information.first['deposit_in_progress'] = true
+            @object.save
+          elsif status.downcase == 'false'
+            @object.admin_information.first['deposit_in_progress'] = false
+            @object.admin_information.first['record_requires_review'] = true
+            @object.save
+            push_work_to_review
+          end
+        end
+
+        def push_work_to_review
+          # Push a work to the review server for further processing
+          # Hyrax::Workflow::TransferToReview.call(target: @object)
         end
     end
   end

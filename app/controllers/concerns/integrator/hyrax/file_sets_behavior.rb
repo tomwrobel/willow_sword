@@ -23,7 +23,7 @@ module Integrator
         @actor.file_set.update(create_file_set_attributes) unless @attributes.blank?
         @actor.file_set.save!
         @actor.attach_to_work(@object) if @object
-        set_in_progress_status_for_parent_work
+        set_in_progress_status_for_parent_work_and_push
       end
 
       def update_file_set
@@ -41,13 +41,13 @@ module Integrator
         # update_metadata
         @actor.file_set.update(update_file_set_attributes) unless @attributes.blank?
         @actor.file_set.save!
-        set_in_progress_status_for_parent_work
+        set_in_progress_status_for_parent_work_and_push
       end
 
       private
-        def set_in_progress_status_for_parent_work
+        def set_in_progress_status_for_parent_work_and_push
           # If a deposit is in progress, or has been completed, set the relevant
-          # in progress and requires review flags
+          # in progress and requires review flags and push to review if required
           # Add in-progress header
           return if @headers[:in_progress].blank?
           status = @headers[:in_progress]
@@ -56,11 +56,16 @@ module Integrator
             @object.save
           elsif status.downcase == 'false'
             @object.admin_information.first['deposit_in_progress'] = false
-            @object.admin_information.first['requires_review'] = true
+            @object.admin_information.first['record_requires_review'] = true
             @object.save
+            push_work_to_review
           end
         end
 
+        def push_work_to_review
+          # Push a work to the review server for further processing
+          # Hyrax::Workflow::TransferToReview.call(target: @object)
+        end
 
         def find_file_set_by_id
           @file_set_klass.find(params[:id]) if @file_set_klass.exists?(params[:id])
@@ -83,9 +88,14 @@ module Integrator
         def transform_file_set_attributes
           if WillowSword.config.allow_only_permitted_attributes
             @attributes.slice(*permitted_file_set_attributes)
-          else
-            @attributes
           end
+          # Code needs to be here in order to fire on create OR update
+          if WillowSword.config.check_back_by_default
+            unless @attributes['file_embargo_release_method']
+              @attributes['file_embargo_release_method'] = 'Check back'
+            end
+          end
+          @attributes
         end
 
         def permitted_file_set_attributes

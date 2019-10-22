@@ -67,12 +67,12 @@ module WillowSword
 
     def add_access_condition
       fields = {
-        'licence'=>'license',
-        'licence_statement'=>'license_statement',
-        'licence_start_date'=>'license_start_date',
-        'licence_url'=>'license_url',
-        'rights_statement'=>'rights_statement',
-        'record_ora_deposit_licence'=>'record_ora_deposit_licence'
+          'licence'=>'license',
+          'licence_statement'=>'license_statement',
+          'licence_start_date'=>'license_start_date',
+          'licence_url'=>'license_url',
+          'rights_statement'=>'rights_statement',
+          'record_ora_deposit_licence'=>'record_ora_deposit_licence'
       }
       fields.each do |field, typ|
         parent = 'licence_and_rights_information'
@@ -94,26 +94,26 @@ module WillowSword
           xmlns:dc='http://purl.org/dc/elements/1.1/'/>"
       de = LibXML::XML::Document.string(dataset_extension)
       fields = {
-        'data_collection_start_date'=>['mods:dateOther', {
-                                'point'=>'start',
-                                'type'=>'data_collection'}],
-        'data_collection_end_date'=>['mods:dateOther', {
-                                'point'=>'end',
-                                'type'=>'data_collection'}],
-        'data_coverage_spatial'=>['dcterms:spatial'],
-        'data_coverage_temporal_start_date'=>['mods:dateOther', {
-                                'point'=>'start',
-                                'type'=>'data_coverage'}],
-        'data_coverage_temporal_end_date'=>['mods:dateOther', {
-                                'point'=>'end',
-                                'type'=>'data_coverage'}],
-        'data_format'=>['dc:type'],
-        'data_digital_storage_location'=>['ora_dataset:digital_storage_location'],
-        'data_digital_data_total_file_size'=>['dcterms:extent'],
-        'data_digital_data_format'=>['dc:format'],
-        'data_digital_data_version'=>['dc:version'],
-        'data_physical_storage_location'=>['ora_dataset:physical_storage_location'],
-        'data_management_plan_url'=>['dcterms:references']
+          'data_collection_start_date'=>['mods:dateOther', {
+              'point'=>'start',
+              'type'=>'data_collection'}],
+          'data_collection_end_date'=>['mods:dateOther', {
+              'point'=>'end',
+              'type'=>'data_collection'}],
+          'data_coverage_spatial'=>['dcterms:spatial'],
+          'data_coverage_temporal_start_date'=>['mods:dateOther', {
+              'point'=>'start',
+              'type'=>'data_coverage'}],
+          'data_coverage_temporal_end_date'=>['mods:dateOther', {
+              'point'=>'end',
+              'type'=>'data_coverage'}],
+          'data_format'=>['dc:type'],
+          'data_digital_storage_location'=>['ora_dataset:digital_storage_location'],
+          'data_digital_data_total_file_size'=>['dcterms:extent'],
+          'data_digital_data_format'=>['dc:format'],
+          'data_digital_data_version'=>['dc:version'],
+          'data_physical_storage_location'=>['ora_dataset:physical_storage_location'],
+          'data_management_plan_url'=>['dcterms:references']
       }
       parent = 'bibliographic_information'
       fields.each do |field, tags|
@@ -137,10 +137,10 @@ module WillowSword
         xmlns:uketd_dc='http://naca.central.cranfield.ac.uk/ethos-oai/2.0/'
         xmlns:dcterms='http://purl.org/dc/terms/'/>"
       fields = {
-        'thesis_degree_institution' => 'uketdterms:institution',
-        'thesis_degree_level' => 'uketdterms:qualificationlevel',
-        'thesis_degree_name' => 'uketdterms:qualificationname',
-        'thesis_leave_to_supplicate_date' => 'dcterms:issued'
+          'thesis_degree_institution' => 'uketdterms:institution',
+          'thesis_degree_level' => 'uketdterms:qualificationlevel',
+          'thesis_degree_name' => 'uketdterms:qualificationname',
+          'thesis_leave_to_supplicate_date' => 'dcterms:issued'
       }
       etd = LibXML::XML::Document.string(etd_extension)
       parent = 'bibliographic_information'
@@ -170,13 +170,13 @@ module WillowSword
       @doc.root << create_node('mods:identifier', @work.id, {'type' => 'pid'})
       # identifier fields
       fields = {
-        'identifier_pmid' => ['item_description_and_embargo_information', 'pmid'],
-        'identifier_pubs_identifier' => ['item_description_and_embargo_information', 'pubs_id'],
-        'tinypid' => ['item_description_and_embargo_information', 'tinypid'],
-        'identifier_uuid' => ['item_description_and_embargo_information', 'uuid'],
-        'identifier_source_identifier' => ['admin_information', 'source_identifier'],
-        'identifier_tombstone_record_identifier' => ['admin_information', 'tombstone'],
-        'paper_number' => ['bibliographic_information', 'paper_number']
+          'identifier_pmid' => ['item_description_and_embargo_information', 'pmid'],
+          'identifier_pubs_identifier' => ['item_description_and_embargo_information', 'pubs_id'],
+          'tinypid' => ['item_description_and_embargo_information', 'tinypid'],
+          'identifier_uuid' => ['item_description_and_embargo_information', 'uuid'],
+          'identifier_source_identifier' => ['admin_information', 'source_identifier'],
+          'identifier_tombstone_record_identifier' => ['admin_information', 'tombstone'],
+          'paper_number' => ['bibliographic_information', 'paper_number']
       }
       fields.each do |field, tags|
         val = get_child_content(tags[0], field)
@@ -184,21 +184,18 @@ module WillowSword
       end
       # publisher id fields
       fields = {
-        'identifier_doi'=>'doi',
-        'identifier_eisbn'=>'eisbn',
-        'identifier_eissn'=>'eissn',
-        'identifier_isbn_10'=>'isbn',
-        'identifier_isbn_13'=>'isbn13',
-        'identifier_issn'=>'issn',
-        'identifier_pii'=>'pii'
+          'identifier_doi'=>'doi',
+          'identifier_eisbn'=>'eisbn',
+          'identifier_eissn'=>'eissn',
+          'identifier_isbn_10'=>'isbn',
+          'identifier_isbn_13'=>'isbn13',
+          'identifier_issn'=>'issn',
+          'identifier_pii'=>'pii'
       }
       parent = 'bibliographic_information'
       child = 'publishers'
       fields.each do |field, tag|
         val = get_grand_child_content(parent, child, field)
-        if val != nil and field == 'identifier_doi'
-          val = val[0]
-        end
         @doc.root << create_node('mods:identifier', val, {'type' => tag}) unless val.blank?
       end
     end
@@ -210,8 +207,8 @@ module WillowSword
         @doc.root << lang
         vals.each do |val|
           langterm = create_node('mods:languageTerm', val, {
-            'authority' => 'iso639-2b',
-            'type' => 'text'
+              'authority' => 'iso639-2b',
+              'type' => 'text'
           })
           lang << langterm
         end
@@ -228,6 +225,7 @@ module WillowSword
 
     def add_name
       add_name_commissioning_body
+      add_name_manufacturer
       add_name_rights_holder
       add_name_funder
       add_name_publisher
@@ -244,6 +242,28 @@ module WillowSword
         role_node = create_node('mods:role')
         name_node << role_node
         role_node << create_node('mods:roleTerm', 'Commissioning body', {'type' => 'text'})
+      end
+    end
+
+    def add_name_manufacturer
+      parent = 'bibliographic_information'
+      manufacturer = get_child_content(parent, 'manufacturer')
+      manufacturer_website_url = get_child_content(parent, 'manufacturer_website_url')
+
+      unless manufacturer.blank? and manufacturer_website_url.blank?
+        name_node = create_node('mods:name', nil, {'type' => 'corporate'})
+        @doc.root << name_node
+        unless manufacturer.blank?
+          name_node << create_node('mods:displayForm', manufacturer)
+        end
+        unless manufacturer_website_url.blank?
+          name_node << create_node('mods:nameIdentifier',
+                                   manufacturer_website_url,
+                                   {'type' => 'website'})
+        end
+        role_node = create_node('mods:role')
+        name_node << role_node
+        role_node << create_node('mods:roleTerm', 'Manufacturer', {'type' => 'text'})
       end
     end
 
@@ -278,27 +298,37 @@ module WillowSword
         # affiliation - for storing grant information
         aff_node = create_node('mods:affiliation')
         funder_node << aff_node
+        # funding_programme
+        programme = get_content('funder_funding_programme', funder)
+        funder_programme_node = create_node('ora_admin:funding_programme', programme) unless programme.blank?
+        # funder_compliance
+        compliance = get_content('funder_compliance_met', funder)
+        funder_compliance_node = create_node('ora_admin:funder_compliance', compliance) unless compliance.blank?
         # grants
         funder.grant_information.each do |grant|
           funding_node = create_node('ora_admin:funding')
           add_namespaces(funding_node, {'ora_admin' => 'http://ora.ox.ac.uk/vocabs/admin'})
           funder_node << funding_node
-          # funding_programme
-          val = get_content('funder_funding_programme', grant)
-          funding_node << create_node('ora_admin:funding_programme', val) unless val.blank?
-          # funder_compliance
-          val = get_content('funder_compliance_met', grant)
-          funding_node << create_node('ora_admin:funder_compliance', val) unless val.blank?
           # grant
           val1 = get_content('grant_identifier', grant)
-          val2 = get_content('is_funding_for', grant)
-          unless val1.blank? and val2.blank?
+          funding_for = get_content('is_funding_for', grant)
+          unless val1.blank? and funding_for.blank?
             grant_node = create_node('ora_admin:funder_grant')
             funding_node << grant_node
             # grant_identifier
             grant_node << create_node('ora_admin:grant_identifier', val1) unless val1.blank?
             # is_funding_for
-            grant_node << create_node('ora_admin:is_funding_for', val2)  unless val2.blank?
+            unless funding_for.blank?
+              funding_for.each do |val|
+                  grant_node << create_node('ora_admin:is_funding_for', val)  unless val.blank?
+              end
+            end
+
+            # Note, if we're moving funder programme and compliance, then roll back to
+            # 220204b837db313d4a01589bfe8fcb08f1bfdccb for funders
+            grant_node << funder_programme_node unless programme.blank?
+
+            grant_node << funder_compliance_node unless compliance.blank?
           end
         end
       end
@@ -324,7 +354,8 @@ module WillowSword
 
     def add_name_person
       etal_roles = []
-      contributors = @work.authors_and_contributors[0].contributors
+      # contributors = @work.authors_and_contributors[0].contributors
+      contributors = @work.contributors
       contributors.each do |creator|
         val = get_content('contributor_type', creator)
         val = 'personal' if val.blank?
@@ -367,27 +398,27 @@ module WillowSword
         #   email_address
         val = get_content('contributor_email', creator)
         nam_node << create_node('mods:nameIdentifier', val, {
-          'type' => 'email_address'
+            'type' => 'email_address'
         }) unless val.blank?
         #   website
         val = get_content('contributor_website_url', creator)
         nam_node << create_node('mods:nameIdentifier', val, {
-          'type' => 'website'
+            'type' => 'website'
         }) unless val.blank?
         #   contributor_record_identifier
         val = get_content('contributor_record_identifier', creator)
         nam_node << create_node('mods:nameIdentifier', val, {
-          'type' => 'contributor_record_identifier'
+            'type' => 'contributor_record_identifier'
         }) unless val.blank?
         #   sso
         val = get_content('institutional_identifier', creator)
         nam_node << create_node('mods:nameIdentifier', val, {
-          'type' => 'sso'
+            'type' => 'sso'
         }) unless val.blank?
         #   orcid_identifier
         val = get_content('orcid_identifier', creator)
         nam_node << create_node('mods:nameIdentifier', val, {
-          'type' => 'orcid_identifier'
+            'type' => 'orcid_identifier'
         }) unless val.blank?
         #   other identifiers
         Array(get_content('schemes', creator)).each do |scheme|
@@ -416,32 +447,37 @@ module WillowSword
         #   division
         val = get_content('division', creator)
         aff_node << create_node('ora:affiliationComponent', val, {
-          'type' => 'division'
+            'type' => 'division'
         }) unless val.blank?
         #   department
         val = get_content('department', creator)
         aff_node << create_node('ora:affiliationComponent', val, {
-          'type' => 'department'
+            'type' => 'department'
         }) unless val.blank?
         #   sub_department
         val = get_content('sub_department', creator)
         aff_node << create_node('ora:affiliationComponent', val, {
-          'type' => 'sub_department'
+            'type' => 'sub_department'
         }) unless val.blank?
         #   research_group
         val = get_content('research_group', creator)
         aff_node << create_node('ora:affiliationComponent', val, {
-          'type' => 'research_group'
+            'type' => 'research_group'
         }) unless val.blank?
         #   sub_unit
         val = get_content('sub_unit', creator)
         aff_node << create_node('ora:affiliationComponent', val, {
-          'type' => 'sub_unit'
+            'type' => 'sub_unit'
         }) unless val.blank?
         #   oxford_college
         val = get_content('oxford_college', creator)
         aff_node << create_node('ora:affiliationComponent', val, {
-          'type' => 'oxford_college'
+            'type' => 'oxford_college'
+        }) unless val.blank?
+        #   ora3_affiliation
+        val = get_content('ora3_affiliation', creator)
+        aff_node << create_node('ora:affiliationComponent', val, {
+            'type' => 'ora3_affiliation'
         }) unless val.blank?
         # roles
         Array(get_content('roles', creator)).each do |role|
@@ -480,7 +516,7 @@ module WillowSword
     def add_note
       val = get_content('additional_information')
       @doc.root << create_node('mods:note', val, {
-        'displayLabel' => 'additional_information'
+          'displayLabel' => 'additional_information'
       }) unless val.blank?
     end
 
@@ -494,25 +530,31 @@ module WillowSword
       # date issued
       val = get_grand_child_content(parent, child, 'citation_publication_date')
       origin << create_node('mods:dateIssued', val, {
-        'encoding' => 'iso8601'
+          'encoding' => 'iso8601'
       }) unless val.blank?
-      # date other
+      # date of acceptance
       val = get_grand_child_content(parent, child, 'acceptance_date')
       origin << create_node('mods:dateOther', val, {
-        'type' => 'date_of_acceptance',
-        'encoding' => 'iso8601'
+          'type' => 'date_of_acceptance',
+          'encoding' => 'iso8601'
+      }) unless val.blank?
+      # date of production
+      val = get_grand_child_content(parent, child, 'production_date')
+      origin << create_node('mods:dateOther', val, {
+          'type' => 'production_date',
+          'encoding' => 'iso8601'
       }) unless val.blank?
       # place
       val = get_grand_child_content(parent, child, 'citation_place_of_publication')
       place << create_node('mods:placeTerm', val, {'type' => 'text'}) unless val.blank?
       # url
-      val = get_grand_child_content(parent, child, 'publication_url')
+      val = get_grand_child_content(parent, child, 'publication_website_url')
       place << create_node('mods:placeTerm', val, {'type' => 'code'}) unless val.blank?
       # copyright date
       parent = 'licence_and_rights_information'
       val = get_child_content(parent, 'rights_copyright_date')
       origin << create_node('mods:copyrightDate', val, {
-        'encoding' => 'iso8601'
+          'encoding' => 'iso8601'
       }) unless val.blank?
     end
 
@@ -520,16 +562,16 @@ module WillowSword
       extn = create_node('mods:extension')
       patent_extension = "<ora_patent:patent xmlns:ora_patent='https://ora.ox.ac.uk/vocabs/patent'/>"
       fields = {
-        'patent_number' => 'ora_patent:number',
-        'patent_application_number' => 'ora_patent:application_number',
-        'patent_publication_number' => 'ora_patent:publication_number',
-        'patent_awarded_date' => 'ora_patent:awarded_date',
-        'patent_filed_date' => 'ora_patent:filed_date',
-        'patent_status' => 'ora_patent:status',
-        'patent_territory' => 'ora_patent:territory',
-        'patent_cooperative_classification' => 'ora_patent:cooperative_classification',
-        'patent_european_classification' => 'ora_patent:european_classification',
-        'patent_international_classification' => 'ora_patent:international_classification',
+          'patent_number' => 'ora_patent:number',
+          'patent_application_number' => 'ora_patent:application_number',
+          'patent_publication_number' => 'ora_patent:publication_number',
+          'patent_awarded_date' => 'ora_patent:awarded_date',
+          'patent_filed_date' => 'ora_patent:filed_date',
+          'patent_status' => 'ora_patent:status',
+          'patent_territory' => 'ora_patent:territory',
+          'patent_cooperative_classification' => 'ora_patent:cooperative_classification',
+          'patent_european_classification' => 'ora_patent:european_classification',
+          'patent_international_classification' => 'ora_patent:international_classification',
       }
       patent = LibXML::XML::Document.string(patent_extension)
       parent = 'bibliographic_information'
@@ -549,7 +591,7 @@ module WillowSword
       origin = create_node('mods:originInfo')
       @doc.root << origin
       parent = 'bibliographic_information'
-      fields = %w(physical_form physical_dimensions)
+      fields = %w(physical_form physical_dimensions collection_name)
       fields.each do |field|
         val = get_child_content(parent, field)
         origin << create_node('mods:form', val, {'type' => field}) unless val.blank?
@@ -564,7 +606,7 @@ module WillowSword
     end
 
     def add_ri_event
-      events = get_child_content('bibliographic_information', 'event')
+      events = get_child_content('bibliographic_information', 'events')
       unless events.blank?
         events.each do |event|
           ri_node = create_node('mods:relatedItem', nil, {'otherType' => 'event'})
@@ -592,12 +634,12 @@ module WillowSword
             ori_node = create_node('mods:originInfo')
             ri_node << ori_node
             ori_node << create_node('mods:dateOther', val_start, {
-              'point' => 'start',
-              'type' => 'event_date'
+                'point' => 'start',
+                'type' => 'event_date'
             }) unless val_start.blank?
             ori_node << create_node('mods:dateOther', val_end, {
-              'point' => 'end',
-              'type' => 'event_date'
+                'point' => 'end',
+                'type' => 'event_date'
             }) unless val_start.blank?
           end
         end
@@ -627,7 +669,7 @@ module WillowSword
           # note
           val = get_content('related_item_citation_text', item)
           ri_node << create_node('mods:note', val, {
-            'displayLabel' => 'related_item_citation_text'
+              'displayLabel' => 'related_item_citation_text'
           }) unless val.blank?
         end
       end
@@ -813,7 +855,7 @@ module WillowSword
       admin_fields = %w(depositor_contacted depositor_contact_email_template
       record_first_reviewed_by admin_incorrect_version_deposited record_deposit_date
       record_publication_date record_review_status record_review_status_other
-      record_version rt_ticket_number)
+      record_version rt_ticket_number record_check_back_date)
       admin_fields.each do |fld|
         vals = get_child_content('admin_information', fld)
         label = fld
@@ -834,11 +876,12 @@ module WillowSword
       ha_node = create_node('ora_admin:history')
       oe.root << ha_node
       action_fields = {
-        "action_comment" => "mods:note",
-        "action_date" => "dc:date",
-        "action_description" => "dc:description",
-        "action_duration" => "dcterms:temporal",
-        "action_responsibility" => "dc:contributor"
+          "action_comment" => "mods:note",
+          "action_date" => "dc:date",
+          "action_description" => "dc:description",
+          "action_duration" => "dcterms:temporal",
+          "action_responsibility" => "dc:contributor",
+          "action_category" => "dc:keyword"
       }
       actions = get_child_content('admin_information', 'history_information')
       actions.each do |action|
@@ -864,14 +907,14 @@ module WillowSword
       val = get_child_content('admin_information', 'record_content_source')
       ri << create_node('mods:recordContentSource', val) unless val.blank?
       info_note_fields = {
-        'accept_updates' => ['record_accept_updates', 'admin_information'],
-        'admin_notes' => ['admin_notes', 'admin_information'],
-        'confidential_report' => ['confidential_report', 'bibliographic_information'],
-        'deposit_note' => ['deposit_note', 'licence_and_rights_information'],
-        'ora_data_model_version' => ['ora_data_model_version', 'admin_information'],
-        'pre_counter_downloads' => ['pre_counter_downloads', 'admin_information'],
-        'pre_counter_views' => ['pre_counter_views', 'admin_information'],
-        'requires_review' => ['record_requires_review', 'admin_information'],
+          'accept_updates' => ['record_accept_updates', 'admin_information'],
+          'admin_notes' => ['admin_notes', 'admin_information'],
+          'confidential_report' => ['confidential_report', 'bibliographic_information'],
+          'deposit_note' => ['deposit_note', 'licence_and_rights_information'],
+          'ora_data_model_version' => ['ora_data_model_version', 'admin_information'],
+          'pre_counter_downloads' => ['pre_counter_downloads', 'admin_information'],
+          'pre_counter_views' => ['pre_counter_views', 'admin_information'],
+          'record_requires_review' => ['record_requires_review', 'admin_information'],
       }
       info_note_fields.each do |xml_fld, data_fld|
         val = get_child_content(data_fld[1], data_fld[0])
@@ -885,13 +928,14 @@ module WillowSword
          xmlns:ora_open_access_admin=\"http://ora.ox.ac.uk/vocabs/open_access_admin\"/>"
       oa = LibXML::XML::Document.string(oa_admin)
       fields = {
-        'apc_admin_apc_number' => 'apc_admin_apc_number',
-        'apc_admin_review_status' => 'apc_admin_apc_review_status',
-        'apc_admin_spreadsheet_identifier' => 'apc_admin_apc_spreadsheet_identifier',
-        'ref_compliant_at_deposit' => 'ref_compliant_at_deposit',
-        'ref_compliant_availability' => 'ref_compliant_availability',
-        'ref_exception_required' => 'ref_exception_required',
-        'ref_exception_note' => 'ref_other_exception_note',
+          'apc_admin_apc_number' => 'apc_admin_apc_number',
+          'apc_admin_review_status' => 'apc_admin_apc_review_status',
+          'apc_admin_spreadsheet_identifier' => 'apc_admin_apc_spreadsheet_identifier',
+          'apc_admin_apc_requested' => 'apc_admin_apc_requested',
+          'ref_compliant_at_deposit' => 'ref_compliant_at_deposit',
+          'ref_compliant_availability' => 'ref_compliant_availability',
+          'ref_exception_required' => 'ref_exception_required',
+          'ref_exception_note' => 'ref_other_exception_note',
       }
       fields.each do |xml_fld, data_fld|
         val = get_child_content('admin_information', data_fld)
@@ -914,10 +958,10 @@ module WillowSword
          xmlns:ora_thesis='https://ora.ox.ac.uk/vocabs/thesis'/>"
       ta = LibXML::XML::Document.string(thesis_admin)
       fields = {
-        'thesis_archive_version_completed' => 'thesis_archive_version_complete',
-        'thesis_student_system_updated' => 'thesis_student_system_updated',
-        'thesis_dispensation_from_consultation_granted' => 'thesis_dispensation_from_consultation_granted',
-        'thesis_voluntary_deposit' => 'thesis_voluntary_deposit'
+          'thesis_archive_version_completed' => 'thesis_archive_version_complete',
+          'thesis_student_system_updated' => 'thesis_student_system_updated',
+          'thesis_dispensation_from_consultation_granted' => 'thesis_dispensation_from_consultation_granted',
+          'thesis_voluntary_deposit' => 'thesis_voluntary_deposit'
       }
       fields.each do |xml_fld, data_fld|
         val = get_child_content('admin_information', data_fld)
@@ -951,7 +995,7 @@ module WillowSword
 
     def get_grand_child_content(parent, child, gr_child)
       if @work[parent].any? and not @work[parent][0].blank? and
-         @work[parent][0][child].any? and not @work[parent][0][child][0].blank?
+          @work[parent][0][child].any? and not @work[parent][0][child][0].blank?
         @work[parent][0][child][0][gr_child]
       else
         nil

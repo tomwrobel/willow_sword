@@ -156,11 +156,21 @@ module WillowSword
       ids.each do |key,vals|
         next unless Array(vals).any?
         if pub_keys.include?(key)
-          pub_attrs[pub_keys[key]] = Array(vals).first
+          # Set multivalued fields
+          if %w(doi issn).include?(key)
+            pub_attrs[pub_keys[key]] = vals if vals.any?
+          else
+            pub_attrs[pub_keys[key]] = Array(vals).first
+          end
         elsif item_desc_keys.include?(key)
           item_desc_attrs[item_desc_keys[key]] = Array(vals).first
         elsif admin_keys.include?(key)
-          admin_attrs[admin_keys[key]] = Array(vals).first
+          # Set multivalued fields
+          if %w(source_identifier tombstone).include?(key)
+            admin_attrs[admin_keys[key]] = vals if vals.any?
+          else
+            admin_attrs[admin_keys[key]] = Array(vals).first
+          end
         elsif bib_keys.include?(key)
           bib_attrs[bib_keys[key]] = Array(vals).first
         else
@@ -178,13 +188,13 @@ module WillowSword
       assign_nested_hash(parent, bib_attrs)
       # bibliographic_information - publisher identifiers
       child = 'publishers'
-      assign_second_nested_hash(parent, child, pub_attrs)
+      assign_second_nested_hash(parent, child, pub_attrs) if pub_attrs.any?
       # item_description_and_embargo_information identifiers
       parent = 'item_description_and_embargo_information'
-      assign_nested_hash(parent, item_desc_attrs)
+      assign_nested_hash(parent, item_desc_attrs) if item_desc_attrs.any?
       # admin_information identifiers
       parent = 'admin_information'
-      assign_nested_hash(parent, admin_attrs)
+      assign_nested_hash(parent, admin_attrs) if admin_attrs.any?
     end
 
     def assign_in_progress
@@ -277,6 +287,8 @@ module WillowSword
           assign_name_funder(nam)
         elsif typ == 'corporate' and role_titles.include?('Publisher')
           assign_name_publisher(nam)
+        elsif typ == 'corporate' and role_titles.include?('Manufacturer')
+          assign_name_manufacturer(nam)
         else
           assign_name_person(nam)
         end
@@ -309,7 +321,7 @@ module WillowSword
         'initials' => 'initials',
         'display_form' => 'display_name',
         'preferred_family' => 'preferred_family_name',
-        'preferred_given' => 'preferred_given_name',
+        'preferred_given' => 'preferred_given_names',
         'preferred_email' => 'preferred_contributor_email',
         'type' => 'contributor_type',
       }
@@ -319,7 +331,8 @@ module WillowSword
         'sub_department' => 'sub_department',
         'research_group' => 'research_group',
         'oxford_college' => 'oxford_college',
-        'sub_unit' => 'sub_unit'
+        'sub_unit' => 'sub_unit',
+        'ora3_affiliation' => 'ora3_affiliation'
       }
       id_fields = {
         'email_address' => 'contributor_email',
@@ -377,7 +390,8 @@ module WillowSword
           mapped_name['roles_attributes'] = roles if roles.any?
         end
       end
-      assign_contributor_hash(mapped_name) if name_added
+      # assign_contributor_hash(mapped_name) if name_added
+      assign_nested_hash('contributors', mapped_name, false) if name_added
     end
 
     def assign_name_funder(nam)
@@ -398,7 +412,13 @@ module WillowSword
         mapped_grant = {}
         grant_fields.each do |data_field, model_field|
           vals = Array(grant.fetch(data_field, []))
-          mapped_grant[model_field] = vals.first if vals.any?
+          if model_field == 'grant_identifier'
+            mapped_grant[model_field] = vals.first if vals.any?
+          elsif model_field == 'is_funding_for'
+            mapped_grant[model_field] = vals if vals.any?
+          else
+            funder[model_field] = vals.first if vals.any?
+          end
         end
         grants << mapped_grant if mapped_grant.any?
       end
@@ -418,6 +438,19 @@ module WillowSword
       parent = 'bibliographic_information'
       child = 'publishers'
       assign_second_nested_hash(parent, child, pub_attrs) if pub_attrs.any?
+    end
+
+    def assign_name_manufacturer(nam)
+      pub_attrs = {}
+      vals = Array(nam.fetch('display_form', []))
+      pub_attrs['manufacturer'] = vals[0] if vals.any?
+      urls = []
+      nam.fetch('identifier', []).each do |k, v|
+        urls << Array(v).first if k == 'website' && Array(v).any?
+      end
+      pub_attrs['manufacturer_website_url'] = urls[0] if urls.any?
+      parent = 'bibliographic_information'
+      assign_nested_hash(parent, pub_attrs) if pub_attrs.any?
     end
 
     def assign_note
@@ -447,8 +480,9 @@ module WillowSword
       fields = {
         'date_of_acceptance' => 'acceptance_date',
         'date_issued' => 'citation_publication_date',
+        'production_date' => 'production_date',
         'publication_place' => 'citation_place_of_publication',
-        'publication_url' => 'publication_url'
+        'publication_website_url' => 'publication_website_url'
       }
       fields.each do |data_field, model_field|
         vals = Array(@metadata.fetch(data_field, []))
@@ -470,7 +504,7 @@ module WillowSword
     def assign_physical_description
       return unless @metadata.fetch('form', {}).any?
       # physicalDescription - form
-      fields = %w(physical_form physical_dimensions)
+      fields = %w(physical_form physical_dimensions collection_name)
       form = {}
       fields.each do |field|
         vals = @metadata['form'].fetch(field, [])
@@ -512,7 +546,7 @@ module WillowSword
         event[model_fld] = vals[0] if vals.any?
       end
       parent = 'bibliographic_information'
-      child = 'event'
+      child = 'events'
       assign_second_nested_hash(parent, child, event, false)
     end
 
@@ -664,7 +698,7 @@ module WillowSword
       admin_fields = %w(depositor_contacted depositor_contact_email_template
       record_first_reviewed_by incorrect_version_deposited record_deposit_date
       record_publication_date record_review_status record_review_status_other
-      record_version rt_ticket_number)
+      record_version rt_ticket_number record_check_back_date)
       rights_fields = %w(rights_third_party_copyright_material
                         rights_third_party_copyright_permission_received)
       action_fields = {
@@ -672,7 +706,8 @@ module WillowSword
         'date' => 'action_date',
         'description' => 'action_description',
         'temporal' =>'action_duration',
-        'contributor' => 'action_responsibility'
+        'contributor' => 'action_responsibility',
+        'category' => 'action_category'
       }
       return unless @metadata.fetch('admin_info', {}).any?
       # Assign publisher attributes
@@ -746,7 +781,7 @@ module WillowSword
         'ora_data_model_version' => 'ora_data_model_version',
         'pre_counter_downloads' => 'pre_counter_downloads',
         'pre_counter_views' => 'pre_counter_views',
-        'requires_review' => 'record_requires_review',
+        'record_requires_review' => 'record_requires_review',
       }
       admin_fields = %w(record_accept_updates admin_notes ora_data_model_version
         record_requires_review pre_counter_downloads pre_counter_views)
@@ -774,6 +809,7 @@ module WillowSword
         'apc_admin_apc_number' => 'apc_admin_apc_number',
         'apc_admin_review_status' => 'apc_admin_apc_review_status',
         'apc_admin_spreadsheet_identifier' => 'apc_admin_apc_spreadsheet_identifier',
+        'apc_admin_apc_requested' => 'apc_admin_apc_requested',
         'ref_compliant_at_deposit' => 'ref_compliant_at_deposit',
         'ref_compliant_availability' => 'ref_compliant_availability',
         'ref_exception_required' => 'ref_exception_required',
@@ -814,14 +850,16 @@ module WillowSword
         'extent' => 'file_size',
         'hasVersion' => 'file_version',
         'location' => 'file_path',
-        'datastream' => 'file_admin_fedora3_datastream_id',
+        'datastream' => 'file_admin_fedora3_datastream_identifier',
         'version' => 'file_rioxx_file_version',
         'embargoedUntil' => 'file_embargo_end_date',
         'embargoComment' => 'file_embargo_comment',
+        'embargoPeriod' => 'file_embargo_period',
         'embargoReleaseMethod' => 'file_embargo_release_method',
         'reasonForEmbargo' => 'file_embargo_reason',
         'lastAccessRequestDate' => 'file_last_access_request_date',
         'fileOrder' => 'file_order',
+        'fileSha1' => 'file_sha1',
         'accessConditionAtDeposit' => 'access_condition_at_deposit',
         'fileAndRecordDoNotMatch' => 'file_admin_file_and_record_do_not_match',
         'hasPublicUrl' => 'file_public_url',

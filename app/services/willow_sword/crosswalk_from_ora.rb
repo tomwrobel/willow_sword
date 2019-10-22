@@ -43,13 +43,15 @@ module WillowSword
     def translated_terms
       {
         'accessConditionAtDeposit' => 'access_condition_at_deposit',
-        'datastream' => 'file_admin_fedora3_datastream_id',
+        'datastream' => 'file_admin_fedora3_datastream_identifier',
         'embargoComment' => 'file_embargo_comment',
         'embargoReleaseMethod' => 'file_embargo_release_method',
         'embargoedUntil' => 'file_embargo_end_date',
+        'embargoPeriod' => 'file_embargo_period',
         'extent' => 'file_size',
         'fileAndRecordDoNotMatch' => 'file_admin_file_and_record_do_not_match',
         'fileOrder' => 'file_order',
+        'fileSha1' => 'file_sha1',
         'format' => 'file_format',
         'hasPublicUrl' => 'file_public_url',
         'hasVersion' => 'file_version',

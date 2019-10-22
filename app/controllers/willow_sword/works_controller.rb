@@ -6,7 +6,6 @@ module WillowSword
     attr_reader :object, :current_user
     include WillowSword::ProcessRequest
     include WillowSword::WorksBehavior
-    include WillowSword::ModelToMods
 
     def show
       # @collection_id = params[:collection_id]
@@ -65,7 +64,7 @@ module WillowSword
 
     def render_not_found
       message = "Server cannot find work with id #{params[:id]}"
-      @error = WillowSword::Error.new(message)
+      @error = WillowSword::Error.new(message, :not_found)
       render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
     end
 
