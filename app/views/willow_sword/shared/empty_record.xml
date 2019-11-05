@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mets:mets
+    xmlns:mets="http://www.loc.gov/METS/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd">
+    <mets:metsHdr CREATEDATE="1970-01-01T00:00:00">
+        <mets:agent OTHERTYPE="SOFTWARE" ROLE="CREATOR" TYPE="OTHER">
+            <mets:name>
+               Hyrax
+            </mets:name>
+        </mets:agent>
+    </mets:metsHdr>
+    <mets:dmdSec ID="DMDLOG_0000">
+        <mets:mdWrap MDTYPE="MODS">
+            <mets:xmlData>
+                <mods:mods version="3.8"
+                        xmlns:mods="http://www.loc.gov/mods/v3"
+                        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://www.loc.gov/mods/v3 https://raw.githubusercontent.com/tomwrobel/ora_data_model/master/ora_mods-3.8.xsd">
+                    <mods:note type="error_note">This is an error page. This page is returned when a record cannot be displayed for some unknown reason. This page is returned, instead of an error, to
+                        allow Symplectic Element mass-harvest to continue past a broken record.</mods:note>
+                </mods:mods>
+            </mets:xmlData>
+        </mets:mdWrap>
+    </mets:dmdSec>
+    <mets:structMap TYPE="LOGICAL">
+        <mets:div DMDID="DMDLOG_0000" ID="LOG_0000" LABEL="Object ID" TYPE="Repository object">
+        </mets:div>
+    </mets:structMap>
+</mets:mets>

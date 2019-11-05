@@ -9,12 +9,18 @@ module WillowSword
 
     def show
       # @collection_id = params[:collection_id]
-      find_work_by_query
-      render_not_found and return unless @object
-      xw_klass = WillowSword.config.xw_to_xml_for_work
-      xw = xw_klass.new(@object).to_xml
-      @xml_data = xw.doc.to_s
-      render 'show.xml', formats: [:xml], status: 200
+      begin
+        find_work_by_query
+        render_not_found and return unless @object
+        xw_klass = WillowSword.config.xw_to_xml_for_work
+        xw = xw_klass.new(@object).to_xml
+        @xml_data = xw.doc.to_s
+        render 'show.xml', formats: [:xml], status: 200
+      rescue
+        # If an unspecified error occurs, particularly if
+        # XML generation fails, return an empty record
+        render_empty_record and return
+      end
     end
 
     def create
@@ -68,5 +74,10 @@ module WillowSword
       render '/willow_sword/shared/error.xml.builder', formats: [:xml], status: @error.code
     end
 
+    def render_empty_record
+      # In order to prevent a mass harvest from hanging on any given record, we
+      # return a default empty 'success' result
+      render file: '/willow_sword/shared/empty_record.xml', formats: [:xml]
+    end
   end
 end
