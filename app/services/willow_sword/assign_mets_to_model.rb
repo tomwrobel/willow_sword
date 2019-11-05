@@ -1,4 +1,5 @@
 require 'iso-639'
+require 'date'
 module WillowSword
   module AssignMetsToModel
 
@@ -220,6 +221,27 @@ module WillowSword
         validated_languages = languages.map { |lang| validate_language(lang) }.compact
         @mapped_metadata['language'] = validated_languages
       end
+    end
+
+    def validate_date(date)
+      # Ensure date is ISO valid
+      # Params:
+      #   date(string)
+      # Returns:
+      #   validated_date(string) or nil
+      begin
+        validated_date = Date.parse(date)
+        return validated_date.to_s
+      rescue ArgumentError => ex
+        if date.length == 4 and date.to_i
+          new_date = date + '-01-01'
+          validated_date = validate_date(new_date)
+          return validated_date
+        else
+          return nil
+        end
+      end
+      return nil
     end
 
     def validate_language(language)
@@ -472,7 +494,9 @@ module WillowSword
       # licence_and_rights_information
       rights_attrs = {}
       vals = Array(@metadata.fetch('copyright_date', []))
-      rights_attrs['rights_copyright_date'] = vals[0] if vals.any?
+      copyright_date = vals[0] if vals.any?
+      # copyright_date = validate_date(copyright_date)
+      rights_attrs['rights_copyright_date'] = copyright_date if copyright_date
       parent = 'licence_and_rights_information'
       assign_nested_hash(parent, rights_attrs)
     end
