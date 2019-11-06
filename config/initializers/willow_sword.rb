@@ -25,4 +25,6 @@ WillowSword.setup do |config|
   config.authorize_request = false
   # Set new filesets to check_back by default
   config.check_back_by_default = true
+  # Set default embargo end date for binary files if none is specified
+  config.default_embargo_end_date = '9999-12-31'
 end

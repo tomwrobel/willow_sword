@@ -45,6 +45,7 @@ module Integrator
       end
 
       private
+
         def set_in_progress_status_for_parent_work_and_push
           # If a deposit is in progress, or has been completed, set the relevant
           # in progress and requires review flags and push to review if required
@@ -93,6 +94,12 @@ module Integrator
           if WillowSword.config.check_back_by_default
             unless @attributes['file_embargo_release_method']
               @attributes['file_embargo_release_method'] = 'Check back'
+            end
+          end
+          if WillowSword.config.default_embargo_end_date
+            unless @attributes['file_embargo_end_date']
+              @attributes['file_embargo_end_date'] = WillowSword.config.default_embargo_end_date
+              @attributes['file_embargo_comment'] = @attributes['file_embargo_comment'].to_s + 'Automatically set by Sword2'
             end
           end
           @attributes
