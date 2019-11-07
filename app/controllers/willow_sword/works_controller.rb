@@ -16,9 +16,12 @@ module WillowSword
         xw = xw_klass.new(@object).to_xml
         @xml_data = xw.doc.to_s
         render 'show.xml', formats: [:xml], status: 200
-      rescue
+      rescue => error
         # If an unspecified error occurs, particularly if
         # XML generation fails, return an empty record
+        # This is to aid in Symplectic Harvesting
+        Rails.logger.error error.to_s
+        Rails.logger.error "Returning empty METS response"
         render_empty_record and return
       end
     end

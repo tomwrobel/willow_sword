@@ -54,7 +54,7 @@ module WillowSword
     end
 
     def add_abstract
-      # abstarct
+      # abstract
       val = get_content('abstract')
       create_node_array('mods:abstract', val, @doc.root)
       # summary documentation
@@ -180,7 +180,13 @@ module WillowSword
       }
       fields.each do |field, tags|
         val = get_child_content(tags[0], field)
-        @doc.root << create_node('mods:identifier', val, {'type' => tags[1]}) unless val.blank?
+        if val.present? and val.respond_to?('each')
+          val.each do | result |
+            @doc.root << create_node('mods:identifier', result.to_s, {'type' => tags[1]}) unless result.blank?
+          end
+        else
+          @doc.root << create_node('mods:identifier', val, {'type' => tags[1]}) unless val.blank?
+        end
       end
       # publisher id fields
       fields = {
@@ -196,7 +202,13 @@ module WillowSword
       child = 'publishers'
       fields.each do |field, tag|
         val = get_grand_child_content(parent, child, field)
-        @doc.root << create_node('mods:identifier', val, {'type' => tag}) unless val.blank?
+        if val.present? and val.respond_to?('each')
+          val.each do | result |
+            @doc.root << create_node('mods:identifier', result.to_s, {'type' => tag}) unless result.blank?
+          end
+        else
+          @doc.root << create_node('mods:identifier', val, {'type' => tag}) unless val.blank?
+        end
       end
     end
 
@@ -905,7 +917,13 @@ module WillowSword
       ri << create_node('mods:recordCreationDate', val) unless val.blank?
       # recordContentSource
       val = get_child_content('admin_information', 'record_content_source')
-      ri << create_node('mods:recordContentSource', val) unless val.blank?
+      if val.present? and val.respond_to?('each')
+        val.each do |result|
+          ri << create_node('mods:recordContentSource', result.to_s) unless result.blank?
+        end
+      else
+        ri << create_node('mods:recordContentSource', val) unless val.blank?
+      end
       info_note_fields = {
           'accept_updates' => ['record_accept_updates', 'admin_information'],
           'admin_notes' => ['admin_notes', 'admin_information'],
@@ -918,7 +936,13 @@ module WillowSword
       }
       info_note_fields.each do |xml_fld, data_fld|
         val = get_child_content(data_fld[1], data_fld[0])
-        ri << create_node('mods:recordInfoNote', val, {'type' => xml_fld}) unless val.blank?
+        if val.present? and val.respond_to?('each')
+          val.each do |result|
+            ri << create_node('mods:recordInfoNote', result.to_s, {'type' => xml_fld}) unless result.blank?
+          end
+        else
+          ri << create_node('mods:recordInfoNote', val, {'type' => xml_fld}) unless val.blank?
+        end
       end
     end
 
