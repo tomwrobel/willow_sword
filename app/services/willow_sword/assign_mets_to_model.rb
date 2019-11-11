@@ -525,7 +525,8 @@ module WillowSword
         elsif typ == 'host'
           assign_ri_host(ri)
           assign_ri_host_dataset(ri) if @model == 'dataset' or @model == 'universal test object'
-          assign_ri_host_title_info(ri) if @model == 'journal article' or @model == 'universal test object' or @model == 'conference proceeding'
+          assign_ri_host_title_info(ri) unless @model == 'journal article' or @model == 'dataset'
+          assign_ri_host_title_info_journal_article(ri) if @model == 'journal article'
         elsif typ == 'series'
           assign_ri_series(ri)
         end
@@ -563,6 +564,23 @@ module WillowSword
       end
       assign_nested_hash('related_items', ri, false)
     end
+
+    def assign_ri_host_title_info_journal_article(ri)
+      host = {}
+      fields = {
+          'related_item_title' => 'journal_title',
+          'related_item_url' => 'journal_website_url',
+          'related_item_article_number' => 'article_number',
+      }
+      fields.each do |data_fld, model_fld|
+        vals = Array(ri.fetch(data_fld, []))
+        host[model_fld] = vals[0] if vals.any?
+      end
+      parent = 'bibliographic_information'
+      child = 'publishers'
+      assign_second_nested_hash(parent, child, host) if host.any?
+    end
+
 
     def assign_ri_host_title_info(ri)
       host = {}

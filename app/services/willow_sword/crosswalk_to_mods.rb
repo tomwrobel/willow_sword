@@ -696,8 +696,9 @@ module WillowSword
       # title
       host_title = get_grand_child_content(parent, child, 'host_title')
       journal_title = get_grand_child_content(parent, child, 'journal_title')
+      model = @work.item_description_and_embargo_information.first.type_of_work
 
-      if host_title.present?
+      if host_title.present? and model != 'Journal article'
         title_node = create_node('mods:titleInfo')
         ri_node << title_node
         title_node << create_node('mods:title', host_title) unless host_title.blank?
