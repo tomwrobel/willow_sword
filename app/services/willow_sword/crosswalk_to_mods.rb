@@ -696,21 +696,16 @@ module WillowSword
       # title
       host_title = get_grand_child_content(parent, child, 'host_title')
       journal_title = get_grand_child_content(parent, child, 'journal_title')
-      unless get_child_content(parent, child)[0].respond_to?('host_title')
-        # host title and journal title
-        unless host_title.blank? and journal_title.blank?
-          title_node = create_node('mods:titleInfo')
-          ri_node << title_node
-          title_node << create_node('mods:title', host_title) unless host_title.blank?
-          title_node << create_node('mods:subTitle', journal_title) unless journal_title.blank?
-        end
-      else
-        # journal title
-        unless journal_title.blank?
-          title_node = create_node('mods:titleInfo')
-          ri_node << title_node
-          title_node << create_node('mods:title', journal_title)
-        end
+
+      if host_title.present?
+        title_node = create_node('mods:titleInfo')
+        ri_node << title_node
+        title_node << create_node('mods:title', host_title) unless host_title.blank?
+        title_node << create_node('mods:subTitle', journal_title) unless journal_title.blank?
+      elsif journal_title.present?
+        title_node = create_node('mods:titleInfo')
+        ri_node << title_node
+        title_node << create_node('mods:title', journal_title)
       end
       # part
       part_node = create_node('mods:part')

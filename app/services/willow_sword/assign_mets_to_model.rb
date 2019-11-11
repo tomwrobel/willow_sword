@@ -525,7 +525,7 @@ module WillowSword
         elsif typ == 'host'
           assign_ri_host(ri)
           assign_ri_host_dataset(ri) if @model == 'dataset' or @model == 'universal test object'
-          assign_ri_host_article(ri) if @model == 'article' or @model == 'universal test object'
+          assign_ri_host_title_info(ri) if @model == 'journal article' or @model == 'universal test object' or @model == 'conference proceeding'
         elsif typ == 'series'
           assign_ri_series(ri)
         end
@@ -564,11 +564,13 @@ module WillowSword
       assign_nested_hash('related_items', ri, false)
     end
 
-    def assign_ri_host_dataset(ri)
+    def assign_ri_host_title_info(ri)
       host = {}
       fields = {
         'related_item_title' => 'host_title',
-        'related_item_subtitle' => 'journal_title'
+        'related_item_subtitle' => 'journal_title',
+        'related_item_url' => 'journal_website_url',
+        'related_item_article_number' => 'article_number',
       }
       fields.each do |data_fld, model_fld|
         vals = Array(ri.fetch(data_fld, []))
@@ -579,12 +581,11 @@ module WillowSword
       assign_second_nested_hash(parent, child, host) if host.any?
     end
 
-    def assign_ri_host_article(ri)
+    def assign_ri_host_dataset(ri)
       host = {}
       fields = {
-        'related_item_title' => 'journal_title',
-        'related_item_article_number' => 'article_number',
-        'related_item_url' => 'journal_website_url'
+          'related_item_title' => 'host_title',
+          'related_item_subtitle' => 'journal_title'
       }
       fields.each do |data_fld, model_fld|
         vals = Array(ri.fetch(data_fld, []))
