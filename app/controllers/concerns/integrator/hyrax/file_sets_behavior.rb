@@ -102,7 +102,29 @@ module Integrator
               @attributes['file_embargo_comment'] = @attributes['file_embargo_comment'].to_s + 'Automatically set by Sword2'
             end
           end
+
+          # Auto-set file versions as well as RIOXX version.
+          # TODO: refactor Hyrax code so that rioxx_version and file_version are used properly
+          if @attributes['file_rioxx_file_version'].present?
+            unless @attributes['file_version'].present?
+              @attributes['file_version'] = map_rioxx_file_versions(@attributes['file_rioxx_file_version']) || ''
+            end
+          end
           @attributes
+        end
+
+        def map_rioxx_file_versions(rioxx_version)
+          rioxx_expansions = {
+              'AO' => "Author's original",
+              'SMUR' => "Submitted manuscript under review",
+              'AM' => "Accepted manuscript",
+              'P' => "Proof",
+              'VOR' => "Version of record",
+              'EVOR' => "Enhanced version of record",
+              'CVOR' => "Corrected version of record",
+              'NA' => "Not applicable (or unknown)"
+          }
+          rioxx_expansions[rioxx_version]
         end
 
         def permitted_file_set_attributes
