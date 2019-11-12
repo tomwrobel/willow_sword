@@ -77,12 +77,12 @@ module Integrator
         # Assign pid to object if it doesn't exist
         # Ensure pid becomes object ID (but don't try to save it, as pid isn't
         # a field in the Hyrax model)
-        if attrs['pid'].blank?
+        if attrs['id'].blank?
           uuid = SecureRandom.uuid
           pid = "uuid_#{uuid}"
         else
-          pid = attrs['pid']
-          attrs.except!('pid')
+          pid = attrs['id']
+          attrs.except!('id')
         end
         @object.id = pid
         work_actor.create(environment(attrs))
@@ -140,6 +140,7 @@ module Integrator
           else
            @attributes.merge(file_attributes)
           end
+          @attributes
         end
 
         def file_attributes
