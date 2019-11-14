@@ -133,6 +133,7 @@ module Integrator
         # Override if we need to map the attributes from the parser in
         # a way that is compatible with how the factory needs them.
         def transform_attributes
+          convert_contributor_affiliations
           # TODO: attributes are strings and not symbols
           @attributes['visibility'] = WillowSword.config.default_visibility if @attributes.fetch('visibility', nil).blank?
           if WillowSword.config.allow_only_permitted_attributes
@@ -141,6 +142,43 @@ module Integrator
            @attributes.merge(file_attributes)
           end
           @attributes
+        end
+
+        def convert_contributor_affiliations
+          # BizTalk can store alternative name forms for controlled affiliations values
+          # Convert contributor affiliations to their canonical form
+          return unless @attributes['contributors_attributes'].respond_to?(:each)
+          affiliation_levels = [ :division, :department, :sub_department, :research_group, :sub_unit, :oxford_college]
+          # set canonical names
+          @attributes['contributors_attributes'].each do | contributor |
+            affiliation_levels.each do | affiliation |
+              next unless contributor[affiliation.to_s].present?
+              if affiliation == :division
+                canonical_name = DivisionsService.find_canonical_name(contributor[affiliation.to_s])
+              else
+                canonical_name = AltNamesService.find_canonical_name(contributor[affiliation.to_s], affiliation)
+              end
+              if defined?(canonical_name) and canonical_name.present?
+                  contributor[affiliation.to_s] = canonical_name
+              end
+            end
+            clean_duplicate_name_values contributor
+          end
+        end
+
+        def clean_duplicate_name_values(contributor)
+          # ensure that we unpick the values in ascending order
+          affiliation_order = [:oxford_college, :sub_unit, :sub_department, :department, :division]
+          affiliation_order.each do | key |
+            # Skip there is no value at this level
+            next unless contributor[key.to_s]
+            level = AltNamesService.config[key]
+            # Skip unless there is a parent
+            next unless level[:parent]
+            if contributor[key.to_s] == contributor[level[:parent].to_s]
+              contributor[key.to_s] = ''
+            end
+          end
         end
 
         def file_attributes
