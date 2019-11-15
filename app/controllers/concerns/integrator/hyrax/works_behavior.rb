@@ -263,7 +263,19 @@ module Integrator
 
         def push_work_to_review
           # Push a work to the review server for further processing
-          # Hyrax::Workflow::TransferToReview.call(target: @object)
+          user = User.find_by(email: 'oraadmin@bodleian.ox.ac.uk')
+          work = ActiveFedora::Base.find(@object.id)
+
+          workflow_action_form = ::Hyrax::Forms::WorkflowActionForm.new(
+              current_ability: user.ability,
+              work: work,
+              attributes: {name: 'submit'}
+          )
+          unless workflow_action_form.save
+            Rails.logger.error "Could not send #{@object.id} to Review"
+          end
+          Rails.logger.info "#{@object.id} sent to review"
+          return true
         end
     end
   end
