@@ -113,8 +113,9 @@ module Integrator
             # Set the class based on the resource type
             @work_klass = work_models[@resource_type].constantize
           else
-            # Chooose the first class from the config
-            @work_klass = work_models[work_models.keys.first].constantize
+            # TODO: Change this to 'Record' once that work type is created
+            # https://trello.com/c/vl94Tpjj
+            @work_klass = work_models['universal test object'].constantize
           end
         end
 
