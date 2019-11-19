@@ -959,7 +959,8 @@ module WillowSword
       }
       fields.each do |xml_fld, data_fld|
         val = get_child_content('admin_information', data_fld)
-        oa.root << create_node(xml_fld, val) unless val.blank?
+        namespaced_field = "ora_open_access_admin:#{xml_fld}"
+        oa.root << create_node(namespaced_field, val) unless val.blank?
       end
       node = admin_doc.import(oa.root)
       @admin_doc.root << extn
