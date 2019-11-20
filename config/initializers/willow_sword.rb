@@ -28,5 +28,5 @@ WillowSword.setup do |config|
   # Set default embargo end date for binary files if none is specified
   config.default_embargo_end_date = '9999-12-31'
   # Set the default user email address of the default user
-  config.default_user_email = 'ora.system@bodleian.ox.ac.uk'
+  config.default_user_email = 'oraadmin@bodleian.ox.ac.uk'
 end
