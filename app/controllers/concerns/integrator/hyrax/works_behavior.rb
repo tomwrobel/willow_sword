@@ -86,8 +86,9 @@ module Integrator
           attrs.except!('id')
         end
         # Add record created date
-        unless attrs['record_created_date'].present?
-          attrs['record_created_date'] = DateTime.now().strftime("%Y-%m-%d")
+        record_created_date = attrs['admin_information_attributes'].first.try(:[], 'record_created_date')
+        unless record_created_date.present?
+          attrs['admin_information_attributes'].first['record_created_date'] = DateTime.now().strftime("%Y-%m-%d")
         end
         @object.id = pid
         work_actor.create(environment(attrs))
@@ -273,16 +274,25 @@ module Integrator
           user = User.find_by(email: user_email)
           work = ActiveFedora::Base.find(@object.id)
 
-          workflow_action_form = ::Hyrax::Forms::WorkflowActionForm.new(
-              current_ability: user.ability,
-              work: work,
-              attributes: {name: 'submit'}
-          )
-          unless workflow_action_form.save
+          current_workflow_state = work.sipity_entity.workflow_state_name
+          if current_workflow_state == 'draft'
+            workflow_action_form = ::Hyrax::Forms::WorkflowActionForm.new(
+                current_ability: user.ability,
+                work: work,
+                attributes: {name: 'submit'}
+            )
+            push = workflow_action_form.save
+          else
+            push = ::Hyrax::Workflow::TransferToReview.call(
+                target: @object, comment: nil, user: user)
+          end
+
+          if defined?(push) and push.present?
+            Rails.logger.info "#{@object.id} sent to review"
+            return true
+          else
             Rails.logger.error "Could not send #{@object.id} to Review"
           end
-          Rails.logger.info "#{@object.id} sent to review"
-          return true
         end
     end
   end

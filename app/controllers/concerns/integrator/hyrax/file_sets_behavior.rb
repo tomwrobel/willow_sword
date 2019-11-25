@@ -69,15 +69,25 @@ module Integrator
           user = User.find_by(email: user_email)
           work = ActiveFedora::Base.find(@object.id)
 
-          workflow_action_form = ::Hyrax::Forms::WorkflowActionForm.new(
-              current_ability: user.ability,
-              work: work,
-              attributes: {name: 'submit'}
-          )
-          unless workflow_action_form.save
+          current_workflow_state = work.sipity_entity.workflow_state_name
+          if current_workflow_state == 'draft'
+            workflow_action_form = ::Hyrax::Forms::WorkflowActionForm.new(
+                current_ability: user.ability,
+                work: work,
+                attributes: {name: 'submit'}
+            )
+            push = workflow_action_form.save
+          else
+            push = ::Hyrax::Workflow::TransferToReview.call(
+                target: @object, comment: nil, user: user)
+          end
+
+          if defined?(push) and push.present?
+            Rails.logger.info "#{@object.id} sent to review"
+            return true
+          else
             Rails.logger.error "Could not send #{@object.id} to Review"
           end
-          Rails.logger.info "#{@object.id} sent to review"
         end
 
         def find_file_set_by_id
