@@ -5,6 +5,7 @@
 # https://github.com/leaf-research-technologies/leaf_addons/blob/master/lib/generators/leaf_addons/templates/lib/importer/files_parser.rb
 # https://github.com/leaf-research-technologies/leaf_addons/blob/9643b649df513e404c96ba5b9285d83abc4b2c9a/lib/generators/leaf_addons/templates/lib/importer/factory/base_factory.rb
 require 'securerandom'
+require 'time'
 
 module Integrator
   module Hyrax
@@ -83,6 +84,10 @@ module Integrator
         else
           pid = attrs['id']
           attrs.except!('id')
+        end
+        # Add record created date
+        unless attrs['record_created_date'].present?
+          attrs['record_created_date'] = DateTime.now().strftime("%Y-%m-%d")
         end
         @object.id = pid
         work_actor.create(environment(attrs))
