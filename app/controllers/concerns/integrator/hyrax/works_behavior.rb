@@ -270,6 +270,7 @@ module Integrator
 
         def push_work_to_review
           # Push a work to the review server for further processing
+          sleep(30)
           user_email = WillowSword.config.default_user_email
           user = User.find_by(email: user_email)
           work = ActiveFedora::Base.find(@object.id)
