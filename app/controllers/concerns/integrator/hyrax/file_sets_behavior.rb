@@ -65,7 +65,6 @@ module Integrator
 
         def push_work_to_review
           # Push a work to the review server for further processing
-          sleep(30)
           user_email = WillowSword.config.default_user_email
           user = User.find_by(email: user_email)
           work = ActiveFedora::Base.find(@object.id)
@@ -80,11 +79,11 @@ module Integrator
             push = workflow_action_form.save
           else
             push = ::Hyrax::Workflow::TransferToReview.call(
-                target: @object, comment: nil, user: user)
+                target: work, comment: nil, user: user)
           end
 
           if defined?(push) and push.present?
-            Rails.logger.info "#{@object.id} sent to review"
+            Rails.logger.info "#{work.id} sent to review"
             return true
           else
             Rails.logger.error "Could not send #{@object.id} to Review"
