@@ -537,6 +537,7 @@ module WillowSword
       event = {}
       fields = {
         'related_item_title' => 'event_title',
+        'related_item_subtitle' => 'event_series_title',
         'related_item_physical_location' => 'event_location',
         'related_item_url' => 'event_website_url',
         'related_item_event_start_date' => 'event_start_date',

@@ -624,11 +624,17 @@ module WillowSword
           ri_node = create_node('mods:relatedItem', nil, {'otherType' => 'event'})
           @doc.root << ri_node
           # event title
-          val = get_content('event_title', event)
-          unless val.blank?
+          event_title = get_content('event_title', event)
+          event_subtitle = get_content('event_series_title', event)
+          unless event_title.blank? and event_subtitle.blank?
             title_node = create_node('mods:titleInfo')
             ri_node << title_node
-            title_node << create_node('mods:title', val)
+            unless event_title.blank?
+              title_node << create_node('mods:title', event_title)
+            end
+            unless event_subtitle.blank?
+              title_node << create_node('mods:subTitle', event_subtitle)
+            end
           end
           # location
           val1 = get_content('event_location', event)
