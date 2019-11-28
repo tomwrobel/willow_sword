@@ -132,6 +132,9 @@ module Integrator
               @attributes['file_version'] = map_rioxx_file_versions(@attributes['file_rioxx_file_version']) || ''
             end
           end
+
+          # Set last updated value (format from Hyrax::Workflow::SetSubmittedAttributes date format)
+          @attributes['last_updated'] = [DateTime.now.strftime("%Y-%m-%dT%H:%M:%SZ")]
           @attributes
         end
 
