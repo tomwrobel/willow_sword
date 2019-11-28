@@ -134,7 +134,7 @@ module Integrator
           end
 
           # Set last updated value (format from Hyrax::Workflow::SetSubmittedAttributes date format)
-          @attributes['last_updated'] = [DateTime.now.strftime("%Y-%m-%dT%H:%M:%SZ")]
+          @attributes['date_modified'] = [DateTime.now.strftime("%Y-%m-%dT%H:%M:%SZ")]
           @attributes
         end
 
