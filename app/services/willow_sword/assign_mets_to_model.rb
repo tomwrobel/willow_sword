@@ -262,14 +262,18 @@ module WillowSword
     end
 
     def assign_location
-      # TODO: location - physical_location
-      #   No equivalent Hyrax field found
       # location - url
       vals = Array(@metadata.fetch('url',[]))
       if vals.any?
         parent = 'admin_information'
         admin_attrs = { 'has_public_url' => vals[0] }
         assign_nested_hash(parent, admin_attrs)
+      end
+      physical_location = Array(@metadata.fetch('physical_location', []))
+      if physical_location.any?
+        parent = 'bibliographic_information'
+        bib_attrs = {'physical_location' => physical_location[0]}
+        assign_nested_hash(parent, bib_attrs)
       end
     end
 

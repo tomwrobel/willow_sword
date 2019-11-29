@@ -228,11 +228,16 @@ module WillowSword
     end
 
     def add_location
-      # TODO: mods:location/mods:physicalLocation
       loc = create_node('mods:location')
-      @doc.root << loc
-      val = get_child_content('admin_information', 'has_public_url')
-      loc << create_node('mods:url', val) unless val.blank?
+      url = get_child_content('admin_information', 'has_public_url')
+      physical_location = get_child_content('bibliographic_information', 'physical_location')
+
+      if url.present? or physical_location.present?
+        @doc.root << loc
+        loc << create_node('mods:url', url) unless url.blank?
+        loc << create_node('mods:physicalLocation', physical_location) unless physical_location.blank?
+      end
+
     end
 
     def add_name
