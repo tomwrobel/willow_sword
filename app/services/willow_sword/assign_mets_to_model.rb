@@ -915,6 +915,8 @@ module WillowSword
     end
 
     def assign_contributor_hash(values)
+      ### Deprecated
+      #
       # Assign a contributor hash (values)to an author_and_contributor object.
       #
       # This method assigns a contributor hash to the Hyrax contributors list.
@@ -927,9 +929,9 @@ module WillowSword
       # In addition, each contributor contains RoleInfo roles
 
       # Create contributor attributes if they do not exist
-      @mapped_metadata["authors_and_contributors_attributes"] ||= []
-      @mapped_metadata["authors_and_contributors_attributes"][0] ||= {}
-      @mapped_metadata["authors_and_contributors_attributes"][0]["contributors"] ||= []
+      @mapped_metadata["contributors_attributes"] ||= []
+      @mapped_metadata["contributors_attributes"][0] ||= {}
+      @mapped_metadata["contributors_attributes"][0]["contributors"] ||= []
 
       # Create the contributor and assign hash values via slice
       contributor = ContributorInfo.new
@@ -943,7 +945,7 @@ module WillowSword
       end
 
       # Add completed contributor to the work
-      @mapped_metadata["authors_and_contributors_attributes"][0]["contributors"] << contributor
+      @mapped_metadata["contributors_attributes"][0]["contributors"] << contributor
     end
 
     def assign_second_nested_hash(parent, child, values, merge=true)
