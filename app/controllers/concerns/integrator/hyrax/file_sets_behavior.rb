@@ -121,7 +121,14 @@ module Integrator
           if WillowSword.config.default_embargo_end_date
             unless @attributes['file_embargo_end_date']
               @attributes['file_embargo_end_date'] = WillowSword.config.default_embargo_end_date
-              @attributes['file_embargo_comment'] = @attributes['file_embargo_comment'].to_s + 'Automatically set by Sword2'
+              embargo_comment_string = 'Embargo end date automatically set by Sword2'
+              embargo_comments = [@attributes['file_embargo_comment'].to_s,
+                                  embargo_comment_string]
+              # Ensure the embargo comment contains a note that it was automatically set
+              # if necessary
+              unless @attributes['file_embargo_comment'].to_s.include?(embargo_comment_string)
+                @attributes['file_embargo_comment'] = embargo_comments.reject {|a| a.to_s.empty?}.join(' ')
+              end
             end
           end
 
