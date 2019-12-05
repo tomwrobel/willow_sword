@@ -323,9 +323,11 @@ module WillowSword
         funder_compliance_node = create_node('ora_admin:funder_compliance', compliance) unless compliance.blank?
         # grants
         funder.grant_information.each do |grant|
+          affiliation_node = create_node('mods:affiliation')
           funding_node = create_node('ora_admin:funding')
           add_namespaces(funding_node, {'ora_admin' => 'http://ora.ox.ac.uk/vocabs/admin'})
-          funder_node << funding_node
+          affiliation_node << funding_node
+          funder_node << affiliation_node
           # grant
           val1 = get_content('grant_identifier', grant)
           funding_for = get_content('is_funding_for', grant)
