@@ -132,7 +132,8 @@ module Integrator
               # Ensure the embargo comment contains a note that it was automatically set
               # if necessary
               unless @attributes['file_embargo_comment'].to_s.include?(embargo_comment_string)
-                @attributes['file_embargo_comment'] = embargo_comments.reject {|a| a.to_s.empty?}.join(' ')
+                @attributes['file_embargo_comment'] = embargo_comments.reject {|a| a.to_s.empty?}.join('. ')
+                @attributes['file_embargo_comment'].sub!('.. Embargo end date', '. Embargo end date')
               end
             end
           end
