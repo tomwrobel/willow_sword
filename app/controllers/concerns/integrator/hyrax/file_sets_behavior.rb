@@ -52,10 +52,15 @@ module Integrator
           # Add in-progress header
           return if @headers[:in_progress].blank?
           status = @headers[:in_progress]
-          if status.downcase == 'true'
+          # TODO: We've switched the documented boolean meaning here.
+          # TODO: This is because Repotool2 has a bug and inverts the
+          # TODO: meaning of the flag for binary files. This will be
+          # TODO: tracked in https://github.com/tomwrobel/ora_data_model/issues/151
+          # TODO: and should be fixed when this is resolved
+          if status.downcase == 'false'
             @object.admin_information.first['deposit_in_progress'] = true
             @object.save
-          elsif status.downcase == 'false'
+          elsif status.downcase == 'true'
             @object.admin_information.first['deposit_in_progress'] = false
             @object.admin_information.first['record_requires_review'] = true
             @object.save
