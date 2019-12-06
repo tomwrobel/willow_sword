@@ -608,7 +608,7 @@ module WillowSword
     end
 
     def add_physical_description
-      origin = create_node('mods:originInfo')
+      origin = create_node('mods:physicalDescription')
       @doc.root << origin
       parent = 'bibliographic_information'
       fields = %w(physical_form physical_dimensions collection_name)
