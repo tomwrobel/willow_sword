@@ -378,7 +378,8 @@ module WillowSword
       contributors.each do |creator|
         val = get_content('contributor_type', creator)
         val = 'personal' if val.blank?
-        nam_node = create_node('mods:name', nil, {'type' => val})
+        contributor_type = val.downcase
+        nam_node = create_node('mods:name', nil, {'type' => contributor_type})
         @doc.root << nam_node
         # creator name
         val = get_content('display_name', creator)
