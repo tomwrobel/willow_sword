@@ -756,7 +756,7 @@ module WillowSword
         end
         # Set record as deposited if no review status otherwise set
         if admin_attrs['record_review_status'].blank?
-          admin_attrs['record_review_status'] = 'Deposited'
+          admin_attrs['record_review_status'] = 'Deposited (not reviewed)'
         end
       end
       # assign history action wthin admin
