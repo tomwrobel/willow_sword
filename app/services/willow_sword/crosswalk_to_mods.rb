@@ -210,6 +210,22 @@ module WillowSword
           @doc.root << create_node('mods:identifier', val, {'type' => tag}) unless val.blank?
         end
       end
+
+      # output general record identifier fields
+      # these are fields for which no pre-set ORA4 field exists
+      record_identifiers = get_child_content(
+          'item_description_and_embargo_information','record_identifiers')
+
+      if record_identifiers.present? and record_identifiers.respond_to?('each')
+        record_identifiers.each do | ri |
+          scheme = ri.record_identifier_scheme
+          identifier = ri.record_identifier
+          if scheme != 'pid'
+            @doc.root << create_node(
+              'mods:identifier', identifier.to_s, {'type' => scheme.to_s}) unless identifier.blank?
+          end
+        end
+      end
     end
 
     def add_language
