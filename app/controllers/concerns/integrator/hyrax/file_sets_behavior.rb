@@ -52,11 +52,22 @@ module Integrator
           # Add in-progress header
           return if @headers[:in_progress].blank?
           status = @headers[:in_progress]
-          # TODO: We've switched the documented boolean meaning here.
+
+          workaround_status = WillowSword.config.in_progress_workaround
+          # TODO: If the config file has in_progress_workaround == true
+          # TODO: we've switched the documented boolean meaning here.
           # TODO: This is because Repotool2 has a bug and inverts the
           # TODO: meaning of the flag for binary files. This will be
           # TODO: tracked in https://github.com/tomwrobel/ora_data_model/issues/151
-          # TODO: and should be fixed when this is resolved
+          # TODO: and should be removed when this is resolved
+          if workaround_status.present?
+            if status.downcase == 'false'
+              status = 'true'
+            elsif status.downcase == 'true'
+              status = 'false'
+            end
+          end
+
           if status.downcase == 'false'
             @object.admin_information.first['deposit_in_progress'] = true
             @object.save

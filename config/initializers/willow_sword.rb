@@ -29,4 +29,6 @@ WillowSword.setup do |config|
   config.default_embargo_end_date = '9999-12-31'
   # Set the default user email address of the default user
   config.default_user_email = 'oraadmin@bodleian.ox.ac.uk'
+  # Use a workaround for incorrect in_progress SE calls
+  config.in_progress_workaround = false
 end
