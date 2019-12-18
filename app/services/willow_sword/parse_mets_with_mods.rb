@@ -251,6 +251,9 @@ module WillowSword
       # originInfo - dateOther
       vals = get_text(@mods, 'originInfo/dateOther[@type="date_of_acceptance"]')
       @metadata['date_of_acceptance'] = vals if vals.any?
+      # originInfo - dateOther productionDate
+      vals = get_text(@mods, 'originInfo/dateOther[@type="production_date"]')
+      @metadata['production_date'] = vals if vals.any?
       # originInfo - place type=text
       vals = get_text(@mods, 'originInfo/place/placeTerm[@type="text"]')
       @metadata['publication_place'] = vals if vals.any?
