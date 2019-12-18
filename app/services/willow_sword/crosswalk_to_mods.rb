@@ -575,7 +575,7 @@ module WillowSword
           'encoding' => 'iso8601'
       }) unless val.blank?
       # date of production
-      val = get_grand_child_content(parent, child, 'production_date')
+      val = get_child_content(parent,'production_date')
       origin << create_node('mods:dateOther', val, {
           'type' => 'production_date',
           'encoding' => 'iso8601'
