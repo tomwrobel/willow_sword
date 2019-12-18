@@ -68,10 +68,10 @@ module Integrator
             end
           end
 
-          if status.downcase == 'false'
+          if status.downcase == 'true'
             @object.admin_information.first['deposit_in_progress'] = true
             @object.save
-          elsif status.downcase == 'true'
+          elsif status.downcase == 'false'
             @object.admin_information.first['deposit_in_progress'] = false
             @object.admin_information.first['record_requires_review'] = true
             @object.save
