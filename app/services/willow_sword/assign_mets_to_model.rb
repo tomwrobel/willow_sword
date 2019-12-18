@@ -479,12 +479,23 @@ module WillowSword
     end
 
     def assign_origin_info
+      # production information
+      prd_attrs = {}
+      fields = {
+          'production_date' => 'production_date'
+      }
+      fields.each do |data_field, model_field|
+        vals = Array(@metadata.fetch(data_field, []))
+        prd_attrs[model_field] = vals.first if vals.any?
+      end
+      parent = 'bibliographic_information'
+      assign_nested_hash(parent, prd_attrs) if prd_attrs.any?
+
       # publisher information
       pub_attrs = {}
       fields = {
         'date_of_acceptance' => 'acceptance_date',
         'date_issued' => 'citation_publication_date',
-        'production_date' => 'production_date',
         'publication_place' => 'citation_place_of_publication',
         'publication_website_url' => 'publication_website_url'
       }
