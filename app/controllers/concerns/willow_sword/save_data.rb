@@ -94,7 +94,7 @@ module WillowSword
       return unless file_path.present?
       content_type = get_content_type(file_path)
       contents_path = File.join(@dir, 'contents')
-      if content_type == 'application/zip'
+      if content_type == 'application/zip' and WillowSword.config.unpack_zip_files
         zp = WillowSword::ZipPackage.new(file_path, contents_path)
         zp.unzip_file
       else

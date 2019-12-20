@@ -31,4 +31,6 @@ WillowSword.setup do |config|
   config.default_user_email = 'oraadmin@bodleian.ox.ac.uk'
   # Use a workaround for incorrect in_progress SE calls
   config.in_progress_workaround = false
+  # Should deposited zip files be unpacked? (required 'false' by Repotool2 behaviour)
+  config.unpack_zip_files = true
 end
