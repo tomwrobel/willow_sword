@@ -391,7 +391,20 @@ module WillowSword
       etal_roles = []
       # contributors = @work.authors_and_contributors[0].contributors
       contributors = @work.contributors
-      contributors.each do |creator|
+      max_contributors = WillowSword.config.maximum_contributors_in_response
+      # TODO: remove author et_al hack and replace with a proper filter
+      # TODO: perhaps find the number of each role with a filter
+      # The only role we have with so many contributors is the author field
+      # so while it is a hack to do so, we sent the et_al flag for Author roles
+      # to True without checking that this is, in fact, the case
+      if max_contributors > 0 and contributors.count > max_contributors
+        total_contributors = max_contributors - 1
+        contributors_for_response = contributors[0..total_contributors]
+        etal_roles = ['Author']
+      else
+        contributors_for_response = contributors
+      end
+      contributors_for_response.each do |creator|
         val = get_content('contributor_type', creator)
         val = 'personal' if val.blank?
         contributor_type = val.downcase

@@ -33,4 +33,9 @@ WillowSword.setup do |config|
   config.in_progress_workaround = false
   # Should deposited zip files be unpacked? (required 'false' by Repotool2 behaviour)
   config.unpack_zip_files = true
+  # Is there a maximum number of contributors in a Sword GET response?
+  # Repotool times out after 100 seconds, so contributor lists > 300 have
+  # proved problematic. 0 = no maximum
+  # This value is used in the outbound MODS crosswalk only (/app/services/crosswalk_to_mods.rb)
+  config.maximum_contributors_in_response = 0
 end
