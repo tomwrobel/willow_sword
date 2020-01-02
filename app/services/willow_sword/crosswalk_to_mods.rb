@@ -315,7 +315,15 @@ module WillowSword
 
     def add_name_funder
       funders = get_content('funders')
-      funders.each do |funder|
+      max_funders = WillowSword.config.maximum_funders_in_response
+      # Ensure the Sword Response isn't bogged down by too many funders
+      if max_funders > 0 and funders.count > max_funders
+        funders_for_response = funders[0..max_funders]
+      else
+        funders_for_response = funders
+      end
+
+      funders_for_response.each do |funder|
         funder_node = create_node('mods:name', nil, {'type' => 'corporate'})
         @doc.root << funder_node
         # funder_name
@@ -398,9 +406,8 @@ module WillowSword
       # so while it is a hack to do so, we sent the et_al flag for Author roles
       # to True without checking that this is, in fact, the case
       if max_contributors > 0 and contributors.count > max_contributors
-        total_contributors = max_contributors - 1
-        contributors_for_response = contributors[0..total_contributors]
-        etal_roles = ['Author']
+        contributors_for_response = contributors[0..max_contributors]
+        etal_roles << 'Author'
       else
         contributors_for_response = contributors
       end
