@@ -316,14 +316,11 @@ module WillowSword
     def add_name_funder
       funders = get_content('funders')
       max_funders = WillowSword.config.maximum_funders_in_response
-      # Ensure the Sword Response isn't bogged down by too many funders
-      if max_funders > 0 and funders.count > max_funders
-        funders_for_response = funders[0..max_funders]
-      else
-        funders_for_response = funders
-      end
 
-      funders_for_response.each do |funder|
+      funders.each_with_index do |funder, index|
+        # Ensure the Sword Response isn't bogged down by too many funders
+        break if max_funders > 0 and index >= max_funders
+
         funder_node = create_node('mods:name', nil, {'type' => 'corporate'})
         @doc.root << funder_node
         # funder_name
@@ -400,18 +397,16 @@ module WillowSword
       # contributors = @work.authors_and_contributors[0].contributors
       contributors = @work.contributors
       max_contributors = WillowSword.config.maximum_contributors_in_response
-      # TODO: remove author et_al hack and replace with a proper filter
-      # TODO: perhaps find the number of each role with a filter
-      # The only role we have with so many contributors is the author field
-      # so while it is a hack to do so, we sent the et_al flag for Author roles
-      # to True without checking that this is, in fact, the case
-      if max_contributors > 0 and contributors.count > max_contributors
-        contributors_for_response = contributors[0..max_contributors]
-        etal_roles << 'Author'
-      else
-        contributors_for_response = contributors
-      end
-      contributors_for_response.each do |creator|
+      contributors.each_with_index do |creator, index|
+        if max_contributors > 0 and index >= max_contributors
+          # TODO: remove author et_al hack and replace with a proper filter
+          # TODO: perhaps find the number of each role with a filter
+          # The only role we have with so many contributors is the author field
+          # so while it is a hack to do so, we sent the et_al flag for Author roles
+          # to True without checking that this is, in fact, the case
+          etal_roles << 'Author'
+          break
+        end
         val = get_content('contributor_type', creator)
         val = 'personal' if val.blank?
         contributor_type = val.downcase
