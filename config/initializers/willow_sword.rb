@@ -43,4 +43,6 @@ WillowSword.setup do |config|
   # proved problematic. 0 = no maximum
   # This value is used in the outbound MODS crosswalk only (/app/services/crosswalk_to_mods.rb)
   config.maximum_funders_in_response = 0
+  # Used for where names appear in UPPER CASE
+  config.titlecase_personal_names = false
 end

@@ -350,7 +350,13 @@ module WillowSword
       nam.each do |key, val|
         if name_fields.include?(key)
           name_added = true if key != 'type' and Array(val).any?
-          mapped_name[name_fields[key]] = Array(val).first if Array(val).any?
+          name_value = Array(val).first if Array(val).any?
+          if WillowSword.config.titlecase_personal_names
+            unless key == 'initials'
+              name_value = titlecase_name_value(name_value)
+            end
+          end
+          mapped_name[name_fields[key]] = name_value if name_value.present?
         elsif key == 'affiliation'
           val.each do |aff_key, aff_val|
             if affiliation_fields.include?(aff_key)
@@ -973,6 +979,34 @@ module WillowSword
         parent_vals["#{child}_attributes"] << values
       end
       @mapped_metadata["#{parent}_attributes"] = [parent_vals]
+    end
+
+    def titlecase_name_value(name_value)
+      # Convert an all uppercase name value into titlecase
+      #
+      # Name values are given names, family names, but not initials
+      #
+      # Logic derived from ora.interface.objects_metadata _capitalise_name()
+      if name_value == name_value.upcase
+        # name_value is uppercase, so we need to fix it
+        # Fix names separated by spaces
+        name_value = name_value.humanize.gsub(/\b('?[a-z])/) { $1.capitalize }
+        name_value = process_split_name_value(name_value, divider: ' ')
+        name_value = process_split_name_value(name_value, divider: '-')
+      end
+      name_value
+    end
+
+    def process_split_name_value(name_string, divider: ' ')
+      name_elements = name_string.split(divider)
+      name_elements.each_with_index do |element, i|
+        if element.start_with?('Mc') and element.length > 2
+          # capture "McDonald" etc. names
+          # We don't want to capitalise after 'Mac' because of surnames like Mack/Mackey
+          name_elements[i] = element[0,2] + element[2,element.length].titleize()
+        end
+      end
+      return name_elements.join(divider)
     end
 
   end
