@@ -173,7 +173,7 @@ module Integrator
               'CVOR' => "Corrected version of record",
               'NA' => "Not applicable (or unknown)"
           }
-          rioxx_expansions[rioxx_version]
+          rioxx_expansions[rioxx_version.upcase]
         end
 
         def permitted_file_set_attributes
