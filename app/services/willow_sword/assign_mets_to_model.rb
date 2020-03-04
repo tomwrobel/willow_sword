@@ -750,7 +750,12 @@ module WillowSword
         'contributor' => 'action_responsibility',
         'category' => 'action_category'
       }
-      return unless @metadata.fetch('admin_info', {}).any?
+      unless @metadata.fetch('admin_info', {}).any?
+        admin_attrs = {}
+        admin_attrs['record_review_status'] = 'Deposited (not reviewed)'
+        assign_nested_hash('admin_information', admin_attrs) if admin_attrs.any?
+        return
+      end
       # Assign publisher attributes
       pub_attrs = {}
       pub_fields.each do |field|
