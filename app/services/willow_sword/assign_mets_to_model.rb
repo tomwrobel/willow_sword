@@ -771,10 +771,10 @@ module WillowSword
         else
           admin_attrs[label] = vals[0] if vals.any?
         end
-        # Set record as deposited if no review status otherwise set
-        if admin_attrs['record_review_status'].blank?
-          admin_attrs['record_review_status'] = 'Deposited (not reviewed)'
-        end
+      end
+      # Set record as deposited if no review status otherwise set
+      if admin_attrs['record_review_status'].blank?
+        admin_attrs['record_review_status'] = 'Deposited (not reviewed)'
       end
       # assign history action wthin admin
       history = []
