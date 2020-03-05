@@ -750,7 +750,12 @@ module WillowSword
         'contributor' => 'action_responsibility',
         'category' => 'action_category'
       }
-      return unless @metadata.fetch('admin_info', {}).any?
+      unless @metadata.fetch('admin_info', {}).any?
+        admin_attrs = {}
+        admin_attrs['record_review_status'] = 'Deposited (not reviewed)'
+        assign_nested_hash('admin_information', admin_attrs) if admin_attrs.any?
+        return
+      end
       # Assign publisher attributes
       pub_attrs = {}
       pub_fields.each do |field|
@@ -771,10 +776,10 @@ module WillowSword
         else
           admin_attrs[label] = vals[0] if vals.any?
         end
-        # Set record as deposited if no review status otherwise set
-        if admin_attrs['record_review_status'].blank?
-          admin_attrs['record_review_status'] = 'Deposited (not reviewed)'
-        end
+      end
+      # Set record as deposited if no review status otherwise set
+      if admin_attrs['record_review_status'].blank?
+        admin_attrs['record_review_status'] = 'Deposited (not reviewed)'
       end
       # assign history action wthin admin
       history = []
