@@ -400,6 +400,10 @@ module WillowSword
           mapped_name['roles_attributes'] = roles if roles.any?
         end
       end
+      # Add institution as Oxford if SSO set
+      if mapped_name['institutional_identifier'].present? and mapped_name['institution'].blank?
+        mapped_name['institution'] = 'University of Oxford'
+      end
       # assign_contributor_hash(mapped_name) if name_added
       assign_nested_hash('contributors', mapped_name, false) if name_added
     end
