@@ -45,6 +45,8 @@ WillowSword.setup do |config|
   config.maximum_funders_in_response = 0
   # Used for where names appear in UPPER CASE
   config.titlecase_personal_names = false
+  # Used for hard setting display names to Surname, Initials format
+  config.display_name_as_family_name_initials = true
   # tmp directory location for request metadata and binary files
   config.tmp_directory_location = 'tmp/data'
 end
