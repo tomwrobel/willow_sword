@@ -400,6 +400,24 @@ module WillowSword
           mapped_name['roles_attributes'] = roles if roles.any?
         end
       end
+      # Add institution as Oxford if SSO set
+      if mapped_name['institutional_identifier'].present? and mapped_name['institution'].blank?
+        mapped_name['institution'] = 'University of Oxford'
+      end
+      if WillowSword.config.display_name_as_family_name_initials.present?
+        # ORA specific override to format display name
+        initials = ''
+        if mapped_name['initials'].present?
+          initials = mapped_name['initials']
+        elsif mapped_name['given_names'].present?
+          # return the first letter of all given names if that letter is uppercase
+          firstchars = mapped_name['given_names'].split.map(&:first).join
+          initials = firstchars.scan(/\p{Upper}/).join
+        end
+        if initials.present? and mapped_name['family_name'].present?
+          mapped_name['display_name'] = "#{mapped_name['family_name']}, #{initials}"
+        end
+      end
       # assign_contributor_hash(mapped_name) if name_added
       assign_nested_hash('contributors', mapped_name, false) if name_added
     end
