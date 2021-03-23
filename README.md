@@ -1,6 +1,8 @@
 # WillowSword
 A Ruby on Rails engine for the Sword V2 server. The Sword server is currently integrated with Hyrax V2.
 
+The operational version of this code is on gitlab.bodleian.ox.ac.uk/ORA4/willow_sword
+
 ## Important note for ORA users
 
 This project uses git flow conventions for code management, with a major wrinkle: 
